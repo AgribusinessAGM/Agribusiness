@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
 import type { ComputeResult } from '../../engine/compute';
 import { MP, opexItemScale, opexYear, HZ } from '../../engine/compute';
-import { nf } from '../../engine/format';
+import { nf, pctShare } from '../../engine/format';
 import { NumberField } from '../NumberField';
 import { useApp } from '../../state/store';
 import type { Assumptions } from '../../types';
@@ -45,7 +45,7 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
       title: cat.label,
       items,
       subtotalFmt: nf(catPlena, 0) + ' €/Ha',
-      pct: Math.round((catPlena / r.opexHa) * 100) + '%',
+      pct: pctShare(catPlena / r.opexHa),
     };
   });
 

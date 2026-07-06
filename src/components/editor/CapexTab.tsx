@@ -1,5 +1,5 @@
 import type { ComputeResult } from '../../engine/compute';
-import { nf } from '../../engine/format';
+import { nf, pctShare } from '../../engine/format';
 import { NumberField } from '../NumberField';
 import { useApp } from '../../state/store';
 import type { Assumptions, CapexUnit } from '../../types';
@@ -21,7 +21,7 @@ export function CapexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
       unitLabel: CAP_UNIT[g.unit],
       items,
       subtotalFmt: nf(subtotal, 0) + ' €/Ha',
-      pct: Math.round((subtotal / r.capexHa) * 100) + '%',
+      pct: pctShare(subtotal / r.capexHa),
     };
   });
 

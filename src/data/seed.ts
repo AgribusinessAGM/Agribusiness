@@ -29,6 +29,40 @@ export function baseA(ov?: Partial<Assumptions>): Assumptions {
   );
 }
 
+// Modelo en blanco para "Nuevo modelo": conserva la superficie elegida en el
+// modal de creación, pero deja el resto de casillas editables (Supuestos,
+// CAPEX, OPEX) a 0 para que el usuario las rellene desde cero.
+export function blankA(superficie: number): Assumptions {
+  const a = baseA({ superficie });
+  return {
+    ...a,
+    marcoN: 0,
+    marcoM: 0,
+    precioEVOO: 0,
+    prodPlena: 0,
+    alquiler: 0,
+    personal: 0,
+    inflacion: 0,
+    is: 0,
+    financiacion: 0,
+    interes: 0,
+    plazo: 0,
+    carencia: 0,
+    capexFee: 0,
+    opexFee: 0,
+    fondoCost: 0,
+    equityFondo: 0,
+    capexGroups: a.capexGroups.map((g) => ({
+      ...g,
+      items: g.items.map((it) => ({ ...it, v: 0 })),
+    })),
+    opexItems: a.opexItems.map((cat) => ({
+      ...cat,
+      items: cat.items.map((it) => ({ ...it, cant: 0, coste: 0 })),
+    })),
+  };
+}
+
 export function buildSeed(): FinModel[] {
   return [
     {

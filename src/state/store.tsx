@@ -9,7 +9,7 @@ import type {
   Screen,
   TemplateKey,
 } from '../types';
-import { baseA, buildSeed, buildUsers } from '../data/seed';
+import { blankA, buildSeed, buildUsers } from '../data/seed';
 import { fmt2, parseNum } from '../engine/format';
 
 export interface AppState {
@@ -228,7 +228,7 @@ export function useAppStore(): AppStore {
         status: 'Borrador',
         updated: 'ahora',
         shared: 'solo tú',
-        a: baseA({ superficie: s.newHa || 100 }),
+        a: blankA(s.newHa || 100),
       };
       return {
         ...s,
