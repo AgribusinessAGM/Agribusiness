@@ -1,0 +1,95 @@
+:root {
+  --brand: #2e6b34;
+  --brandD: #1e4423;
+  --brandL: #eaf1e8;
+  --accent: #b07d2e;
+  --bg: #f3f5f1;
+  --surface: #ffffff;
+  --ink: #182015;
+  --ink2: #606b58;
+  --line: #dde3d8;
+  --muted: #b9c2b0;
+  --radius: 6px;
+  --shadow: 0 1px 2px rgba(20, 40, 20, 0.07);
+  --editable: #fff8e6;
+  --editableLine: #e3c580;
+  --font: 'Public Sans', system-ui, sans-serif;
+  --num: 'IBM Plex Mono', monospace;
+
+  --almendro-brand: #997300;
+  --almendro-brandD: #6b5000;
+  --almendro-brandL: #f4eeda;
+  --almendro-accent: #8a5a1e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+input {
+  outline: none;
+  font-family: inherit;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+input:focus {
+  border-color: var(--brand) !important;
+}
+
+::selection {
+  background: var(--brandL);
+}
+
+button {
+  font-family: inherit;
+}
+
+.lift {
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+}
+
+.lift:hover {
+  transform: translateY(-2px);
+}
+
+.row-h:hover {
+  background: var(--brandL);
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
