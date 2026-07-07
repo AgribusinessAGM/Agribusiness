@@ -252,7 +252,7 @@ export function EditorLayout() {
                 <SupuestosTab a={a} r={r} />
               </div>
               <img
-                src="/assets/olivar-detalle.jpg"
+                src="/assets/olivar-detalle.webp"
                 alt="Detalle de olivar"
                 style={{
                   gridColumn: '4 / 5',
