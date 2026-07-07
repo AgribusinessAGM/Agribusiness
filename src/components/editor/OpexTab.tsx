@@ -197,7 +197,7 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
                       onChangeRaw={(raw) => onOpexField(it.catKey, it.key, 'coste', raw)}
                     />
                   </div>
-                  <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--ink2)', whiteSpace: 'nowrap' }}>
+                  <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--ink2)', whiteSpace: 'pre-line' }}>
                     {it.unidad}
                   </div>
                   <div style={{ textAlign: 'right', fontFamily: 'var(--num)', fontSize: 14, color: 'var(--ink2)' }}>
