@@ -80,9 +80,9 @@ function buildOpex() {
       label: 'Cosecha y comercialización',
       items: [
         I('Cabalgante', 'Ha', 1, 350, rep([0, 0], 350, 11)),
-        I('Transporte interno', '€/Kg/ Aceitunas', 1, 0.01, [0, 0, 89.25, 107.1, 116.03].concat(Array(8).fill(133.88))),
-        I('Transporte a planta central', '€/Kg/ Aceitunas', 1, 0.01, [0, 0, 89.25, 107.1, 116.03].concat(Array(8).fill(133.88))),
-        I('Maquila', '€/Kg/ Aceitunas', 1, 0.03, [0, 0, 267.75, 321.3, 348.07].concat(Array(8).fill(401.63))),
+        I('Transporte interno', '€/Kg/Aceituna', 1, 0.01, [0, 0, 89.25, 107.1, 116.03].concat(Array(8).fill(133.88))),
+        I('Transporte a planta central', '€/Kg/Aceituna', 1, 0.01, [0, 0, 89.25, 107.1, 116.03].concat(Array(8).fill(133.88))),
+        I('Maquila', '€/Kg/Aceituna', 1, 0.03, [0, 0, 267.75, 321.3, 348.07].concat(Array(8).fill(401.63))),
       ],
     },
     {

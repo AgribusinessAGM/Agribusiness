@@ -39,16 +39,37 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
       const plena = opexYear(it.sched, MP) * scale;
       const year1 = opexYear(it.sched, 1) * scale;
       catPlena += plena;
-      return { ...it, plenaFmt: nf(plena, 0), year1Fmt: nf(year1, 0) };
+      return { ...it, catKey: cat.key, plenaFmt: nf(plena, 0), year1Fmt: nf(year1, 0) };
     });
     return {
       key: cat.key,
       title: cat.label,
       items,
+      rawPlena: catPlena,
       subtotalFmt: nf(catPlena, 0) + ' €/Ha',
       pct: pctShare(catPlena / r.opexHa),
     };
   });
+
+  // Agrupación visual: "Mantenimiento de infraestructura" se muestra dentro
+  // de la tarjeta de "Riego" (sus sub-partidas son de agua/riego), dejando 8
+  // tarjetas en una cuadrícula de 4x2. Los datos siguen viviendo en sus
+  // categorías originales — cada fila edita con su catKey real.
+  const infraCard = opexDetail.find((g) => g.key === 'infra');
+  const opexCards = opexDetail
+    .filter((g) => g.key !== 'infra')
+    .map((g) => {
+      if (g.key !== 'riego' || !infraCard) return g;
+      const rawPlena = g.rawPlena + infraCard.rawPlena;
+      return {
+        ...g,
+        title: 'Riego y mantenimiento',
+        items: [...g.items, ...infraCard.items],
+        rawPlena,
+        subtotalFmt: nf(rawPlena, 0) + ' €/Ha',
+        pct: pctShare(rawPlena / r.opexHa),
+      };
+    });
 
   const projHa = +state.projHa || 0;
   const inflFp = (y: number) => Math.pow(1 + a.inflacion / 100, y - 1);
@@ -96,7 +117,7 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
           año de referencia.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          {opexDetail.map((g) => (
+          {opexCards.map((g) => (
             <div
               key={g.key}
               style={{
@@ -156,18 +177,18 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
                   <div style={{ fontSize: 13.5 }}>{it.label}</div>
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                     <NumberField
-                      id={'op:cant:' + g.key + '.' + it.key}
+                      id={'op:cant:' + it.catKey + '.' + it.key}
                       value={it.cant}
                       width={84}
                       style={{ fontSize: 13.5 }}
-                      onChangeRaw={(raw) => onOpexField(g.key, it.key, 'cant', raw)}
+                      onChangeRaw={(raw) => onOpexField(it.catKey, it.key, 'cant', raw)}
                     />
                     <NumberField
-                      id={'op:coste:' + g.key + '.' + it.key}
+                      id={'op:coste:' + it.catKey + '.' + it.key}
                       value={it.coste}
                       width={84}
                       style={{ fontSize: 13.5 }}
-                      onChangeRaw={(raw) => onOpexField(g.key, it.key, 'coste', raw)}
+                      onChangeRaw={(raw) => onOpexField(it.catKey, it.key, 'coste', raw)}
                     />
                   </div>
                   <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--ink2)', whiteSpace: 'nowrap' }}>
