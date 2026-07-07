@@ -28,9 +28,9 @@ export function NumberField({ id, value, onChangeRaw, width = 98, style }: Numbe
         fontSize: 14,
         padding: '6px 8px',
         border: canEdit ? '1px solid var(--editableLine)' : '1px solid var(--line)',
-        background: canEdit ? 'var(--editable)' : 'transparent',
+        background: canEdit ? '#dceaf7' : 'transparent',
         borderRadius: 6,
-        color: 'var(--ink)',
+        color: canEdit ? '#0000ff' : 'var(--ink)',
         cursor: canEdit ? 'text' : 'default',
         ...style,
       }}
