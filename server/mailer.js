@@ -1,12 +1,27 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
-const apiKey = process.env.RESEND_API_KEY;
-const fromEmail = process.env.FROM_EMAIL || 'onboarding@resend.dev';
-const resend = apiKey ? new Resend(apiKey) : null;
+const smtpUser = process.env.SMTP_USER;
+const smtpPass = process.env.SMTP_PASS;
+const smtpHost = process.env.SMTP_HOST || 'smtp.office365.com';
+const smtpPort = Number(process.env.SMTP_PORT || 587);
+const fromEmail = process.env.FROM_EMAIL || smtpUser;
 
-if (!apiKey) {
+const transporter =
+  smtpUser && smtpPass
+    ? nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        secure: false, // usa STARTTLS en el puerto 587 (estándar para Microsoft 365)
+        auth: { user: smtpUser, pass: smtpPass },
+        connectionTimeout: 10_000,
+        greetingTimeout: 10_000,
+        socketTimeout: 15_000,
+      })
+    : null;
+
+if (!transporter) {
   console.warn(
-    '[mailer] RESEND_API_KEY no configurada. Los correos de invitación no se enviarán de verdad; ' +
+    '[mailer] SMTP_USER/SMTP_PASS no configurados. Los correos de invitación no se enviarán de verdad; ' +
       'el enlace se imprimirá en esta consola y se devolverá en la respuesta de la API (solo en desarrollo).',
   );
 }
@@ -42,16 +57,22 @@ export async function sendInviteEmail({ to, name, link }) {
   const subject = 'Crea tu contraseña — Plataforma de modelos financieros';
   const html = inviteEmailHtml({ name, link });
 
-  if (!resend) {
+  if (!transporter) {
     console.log(`[mailer] (simulado) Invitación para ${to}`);
     console.log(`[mailer] Enlace: ${link}`);
     return { sent: false, link };
   }
 
-  const { data, error } = await resend.emails.send({ from: fromEmail, to, subject, html });
-  if (error) {
-    console.error('[mailer] Error enviando email con Resend:', error);
-    throw new Error('No se pudo enviar el correo: ' + (error.message || 'error desconocido'));
+  try {
+    await transporter.sendMail({ from: fromEmail, to, subject, html });
+  } catch (e) {
+    console.error('[mailer] Error enviando email por SMTP:', e);
+    throw new Error(
+      'No se pudo enviar el correo: ' +
+        (e.message || 'error desconocido') +
+        '. Si es un fallo de autenticación, comprueba que el buzón tiene el SMTP autenticado activado y que ' +
+        'SMTP_PASS es una contraseña de aplicación (no la contraseña normal de la cuenta).',
+    );
   }
-  return { sent: true, id: data?.id, link };
+  return { sent: true, link };
 }
