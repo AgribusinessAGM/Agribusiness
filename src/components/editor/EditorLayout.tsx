@@ -17,7 +17,17 @@ const TAB_DEFS: [EditorTab, string, boolean][] = [
   ['fin', '4 · E. Financiera', false],
 ];
 
-function TabWithPhoto({ photo, alt, children }: { photo: string; alt: string; children: ReactNode }) {
+function TabWithPhoto({
+  photo,
+  alt,
+  objectPosition = 'center',
+  children,
+}: {
+  photo: string;
+  alt: string;
+  objectPosition?: string;
+  children: ReactNode;
+}) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
       <div style={{ gridColumn: '1 / 4' }}>{children}</div>
@@ -29,6 +39,7 @@ function TabWithPhoto({ photo, alt, children }: { photo: string; alt: string; ch
           width: '100%',
           height: '100%',
           objectFit: 'cover',
+          objectPosition,
           borderRadius: 'var(--radius)',
           boxShadow: 'var(--shadow)',
         }}
@@ -273,7 +284,11 @@ export function EditorLayout() {
             </TabWithPhoto>
           )}
           {state.etab === 'capex' && (
-            <TabWithPhoto photo="/assets/capex-detalle.webp" alt="Vivero de plantones en filas">
+            <TabWithPhoto
+              photo="/assets/capex-detalle.webp"
+              alt="Vivero de plantones en filas"
+              objectPosition="right center"
+            >
               <CapexTab a={a} r={r} />
             </TabWithPhoto>
           )}
