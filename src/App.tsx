@@ -19,8 +19,12 @@ function AppShell() {
   const model = active();
   const [routeToken, setRouteToken] = useState<string | null>(getTokenFromUrl);
 
+  // El tema por cultivo solo aplica dentro de la vista de un modelo concreto
+  // (editor/resultados) — el dashboard y la administración muestran varios
+  // modelos a la vez, así que se quedan siempre en el verde por defecto.
+  const isModelScreen = state.screen === 'editor' || state.screen === 'results';
   const cropOverride: CSSProperties =
-    model.crop === 'almendro'
+    isModelScreen && model.crop === 'almendro'
       ? ({
           '--brand': '#997300',
           '--brandD': '#6b5000',
