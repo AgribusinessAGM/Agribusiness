@@ -269,7 +269,8 @@ export function useAppStore(): AppStore {
   const setEtab = useCallback((key: EditorTab) => setState((s) => ({ ...s, etab: key })), []);
 
   const onNumFocus = useCallback((id: string, currentDisplay: string) => {
-    setState((s) => ({ ...s, editKey: id, editRaw: String(currentDisplay).replace(/\./g, '') }));
+    const raw = String(currentDisplay).replace(/\./g, '');
+    setState((s) => ({ ...s, editKey: id, editRaw: raw === '0' ? '' : raw }));
   }, []);
   const onNumBlur = useCallback(() => {
     setState((s) => ({ ...s, editKey: null, editRaw: '' }));
