@@ -7,7 +7,7 @@ import type { Assumptions, CapexUnit } from '../../types';
 const CAP_UNIT: Record<CapexUnit, string> = { ud: '€/árbol', ha: '€/Ha' };
 
 export function CapexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
-  const { onField, onCapexField } = useApp();
+  const { onField, onCapexField, canEdit } = useApp();
 
   const capexDetail = a.capexGroups.map((g) => {
     const items = g.items.map((it) => {
@@ -32,15 +32,15 @@ export function CapexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
         <span
           style={{
             fontSize: 11,
-            background: 'var(--editable)',
-            color: 'var(--brandD)',
-            border: '1px solid var(--editableLine)',
+            background: canEdit ? 'var(--editable)' : 'var(--bg)',
+            color: canEdit ? 'var(--brandD)' : 'var(--ink2)',
+            border: `1px solid ${canEdit ? 'var(--editableLine)' : 'var(--line)'}`,
             padding: '2px 8px',
             borderRadius: 999,
             fontWeight: 700,
           }}
         >
-          coste unitario editable
+          {canEdit ? 'coste unitario editable' : 'solo lectura'}
         </span>
       </div>
       <p style={{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 20px' }}>

@@ -2,6 +2,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { hashPassword } from './auth.js';
+import { buildSeedModels } from './seedModels.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // En Railway (o cualquier host con filesystem efímero), define DB_PATH apuntando
@@ -36,6 +37,24 @@ db.exec(`
     PRIMARY KEY (user_id, model_id),
     FOREIGN KEY (user_id) REFERENCES users(id)
   );
+  CREATE TABLE IF NOT EXISTS sessions (
+    token TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    expires_at TEXT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  );
+  CREATE TABLE IF NOT EXISTS models (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    crop TEXT NOT NULL DEFAULT 'olivo',
+    region TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'Borrador',
+    created_by INTEGER,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+    assumptions TEXT NOT NULL,
+    FOREIGN KEY (created_by) REFERENCES users(id)
+  );
 `);
 
 // Migración para bases de datos creadas antes de añadir el rol.
@@ -46,13 +65,14 @@ if (!hasRoleColumn) {
   db.exec("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'user'");
 }
 
-// Demo seed: replica los usuarios que ya existían como datos de ejemplo en el
-// prototipo, con una contraseña conocida para poder probar el login real.
+// Demo seed: replica los usuarios y modelos que ya existían como datos de
+// ejemplo en el prototipo, con una contraseña conocida para poder probar el
+// login real.
 const DEMO_PASSWORD = 'agromillora2026';
 
-function seedIfEmpty() {
+function seedUsersIfEmpty() {
   const { c } = db.prepare('SELECT COUNT(*) as c FROM users').get();
-  if (c > 0) return;
+  if (c > 0) return null;
 
   const insertUser = db.prepare(
     'INSERT INTO users (name, email, org, password_hash, status, role) VALUES (?, ?, ?, ?, ?, ?)',
@@ -91,13 +111,34 @@ function seedIfEmpty() {
   ];
 
   const hash = hashPassword(DEMO_PASSWORD);
+  let adminId = null;
   for (const u of seed) {
     const { lastInsertRowid } = insertUser.run(u.name, u.email, u.org, hash, 'active', u.role);
+    if (u.role === 'admin') adminId = lastInsertRowid;
     for (const [modelId, level] of Object.entries(u.access)) {
       if (level !== 'none') insertAccess.run(lastInsertRowid, Number(modelId), level);
     }
   }
   console.log(`[db] Usuarios demo creados. Contraseña demo para todos: "${DEMO_PASSWORD}"`);
+  return adminId;
 }
 
-seedIfEmpty();
+function seedModelsIfEmpty(createdBy) {
+  const { c } = db.prepare('SELECT COUNT(*) as c FROM models').get();
+  if (c > 0) return;
+
+  const insertModel = db.prepare(
+    'INSERT INTO models (id, name, crop, region, status, created_by, updated_at, assumptions) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+  );
+  const now = new Date();
+  const daysAgo = (n) => new Date(now.getTime() - n * 86400000).toISOString();
+  const updatedAt = [daysAgo(0), daysAgo(4), daysAgo(14)];
+
+  buildSeedModels().forEach((m, i) => {
+    insertModel.run(m.id, m.name, m.crop, m.region, m.status, createdBy, updatedAt[i], JSON.stringify(m.a));
+  });
+  console.log('[db] Modelos demo creados.');
+}
+
+const seededAdminId = seedUsersIfEmpty();
+seedModelsIfEmpty(seededAdminId);

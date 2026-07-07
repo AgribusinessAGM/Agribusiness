@@ -2,6 +2,7 @@ import { useApp } from '../state/store';
 
 export function TopBar() {
   const { state, gotoDash, gotoAdmin, logout } = useApp();
+  const isAdmin = state.currentUser?.role === 'admin';
   const initials = (state.currentUser?.name || '?')
     .split(' ')
     .filter(Boolean)
@@ -46,9 +47,11 @@ export function TopBar() {
         <button onClick={gotoDash} style={navStyle(state.screen === 'dashboard')}>
           Modelos
         </button>
-        <button onClick={gotoAdmin} style={navStyle(state.screen === 'admin')}>
-          Usuarios y permisos
-        </button>
+        {isAdmin && (
+          <button onClick={gotoAdmin} style={navStyle(state.screen === 'admin')}>
+            Usuarios y permisos
+          </button>
+        )}
       </nav>
       <div style={{ flex: 1 }} />
       <div style={{ width: 1, height: 26, background: 'var(--line)' }} />

@@ -24,7 +24,7 @@ function AppShell() {
   // modelos a la vez, así que se quedan siempre en el verde por defecto.
   const isModelScreen = state.screen === 'editor' || state.screen === 'results';
   const cropOverride: CSSProperties =
-    isModelScreen && model.crop === 'almendro'
+    isModelScreen && model?.crop === 'almendro'
       ? ({
           '--brand': '#997300',
           '--brandD': '#6b5000',
@@ -46,6 +46,12 @@ function AppShell() {
     );
   }
 
+  if (state.booting) {
+    return <div style={{ background: 'var(--bg)', minHeight: '100vh' }} />;
+  }
+
+  const isAdmin = state.currentUser?.role === 'admin';
+
   return (
     <div style={{ ...cropOverride, background: 'var(--bg)', color: 'var(--ink)', minHeight: '100vh' }}>
       {state.screen === 'login' ? (
@@ -54,9 +60,9 @@ function AppShell() {
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
           <TopBar />
           {state.screen === 'dashboard' && <Dashboard />}
-          {state.screen === 'editor' && <EditorLayout />}
-          {state.screen === 'results' && <Results />}
-          {state.screen === 'admin' && <Admin />}
+          {state.screen === 'editor' && model && <EditorLayout />}
+          {state.screen === 'results' && model && <Results />}
+          {state.screen === 'admin' && isAdmin && <Admin />}
         </div>
       )}
       <NewModelModal />

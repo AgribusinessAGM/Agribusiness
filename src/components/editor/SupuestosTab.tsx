@@ -66,7 +66,7 @@ const GROUPS: Group[] = [
 ];
 
 export function SupuestosTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
-  const { onField } = useApp();
+  const { onField, canEdit } = useApp();
   return (
     <div style={{ maxWidth: 900 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
@@ -74,15 +74,15 @@ export function SupuestosTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
         <span
           style={{
             fontSize: 11,
-            background: 'var(--editable)',
-            color: 'var(--brandD)',
-            border: '1px solid var(--editableLine)',
+            background: canEdit ? 'var(--editable)' : 'var(--bg)',
+            color: canEdit ? 'var(--brandD)' : 'var(--ink2)',
+            border: `1px solid ${canEdit ? 'var(--editableLine)' : 'var(--line)'}`,
             padding: '2px 8px',
             borderRadius: 999,
             fontWeight: 700,
           }}
         >
-          celdas editables
+          {canEdit ? 'celdas editables' : 'solo lectura'}
         </span>
       </div>
       <p style={{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 22px' }}>

@@ -45,7 +45,7 @@ function KpiBox({ label, value, highlight }: { label: string; value: string; hig
 }
 
 export function EditorLayout() {
-  const { state, gotoDash, setEtab, gotoResults, save, exportXlsx, exportPdf } = useApp();
+  const { state, gotoDash, setEtab, gotoResults, save, exportXlsx, exportPdf, canEdit } = useApp();
   const { model, a, r } = useActiveCompute();
 
   return (
@@ -114,7 +114,7 @@ export function EditorLayout() {
               }}
             >
               <span>{label}</span>
-              {editable && (
+              {editable && canEdit && (
                 <span
                   style={{
                     fontSize: 10,
@@ -142,21 +142,23 @@ export function EditorLayout() {
             gap: 8,
           }}
         >
-          <button
-            onClick={save}
-            style={{
-              background: 'var(--brand)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 'var(--radius)',
-              padding: 10,
-              fontWeight: 700,
-              cursor: 'pointer',
-              fontSize: 13,
-            }}
-          >
-            Guardar cambios
-          </button>
+          {canEdit && (
+            <button
+              onClick={save}
+              style={{
+                background: 'var(--brand)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 'var(--radius)',
+                padding: 10,
+                fontWeight: 700,
+                cursor: 'pointer',
+                fontSize: 13,
+              }}
+            >
+              Guardar cambios
+            </button>
+          )}
           <div style={{ display: 'flex', gap: 8 }}>
             <button
               onClick={exportXlsx}

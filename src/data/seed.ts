@@ -1,4 +1,4 @@
-import type { Assumptions, FinModel } from '../types';
+import type { Assumptions } from '../types';
 import { buildCapex } from './capex';
 import { buildOpex } from './opex';
 
@@ -63,46 +63,5 @@ export function blankA(superficie: number): Assumptions {
   };
 }
 
-export function buildSeed(): FinModel[] {
-  return [
-    {
-      id: 1,
-      name: 'Iberocrops · Olivar Andalucía',
-      crop: 'olivo',
-      region: 'Écija, Sevilla · España',
-      status: 'Activo',
-      updated: 'hoy',
-      shared: '3 personas',
-      a: baseA({}),
-    },
-    {
-      id: 2,
-      name: 'Finca La Dehesa',
-      crop: 'almendro',
-      region: 'Mérida, Extremadura · España',
-      status: 'Borrador',
-      updated: 'hace 4 días',
-      shared: '2 personas',
-      a: baseA({ superficie: 120, precioEVOO: 4.8, prodPlena: 1800, equityFondo: 1410 }),
-    },
-    {
-      id: 3,
-      name: 'Projeto Alentejo',
-      crop: 'olivo',
-      region: 'Beja · Portugal',
-      status: 'En revisión',
-      updated: 'hace 2 semanas',
-      shared: '4 personas',
-      a: baseA({
-        superficie: 400,
-        precioEVOO: 4.35,
-        prodPlena: 2100,
-        financiacion: 50,
-        equityFondo: 5860,
-      }),
-    },
-  ];
-}
-
-// Los usuarios y sus permisos ahora viven en el backend (server/db.js), que
-// siembra estos mismos cuatro usuarios de ejemplo — ver ese archivo.
+// Los modelos y usuarios de ejemplo ahora viven en el backend
+// (server/seedModels.js y server/db.js) — ver esos archivos.

@@ -10,26 +10,28 @@ interface NumberFieldProps {
 }
 
 export function NumberField({ id, value, onChangeRaw, width = 98, style }: NumberFieldProps) {
-  const { edVal, onNumFocus, onNumBlur } = useApp();
+  const { edVal, onNumFocus, onNumBlur, canEdit } = useApp();
   const disp = edVal(id, value);
   return (
     <input
       type="text"
       inputMode="decimal"
       value={disp}
-      onFocus={(e) => onNumFocus(id, e.target.value)}
+      readOnly={!canEdit}
+      onFocus={(e) => canEdit && onNumFocus(id, e.target.value)}
       onBlur={onNumBlur}
-      onChange={(e) => onChangeRaw(e.target.value)}
+      onChange={(e) => canEdit && onChangeRaw(e.target.value)}
       style={{
         width,
         textAlign: 'right',
         fontFamily: 'var(--num)',
         fontSize: 14,
         padding: '6px 8px',
-        border: '1px solid var(--editableLine)',
-        background: 'var(--editable)',
+        border: canEdit ? '1px solid var(--editableLine)' : '1px solid var(--line)',
+        background: canEdit ? 'var(--editable)' : 'transparent',
         borderRadius: 6,
         color: 'var(--ink)',
+        cursor: canEdit ? 'text' : 'default',
         ...style,
       }}
     />

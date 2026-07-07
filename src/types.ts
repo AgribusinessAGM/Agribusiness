@@ -62,6 +62,7 @@ export interface FinModel {
   status: ModelStatus;
   updated: string;
   shared: string;
+  myAccess: AccessLevel;
   a: Assumptions;
 }
 
