@@ -13,7 +13,7 @@ const TAB_DEFS: [EditorTab, string, boolean][] = [
   ['capex', '1 · CAPEX', true],
   ['opex', '2 · OPEX', true],
   ['rent', '3 · Rentabilidad', false],
-  ['fin', 'E. Financiera', false],
+  ['fin', '4 · E. Financiera', false],
 ];
 
 function KpiBox({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
