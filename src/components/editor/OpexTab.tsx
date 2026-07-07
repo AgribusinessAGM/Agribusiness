@@ -94,7 +94,7 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
           anual (rampa e inflación) se conserva y la línea escala con lo que edites. €/Ha pleno =
           año de referencia.
         </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           {opexDetail.map((g) => (
             <div
               key={g.key}
@@ -176,6 +176,7 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
           ))}
           <div
             style={{
+              gridColumn: '1 / -1',
               background: 'var(--surface)',
               border: '1px solid var(--line)',
               borderRadius: 'var(--radius)',
