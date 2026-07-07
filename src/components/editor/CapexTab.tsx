@@ -26,7 +26,7 @@ export function CapexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
   });
 
   return (
-    <div style={{ maxWidth: 1080 }}>
+    <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
         <h2 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>1 · CAPEX — Inversión inicial</h2>
         <span

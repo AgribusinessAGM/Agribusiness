@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { nf, pct, k } from '../../engine/format';
 import { useApp } from '../../state/store';
 import { useActiveCompute } from '../../state/useActiveCompute';
@@ -15,6 +16,26 @@ const TAB_DEFS: [EditorTab, string, boolean][] = [
   ['rent', '3 · Rentabilidad', false],
   ['fin', '4 · E. Financiera', false],
 ];
+
+function TabWithPhoto({ photo, alt, children }: { photo: string; alt: string; children: ReactNode }) {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+      <div style={{ gridColumn: '1 / 4' }}>{children}</div>
+      <img
+        src={photo}
+        alt={alt}
+        style={{
+          gridColumn: '4 / 5',
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          borderRadius: 'var(--radius)',
+          boxShadow: 'var(--shadow)',
+        }}
+      />
+    </div>
+  );
+}
 
 function KpiBox({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
@@ -247,25 +268,15 @@ export function EditorLayout() {
 
         <div style={{ flex: 1, overflow: 'auto', padding: 26 }}>
           {state.etab === 'supuestos' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
-              <div style={{ gridColumn: '1 / 4' }}>
-                <SupuestosTab a={a} r={r} />
-              </div>
-              <img
-                src="/assets/olivar-detalle.webp"
-                alt="Detalle de olivar"
-                style={{
-                  gridColumn: '4 / 5',
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  borderRadius: 'var(--radius)',
-                  boxShadow: 'var(--shadow)',
-                }}
-              />
-            </div>
+            <TabWithPhoto photo="/assets/olivar-detalle.webp" alt="Detalle de olivar">
+              <SupuestosTab a={a} r={r} />
+            </TabWithPhoto>
           )}
-          {state.etab === 'capex' && <CapexTab a={a} r={r} />}
+          {state.etab === 'capex' && (
+            <TabWithPhoto photo="/assets/capex-detalle.webp" alt="Vivero de plantones en filas">
+              <CapexTab a={a} r={r} />
+            </TabWithPhoto>
+          )}
           {state.etab === 'opex' && <OpexTab a={a} r={r} />}
           {state.etab === 'rent' && <RentabilidadTab r={r} />}
           {state.etab === 'fin' && <FinancieraTab r={r} />}

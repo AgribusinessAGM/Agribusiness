@@ -29,6 +29,7 @@ const GROUPS: Group[] = [
     rows: [
       { key: 'prodPlena', label: 'Productividad plena', unit: 'kg aceite/Ha' },
       { key: 'precioEVOO', label: 'Precio EVOO (constante)', unit: '€/kg' },
+      { key: 'duracionProyecto', label: 'Duración proyecto', unit: 'años' },
     ],
   },
   {
@@ -94,6 +95,8 @@ export function SupuestosTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
           <div
             key={g.title}
             style={{
+              marginLeft: 20,
+              width: 'calc(100% - 20px)',
               background: 'var(--surface)',
               border: '1px solid var(--line)',
               borderRadius: 'var(--radius)',
@@ -149,7 +152,7 @@ export function SupuestosTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
           }}
         >
           <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--ink2)', marginBottom: 12 }}>
-            Calculado automáticamente
+            Resumen del Proyecto
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }}>
             <div>
