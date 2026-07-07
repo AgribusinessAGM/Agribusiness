@@ -1,25 +1,48 @@
-# CODING AGENTS: READ THIS FIRST
+# Plataforma de modelos financieros — Agromillora
 
-This is a **handoff bundle** from Claude Design (claude.ai/design).
+Plataforma para crear, ajustar y compartir modelos financieros agrícolas
+(CAPEX, OPEX, rentabilidad por capas — Agrícola / SPV / Fondo — y estructura
+financiera), con gestión de usuarios y permisos por modelo.
 
-A user mocked up designs in HTML/CSS/JS using an AI design tool, then exported this bundle so a coding agent can implement the designs for real.
+Implementación en React + TypeScript (Vite) a partir del diseño en
+`project/Plataforma Modelos.dc.html`, con un backend mínimo (Express +
+`node:sqlite`) para usuarios reales, invitaciones por correo y permisos.
 
-## What you should do — IMPORTANT
+## Ejecutar en local
 
-**Read the chat transcripts first.** There are 5 chat transcript(s) in `chats/`. The transcripts show the full back-and-forth between the user and the design assistant — they tell you **what the user actually wants** and **where they landed** after iterating. Don't skip them. The final HTML files are the output, but the chat is where the intent lives.
+Requiere Node.js ≥ 22.5 (usa el módulo experimental `node:sqlite`).
 
-**Read `project/Plataforma Modelos.dc.html` in full.** The user had this file open when they triggered the handoff, so it's almost certainly the primary design they want built. Read it top to bottom — don't skim. Then **follow its imports**: open every file it pulls in (shared components, CSS, scripts) so you understand how the pieces fit together before you start implementing.
+```bash
+npm install
+npm run server   # backend en http://localhost:8787
+npm run dev      # frontend en http://localhost:5173 (proxy /api -> :8787)
+```
 
-**If anything is ambiguous, ask the user to confirm before you start implementing.** It's much cheaper to clarify scope up front than to build the wrong thing.
+Usuarios de ejemplo (ver `server/db.js`): cualquiera de los correos ahí
+listados con la contraseña `agromillora2026`.
 
-## About the design files
+## Compilar y ejecutar en producción
 
-The design medium is **HTML/CSS/JS** — these are prototypes, not production code. Your job is to **recreate them pixel-perfectly** in whatever technology makes sense for the target codebase (React, Vue, native, whatever fits). Match the visual output; don't copy the prototype's internal structure unless it happens to fit.
+```bash
+npm run build   # compila el frontend a dist/
+npm start        # un solo proceso sirve la API y el frontend ya compilado
+```
 
-**Don't render these files in a browser or take screenshots unless the user asks you to.** Everything you need — dimensions, colors, layout rules — is spelled out in the source. Read the HTML and CSS directly; a screenshot won't tell you anything they don't.
+## Variables de entorno
 
-## Bundle contents
+Copia `.env.example` a `.env` y rellena lo necesario. Lo más relevante:
 
-- `README.md` — this file
-- `chats/` — conversation transcripts (read these!)
-- `project/` — the `Plataforma de modelos financieros` project files (HTML prototypes, assets, components)
+- `SMTP_USER` / `SMTP_PASS` — cuenta de Microsoft 365 que envía las
+  invitaciones por correo (opcional: sin esto, el enlace de invitación se
+  muestra en la interfaz en vez de enviarse).
+- `APP_URL` — URL pública de la app, usada para construir el enlace de
+  "crea tu contraseña".
+- `DB_PATH` — ruta del fichero SQLite. En un host con filesystem efímero
+  (Railway, etc.), apunta a un Volume persistente (ej. `/data/data.db`).
+
+## Estructura
+
+- `src/` — frontend (React + TypeScript)
+- `server/` — backend (Express + SQLite)
+- `project/` — bundle de diseño original (Claude Design) — referencia, no se ejecuta
+- `chats/` — transcripciones del diseño original — referencia
