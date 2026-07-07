@@ -299,6 +299,7 @@ export function EditorLayout() {
             <TabWithPhoto
               photo={model.crop === 'almendro' ? '/assets/opex-almendro-detalle.webp' : '/assets/opex-detalle.webp'}
               alt={model.crop === 'almendro' ? 'Cosechadora trabajando en el almendral' : 'Cosechadoras trabajando en el olivar'}
+              objectPosition={model.crop === 'almendro' ? '22% center' : 'center'}
             >
               <OpexTab a={a} r={r} />
             </TabWithPhoto>
