@@ -1,5 +1,6 @@
 import { useApp } from '../state/store';
 import { InviteModal } from './InviteModal';
+import { ResetPasswordModal } from './ResetPasswordModal';
 import type { AccessLevel } from '../types';
 
 const roleMap: Record<AccessLevel, { label: string; bg: string; fg: string }> = {
@@ -9,7 +10,7 @@ const roleMap: Record<AccessLevel, { label: string; bg: string; fg: string }> = 
 };
 
 export function Admin() {
-  const { state, cyclePerm, openInvite } = useApp();
+  const { state, cyclePerm, openInvite, openResetPassword } = useApp();
 
   return (
     <main style={{ maxWidth: 1120, width: '100%', margin: '0 auto', padding: '30px 26px' }}>
@@ -25,7 +26,7 @@ export function Admin() {
           className="lift"
           style={{ background: 'var(--brand)', color: '#fff', border: 'none', borderRadius: 'var(--radius)', padding: '11px 18px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }}
         >
-          + Invitar persona
+          + Añadir persona
         </button>
       </div>
       <div style={{ display: 'flex', gap: 16, margin: '16px 0 20px', fontSize: 12, color: 'var(--ink2)' }}>
@@ -78,6 +79,12 @@ export function Admin() {
                   </div>
                   <div style={{ fontSize: 12, color: 'var(--ink2)' }}>{u.email}</div>
                   <div style={{ fontSize: 11, color: 'var(--ink2)', marginTop: 2 }}>{u.org}</div>
+                  <button
+                    onClick={() => openResetPassword(u.id)}
+                    style={{ background: 'none', border: 'none', color: 'var(--brand)', fontWeight: 600, fontSize: 11, cursor: 'pointer', padding: 0, marginTop: 4 }}
+                  >
+                    {u.status === 'invited' ? 'Definir contraseña' : 'Cambiar contraseña'}
+                  </button>
                 </td>
                 {state.models.map((m) => {
                   const role = u.access[m.id] || 'none';
@@ -100,6 +107,7 @@ export function Admin() {
         </table>
       </div>
       <InviteModal />
+      <ResetPasswordModal />
     </main>
   );
 }

@@ -73,6 +73,57 @@ app.post('/api/users/invite', async (req, res) => {
   });
 });
 
+app.post('/api/users', (req, res) => {
+  const { name, email, org, password } = req.body || {};
+  if (!name?.trim() || !email?.trim()) {
+    return res.status(400).json({ error: 'Nombre y correo son obligatorios.' });
+  }
+  if (!password || password.length < 8) {
+    return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres.' });
+  }
+  const cleanEmail = email.trim().toLowerCase();
+  const existing = db.prepare('SELECT * FROM users WHERE email = ?').get(cleanEmail);
+  if (existing && existing.status === 'active') {
+    return res.status(409).json({ error: 'Ya existe una cuenta activa con ese correo.' });
+  }
+
+  const hash = hashPassword(password);
+  let userId;
+  if (existing) {
+    userId = existing.id;
+    db.prepare("UPDATE users SET name = ?, org = ?, password_hash = ?, status = 'active' WHERE id = ?").run(
+      name.trim(),
+      org?.trim() || '',
+      hash,
+      userId,
+    );
+  } else {
+    const { lastInsertRowid } = db
+      .prepare('INSERT INTO users (name, email, org, password_hash, status) VALUES (?, ?, ?, ?, ?)')
+      .run(name.trim(), cleanEmail, org?.trim() || '', hash, 'active');
+    userId = lastInsertRowid;
+  }
+
+  const user = db.prepare('SELECT id, name, email, org, status FROM users WHERE id = ?').get(userId);
+  res.json({ ok: true, user: { ...publicUser(user), access: {} } });
+});
+
+app.post('/api/users/:id/password', (req, res) => {
+  const { password } = req.body || {};
+  if (!password || password.length < 8) {
+    return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres.' });
+  }
+  const userId = Number(req.params.id);
+  const user = db.prepare('SELECT id FROM users WHERE id = ?').get(userId);
+  if (!user) return res.status(404).json({ error: 'No existe esa persona.' });
+
+  db.prepare("UPDATE users SET password_hash = ?, status = 'active' WHERE id = ?").run(
+    hashPassword(password),
+    userId,
+  );
+  res.json({ ok: true });
+});
+
 app.get('/api/invites/:token', (req, res) => {
   const invite = db.prepare('SELECT * FROM invites WHERE token = ?').get(req.params.token);
   if (!invite) return res.status(404).json({ error: 'Este enlace no es válido.' });

@@ -1,7 +1,16 @@
 import { useApp } from '../state/store';
 
 export function InviteModal() {
-  const { state, closeInvite, setInviteName, setInviteEmail, setInviteOrg, submitInvite } = useApp();
+  const {
+    state,
+    closeInvite,
+    setInviteMode,
+    setInviteName,
+    setInviteEmail,
+    setInviteOrg,
+    setInvitePassword,
+    submitInvite,
+  } = useApp();
   if (!state.showInvite) return null;
 
   const inputStyle = {
@@ -14,6 +23,21 @@ export function InviteModal() {
     background: 'var(--surface)',
     color: 'var(--ink)',
   } as const;
+
+  const tabStyle = (on: boolean) =>
+    ({
+      flex: 1,
+      padding: '9px 6px',
+      borderRadius: 'var(--radius)',
+      border: `1px solid ${on ? 'var(--brand)' : 'var(--line)'}`,
+      background: on ? 'var(--brandL)' : 'var(--surface)',
+      color: on ? 'var(--brandD)' : 'var(--ink)',
+      fontWeight: on ? 700 : 500,
+      fontSize: 13,
+      cursor: 'pointer',
+    }) as const;
+
+  const isDirect = state.inviteMode === 'direct';
 
   return (
     <div
@@ -40,11 +64,26 @@ export function InviteModal() {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 style={{ fontSize: 19, fontWeight: 800, margin: '0 0 4px' }}>Invitar persona</h2>
-        <p style={{ color: 'var(--ink2)', fontSize: 13, margin: '0 0 20px' }}>
-          Le enviaremos un correo para que cree su propia contraseña. Podrás asignarle acceso a
-          cada modelo después, desde la tabla de permisos.
-        </p>
+        <h2 style={{ fontSize: 19, fontWeight: 800, margin: '0 0 4px' }}>Añadir persona</h2>
+
+        {!state.inviteDevLink && (
+          <>
+            <p style={{ color: 'var(--ink2)', fontSize: 13, margin: '0 0 16px' }}>
+              {isDirect
+                ? 'Creas la cuenta y le dices tú la contraseña directamente — no se envía ningún correo.'
+                : 'Le enviaremos un correo para que cree su propia contraseña.'}{' '}
+              Podrás asignarle acceso a cada modelo después, desde la tabla de permisos.
+            </p>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+              <button style={tabStyle(isDirect)} onClick={() => setInviteMode('direct')}>
+                Crear con contraseña
+              </button>
+              <button style={tabStyle(!isDirect)} onClick={() => setInviteMode('email')}>
+                Invitar por correo
+              </button>
+            </div>
+          </>
+        )}
 
         {state.inviteDevLink ? (
           <div>
@@ -113,8 +152,20 @@ export function InviteModal() {
               value={state.inviteOrg}
               onChange={(e) => setInviteOrg(e.target.value)}
               placeholder="Ej. Iberocrops (Cliente)"
-              style={{ ...inputStyle, marginBottom: state.inviteError ? 8 : 24 }}
+              style={inputStyle}
             />
+            {isDirect && (
+              <>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Contraseña</label>
+                <input
+                  type="text"
+                  value={state.invitePassword}
+                  onChange={(e) => setInvitePassword(e.target.value)}
+                  placeholder="Mínimo 8 caracteres"
+                  style={{ ...inputStyle, fontFamily: 'var(--num)', marginBottom: state.inviteError ? 8 : 24 }}
+                />
+              </>
+            )}
             {state.inviteError && (
               <div style={{ color: '#c0392b', fontSize: 13, marginBottom: 16 }}>{state.inviteError}</div>
             )}
@@ -139,7 +190,7 @@ export function InviteModal() {
                   opacity: state.invitePending ? 0.7 : 1,
                 }}
               >
-                {state.invitePending ? 'Enviando…' : 'Enviar invitación'}
+                {state.invitePending ? 'Guardando…' : isDirect ? 'Crear usuario' : 'Enviar invitación'}
               </button>
             </div>
           </>

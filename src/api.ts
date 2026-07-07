@@ -28,6 +28,15 @@ export function inviteUser(input: {
   return request('/users/invite', { method: 'POST', body: JSON.stringify(input) });
 }
 
+export function createUser(input: {
+  name: string;
+  email: string;
+  org: string;
+  password: string;
+}): Promise<{ ok: true; user: AppUser }> {
+  return request('/users', { method: 'POST', body: JSON.stringify(input) });
+}
+
 export function getInvite(token: string): Promise<{ name: string; email: string }> {
   return request(`/invites/${token}`);
 }
@@ -38,4 +47,8 @@ export function acceptInvite(token: string, password: string): Promise<{ ok: tru
 
 export function setAccess(userId: number, modelId: number, level: AccessLevel): Promise<{ ok: true }> {
   return request('/access', { method: 'POST', body: JSON.stringify({ userId, modelId, level }) });
+}
+
+export function resetPassword(userId: number, password: string): Promise<{ ok: true }> {
+  return request(`/users/${userId}/password`, { method: 'POST', body: JSON.stringify({ password }) });
 }

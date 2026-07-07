@@ -31,12 +31,18 @@ export interface AppState {
   newHa: number;
   newTemplate: TemplateKey;
   showInvite: boolean;
+  inviteMode: 'email' | 'direct';
   inviteName: string;
   inviteEmail: string;
   inviteOrg: string;
+  invitePassword: string;
   inviteError: string | null;
   inviteDevLink: string | null;
   invitePending: boolean;
+  resetUserId: number | null;
+  resetPassword: string;
+  resetError: string | null;
+  resetPending: boolean;
   scenario: Scenario | null;
   toast: string | null;
   projHa: number;
@@ -61,12 +67,18 @@ function initialState(): AppState {
     newHa: 100,
     newTemplate: 'olivo',
     showInvite: false,
+    inviteMode: 'direct',
     inviteName: '',
     inviteEmail: '',
     inviteOrg: '',
+    invitePassword: '',
     inviteError: null,
     inviteDevLink: null,
     invitePending: false,
+    resetUserId: null,
+    resetPassword: '',
+    resetError: null,
+    resetPending: false,
     scenario: null,
     toast: null,
     projHa: 1,
@@ -99,10 +111,16 @@ export interface AppStore {
   cyclePerm: (userId: number, modelId: number) => void;
   openInvite: () => void;
   closeInvite: () => void;
+  setInviteMode: (m: 'email' | 'direct') => void;
   setInviteName: (v: string) => void;
   setInviteEmail: (v: string) => void;
   setInviteOrg: (v: string) => void;
+  setInvitePassword: (v: string) => void;
   submitInvite: () => void;
+  openResetPassword: (userId: number) => void;
+  closeResetPassword: () => void;
+  setResetPassword: (v: string) => void;
+  submitResetPassword: () => void;
   save: () => void;
   exportXlsx: () => void;
   exportPdf: () => void;
@@ -286,41 +304,100 @@ export function useAppStore(): AppStore {
         inviteName: '',
         inviteEmail: '',
         inviteOrg: '',
+        invitePassword: '',
         inviteError: null,
         inviteDevLink: null,
       })),
     [],
   );
   const closeInvite = useCallback(() => setState((s) => ({ ...s, showInvite: false })), []);
+  const setInviteMode = useCallback(
+    (m: 'email' | 'direct') => setState((s) => ({ ...s, inviteMode: m, inviteError: null })),
+    [],
+  );
   const setInviteName = useCallback((v: string) => setState((s) => ({ ...s, inviteName: v })), []);
   const setInviteEmail = useCallback((v: string) => setState((s) => ({ ...s, inviteEmail: v })), []);
   const setInviteOrg = useCallback((v: string) => setState((s) => ({ ...s, inviteOrg: v })), []);
+  const setInvitePassword = useCallback((v: string) => setState((s) => ({ ...s, invitePassword: v })), []);
 
   const submitInvite = useCallback(() => {
-    const { inviteName, inviteEmail, inviteOrg } = state;
+    const { inviteMode, inviteName, inviteEmail, inviteOrg, invitePassword } = state;
     if (!inviteName.trim() || !inviteEmail.trim()) {
       setState((s) => ({ ...s, inviteError: 'Nombre y correo son obligatorios.' }));
       return;
     }
+    if (inviteMode === 'direct' && invitePassword.length < 8) {
+      setState((s) => ({ ...s, inviteError: 'La contraseña debe tener al menos 8 caracteres.' }));
+      return;
+    }
     setState((s) => ({ ...s, invitePending: true, inviteError: null }));
+
+    const addOrReplaceUser = (user: AppUser) => (s: AppState) => ({
+      ...s,
+      users: s.users.some((u) => u.id === user.id)
+        ? s.users.map((u) => (u.id === user.id ? user : u))
+        : s.users.concat([user]),
+    });
+
+    if (inviteMode === 'direct') {
+      api
+        .createUser({ name: inviteName, email: inviteEmail, org: inviteOrg, password: invitePassword })
+        .then(({ user }) => {
+          setState((s) => ({ ...addOrReplaceUser(user)(s), invitePending: false, showInvite: false }));
+          flash('Usuario creado');
+        })
+        .catch((e: Error) => {
+          setState((s) => ({ ...s, invitePending: false, inviteError: e.message }));
+        });
+    } else {
+      api
+        .inviteUser({ name: inviteName, email: inviteEmail, org: inviteOrg })
+        .then(({ user, devLink }) => {
+          setState((s) => ({
+            ...addOrReplaceUser(user)(s),
+            invitePending: false,
+            inviteDevLink: devLink || null,
+            showInvite: devLink ? s.showInvite : false,
+          }));
+          flash(devLink ? 'Invitación creada (sin proveedor de email real configurado)' : 'Invitación enviada por correo');
+        })
+        .catch((e: Error) => {
+          setState((s) => ({ ...s, invitePending: false, inviteError: e.message }));
+        });
+    }
+  }, [state.inviteMode, state.inviteName, state.inviteEmail, state.inviteOrg, state.invitePassword, flash]);
+
+  const openResetPassword = useCallback(
+    (userId: number) =>
+      setState((s) => ({ ...s, resetUserId: userId, resetPassword: '', resetError: null })),
+    [],
+  );
+  const closeResetPassword = useCallback(() => setState((s) => ({ ...s, resetUserId: null })), []);
+  const setResetPassword = useCallback((v: string) => setState((s) => ({ ...s, resetPassword: v })), []);
+
+  const submitResetPassword = useCallback(() => {
+    const { resetUserId, resetPassword } = state;
+    if (resetUserId == null) return;
+    if (resetPassword.length < 8) {
+      setState((s) => ({ ...s, resetError: 'La contraseña debe tener al menos 8 caracteres.' }));
+      return;
+    }
+    setState((s) => ({ ...s, resetPending: true, resetError: null }));
     api
-      .inviteUser({ name: inviteName, email: inviteEmail, org: inviteOrg })
-      .then(({ user, devLink }) => {
+      .resetPassword(resetUserId, resetPassword)
+      .then(() => {
         setState((s) => ({
           ...s,
-          invitePending: false,
-          users: s.users.some((u) => u.id === user.id)
-            ? s.users.map((u) => (u.id === user.id ? user : u))
-            : s.users.concat([user]),
-          inviteDevLink: devLink || null,
-          showInvite: devLink ? s.showInvite : false,
+          resetPending: false,
+          resetUserId: null,
+          users: s.users.map((u) => (u.id === resetUserId ? { ...u, status: 'active' } : u)),
         }));
-        flash(devLink ? 'Invitación creada (sin proveedor de email real configurado)' : 'Invitación enviada por correo');
+        flash('Contraseña actualizada');
       })
       .catch((e: Error) => {
-        setState((s) => ({ ...s, invitePending: false, inviteError: e.message }));
+        setState((s) => ({ ...s, resetPending: false, resetError: e.message }));
       });
-  }, [state.inviteName, state.inviteEmail, state.inviteOrg, flash]);
+  }, [state.resetUserId, state.resetPassword, flash]);
 
   const save = useCallback(() => flash('Modelo guardado'), [flash]);
   const exportXlsx = useCallback(() => flash('Exportando a Excel…'), [flash]);
@@ -395,10 +472,16 @@ export function useAppStore(): AppStore {
       cyclePerm,
       openInvite,
       closeInvite,
+      setInviteMode,
       setInviteName,
       setInviteEmail,
       setInviteOrg,
+      setInvitePassword,
       submitInvite,
+      openResetPassword,
+      closeResetPassword,
+      setResetPassword,
+      submitResetPassword,
       save,
       exportXlsx,
       exportPdf,
@@ -436,10 +519,16 @@ export function useAppStore(): AppStore {
       cyclePerm,
       openInvite,
       closeInvite,
+      setInviteMode,
       setInviteName,
       setInviteEmail,
       setInviteOrg,
+      setInvitePassword,
       submitInvite,
+      openResetPassword,
+      closeResetPassword,
+      setResetPassword,
+      submitResetPassword,
       save,
       exportXlsx,
       exportPdf,
