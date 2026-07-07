@@ -422,7 +422,7 @@ export function useAppStore(): AppStore {
       const nm: FinModel = {
         id,
         name,
-        crop: 'olivo',
+        crop: s.newTemplate === 'almendro' ? 'almendro' : 'olivo',
         region: 'Nueva ubicación',
         status: 'Borrador',
         updated: 'ahora',
