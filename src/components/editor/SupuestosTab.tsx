@@ -68,7 +68,7 @@ const GROUPS: Group[] = [
 export function SupuestosTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
   const { onField, canEdit } = useApp();
   return (
-    <div style={{ maxWidth: 900 }}>
+    <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
         <h2 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>Supuestos generales</h2>
         <span

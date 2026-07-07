@@ -246,7 +246,25 @@ export function EditorLayout() {
         </div>
 
         <div style={{ flex: 1, overflow: 'auto', padding: 26 }}>
-          {state.etab === 'supuestos' && <SupuestosTab a={a} r={r} />}
+          {state.etab === 'supuestos' && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+              <div style={{ gridColumn: '1 / 4' }}>
+                <SupuestosTab a={a} r={r} />
+              </div>
+              <img
+                src="/assets/olivar-detalle.jpg"
+                alt="Detalle de olivar"
+                style={{
+                  gridColumn: '4 / 5',
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  borderRadius: 'var(--radius)',
+                  boxShadow: 'var(--shadow)',
+                }}
+              />
+            </div>
+          )}
           {state.etab === 'capex' && <CapexTab a={a} r={r} />}
           {state.etab === 'opex' && <OpexTab a={a} r={r} />}
           {state.etab === 'rent' && <RentabilidadTab r={r} />}
