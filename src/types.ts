@@ -67,6 +67,7 @@ export interface FinModel {
 
 export type AccessLevel = 'edit' | 'view' | 'none';
 export type UserStatus = 'invited' | 'active';
+export type UserRole = 'admin' | 'user';
 
 export interface AppUser {
   id: number;
@@ -74,6 +75,7 @@ export interface AppUser {
   email: string;
   org: string;
   status: UserStatus;
+  role: UserRole;
   access: Record<number, AccessLevel>;
 }
 
@@ -82,6 +84,7 @@ export interface CurrentUser {
   name: string;
   email: string;
   org: string;
+  role: UserRole;
 }
 
 export type Screen = 'login' | 'dashboard' | 'editor' | 'results' | 'admin';

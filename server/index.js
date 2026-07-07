@@ -23,10 +23,18 @@ const INVITE_TTL_MS = 7 * 24 * 3600 * 1000;
 const app = express();
 app.use(express.json());
 
-const publicUser = (row) => ({ id: row.id, name: row.name, email: row.email, org: row.org, status: row.status });
+const publicUser = (row) => ({
+  id: row.id,
+  name: row.name,
+  email: row.email,
+  org: row.org,
+  status: row.status,
+  role: row.role === 'admin' ? 'admin' : 'user',
+});
+const normalizeRole = (role) => (role === 'admin' ? 'admin' : 'user');
 
 app.get('/api/users', (_req, res) => {
-  const users = db.prepare('SELECT id, name, email, org, status FROM users ORDER BY id').all();
+  const users = db.prepare('SELECT id, name, email, org, status, role FROM users ORDER BY id').all();
   const accessRows = db.prepare('SELECT user_id, model_id, level FROM access').all();
   const byUser = {};
   for (const r of accessRows) {
@@ -36,11 +44,12 @@ app.get('/api/users', (_req, res) => {
 });
 
 app.post('/api/users/invite', async (req, res) => {
-  const { name, email, org } = req.body || {};
+  const { name, email, org, role } = req.body || {};
   if (!name?.trim() || !email?.trim()) {
     return res.status(400).json({ error: 'Nombre y correo son obligatorios.' });
   }
   const cleanEmail = email.trim().toLowerCase();
+  const cleanRole = normalizeRole(role);
   const existing = db.prepare('SELECT * FROM users WHERE email = ?').get(cleanEmail);
 
   let userId;
@@ -49,11 +58,16 @@ app.post('/api/users/invite', async (req, res) => {
       return res.status(409).json({ error: 'Ya existe una cuenta activa con ese correo.' });
     }
     userId = existing.id;
-    db.prepare('UPDATE users SET name = ?, org = ? WHERE id = ?').run(name.trim(), org?.trim() || '', userId);
+    db.prepare('UPDATE users SET name = ?, org = ?, role = ? WHERE id = ?').run(
+      name.trim(),
+      org?.trim() || '',
+      cleanRole,
+      userId,
+    );
   } else {
     const { lastInsertRowid } = db
-      .prepare('INSERT INTO users (name, email, org, status) VALUES (?, ?, ?, ?)')
-      .run(name.trim(), cleanEmail, org?.trim() || '', 'invited');
+      .prepare('INSERT INTO users (name, email, org, status, role) VALUES (?, ?, ?, ?, ?)')
+      .run(name.trim(), cleanEmail, org?.trim() || '', 'invited', cleanRole);
     userId = lastInsertRowid;
   }
 
@@ -69,7 +83,7 @@ app.post('/api/users/invite', async (req, res) => {
     return res.status(502).json({ error: e.message });
   }
 
-  const user = db.prepare('SELECT id, name, email, org, status FROM users WHERE id = ?').get(userId);
+  const user = db.prepare('SELECT id, name, email, org, status, role FROM users WHERE id = ?').get(userId);
   res.json({
     ok: true,
     user: { ...publicUser(user), access: {} },
@@ -80,7 +94,7 @@ app.post('/api/users/invite', async (req, res) => {
 });
 
 app.post('/api/users', (req, res) => {
-  const { name, email, org, password } = req.body || {};
+  const { name, email, org, password, role } = req.body || {};
   if (!name?.trim() || !email?.trim()) {
     return res.status(400).json({ error: 'Nombre y correo son obligatorios.' });
   }
@@ -88,6 +102,7 @@ app.post('/api/users', (req, res) => {
     return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres.' });
   }
   const cleanEmail = email.trim().toLowerCase();
+  const cleanRole = normalizeRole(role);
   const existing = db.prepare('SELECT * FROM users WHERE email = ?').get(cleanEmail);
   if (existing && existing.status === 'active') {
     return res.status(409).json({ error: 'Ya existe una cuenta activa con ese correo.' });
@@ -97,21 +112,43 @@ app.post('/api/users', (req, res) => {
   let userId;
   if (existing) {
     userId = existing.id;
-    db.prepare("UPDATE users SET name = ?, org = ?, password_hash = ?, status = 'active' WHERE id = ?").run(
+    db.prepare("UPDATE users SET name = ?, org = ?, password_hash = ?, status = 'active', role = ? WHERE id = ?").run(
       name.trim(),
       org?.trim() || '',
       hash,
+      cleanRole,
       userId,
     );
   } else {
     const { lastInsertRowid } = db
-      .prepare('INSERT INTO users (name, email, org, password_hash, status) VALUES (?, ?, ?, ?, ?)')
-      .run(name.trim(), cleanEmail, org?.trim() || '', hash, 'active');
+      .prepare('INSERT INTO users (name, email, org, password_hash, status, role) VALUES (?, ?, ?, ?, ?, ?)')
+      .run(name.trim(), cleanEmail, org?.trim() || '', hash, 'active', cleanRole);
     userId = lastInsertRowid;
   }
 
-  const user = db.prepare('SELECT id, name, email, org, status FROM users WHERE id = ?').get(userId);
+  const user = db.prepare('SELECT id, name, email, org, status, role FROM users WHERE id = ?').get(userId);
   res.json({ ok: true, user: { ...publicUser(user), access: {} } });
+});
+
+app.post('/api/users/:id/role', (req, res) => {
+  const userId = Number(req.params.id);
+  const user = db.prepare('SELECT id FROM users WHERE id = ?').get(userId);
+  if (!user) return res.status(404).json({ error: 'No existe esa persona.' });
+
+  const cleanRole = normalizeRole(req.body?.role);
+  db.prepare('UPDATE users SET role = ? WHERE id = ?').run(cleanRole, userId);
+  res.json({ ok: true, role: cleanRole });
+});
+
+app.delete('/api/users/:id', (req, res) => {
+  const userId = Number(req.params.id);
+  const user = db.prepare('SELECT id FROM users WHERE id = ?').get(userId);
+  if (!user) return res.status(404).json({ error: 'No existe esa persona.' });
+
+  db.prepare('DELETE FROM access WHERE user_id = ?').run(userId);
+  db.prepare('DELETE FROM invites WHERE user_id = ?').run(userId);
+  db.prepare('DELETE FROM users WHERE id = ?').run(userId);
+  res.json({ ok: true });
 });
 
 app.post('/api/users/:id/password', (req, res) => {
@@ -163,7 +200,7 @@ app.post('/api/login', (req, res) => {
   if (!user || !verifyPassword(password || '', user.password_hash)) {
     return res.status(401).json({ error: 'Correo o contraseña incorrectos.' });
   }
-  res.json({ ok: true, user: { id: user.id, name: user.name, email: user.email, org: user.org } });
+  res.json({ ok: true, user: { id: user.id, name: user.name, email: user.email, org: user.org, role: normalizeRole(user.role) } });
 });
 
 app.post('/api/access', (req, res) => {

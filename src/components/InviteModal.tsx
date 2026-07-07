@@ -9,6 +9,7 @@ export function InviteModal() {
     setInviteEmail,
     setInviteOrg,
     setInvitePassword,
+    setInviteRole,
     submitInvite,
   } = useApp();
   if (!state.showInvite) return null;
@@ -154,6 +155,15 @@ export function InviteModal() {
               placeholder="Ej. Iberocrops (Cliente)"
               style={inputStyle}
             />
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Rol</label>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+              <button style={tabStyle(state.inviteRole === 'user')} onClick={() => setInviteRole('user')}>
+                Usuario
+              </button>
+              <button style={tabStyle(state.inviteRole === 'admin')} onClick={() => setInviteRole('admin')}>
+                Administrador
+              </button>
+            </div>
             {isDirect && (
               <>
                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Contraseña</label>

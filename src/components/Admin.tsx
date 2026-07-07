@@ -10,7 +10,7 @@ const roleMap: Record<AccessLevel, { label: string; bg: string; fg: string }> = 
 };
 
 export function Admin() {
-  const { state, cyclePerm, openInvite, openResetPassword } = useApp();
+  const { state, cyclePerm, openInvite, openResetPassword, setUserRole, deleteUser } = useApp();
 
   return (
     <main style={{ maxWidth: 1120, width: '100%', margin: '0 auto', padding: '30px 26px' }}>
@@ -59,8 +59,22 @@ export function Admin() {
             {state.users.map((u) => (
               <tr key={u.id} style={{ borderTop: '1px solid var(--line)' }}>
                 <td style={{ padding: '12px 18px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                     <div style={{ fontWeight: 600, fontSize: 14 }}>{u.name}</div>
+                    {u.role === 'admin' && (
+                      <span
+                        style={{
+                          fontSize: 10.5,
+                          fontWeight: 700,
+                          color: '#fff',
+                          background: 'var(--brandD)',
+                          padding: '1px 7px',
+                          borderRadius: 999,
+                        }}
+                      >
+                        administrador
+                      </span>
+                    )}
                     {u.status === 'invited' && (
                       <span
                         style={{
@@ -79,12 +93,30 @@ export function Admin() {
                   </div>
                   <div style={{ fontSize: 12, color: 'var(--ink2)' }}>{u.email}</div>
                   <div style={{ fontSize: 11, color: 'var(--ink2)', marginTop: 2 }}>{u.org}</div>
-                  <button
-                    onClick={() => openResetPassword(u.id)}
-                    style={{ background: 'none', border: 'none', color: 'var(--brand)', fontWeight: 600, fontSize: 11, cursor: 'pointer', padding: 0, marginTop: 4 }}
-                  >
-                    {u.status === 'invited' ? 'Definir contraseña' : 'Cambiar contraseña'}
-                  </button>
+                  <div style={{ display: 'flex', gap: 10, marginTop: 4, flexWrap: 'wrap' }}>
+                    <button
+                      onClick={() => openResetPassword(u.id)}
+                      style={{ background: 'none', border: 'none', color: 'var(--brand)', fontWeight: 600, fontSize: 11, cursor: 'pointer', padding: 0 }}
+                    >
+                      {u.status === 'invited' ? 'Definir contraseña' : 'Cambiar contraseña'}
+                    </button>
+                    {state.currentUser?.id !== u.id && (
+                      <>
+                        <button
+                          onClick={() => setUserRole(u.id, u.role === 'admin' ? 'user' : 'admin')}
+                          style={{ background: 'none', border: 'none', color: 'var(--brand)', fontWeight: 600, fontSize: 11, cursor: 'pointer', padding: 0 }}
+                        >
+                          {u.role === 'admin' ? 'Quitar administrador' : 'Hacer administrador'}
+                        </button>
+                        <button
+                          onClick={() => deleteUser(u.id)}
+                          style={{ background: 'none', border: 'none', color: '#c0392b', fontWeight: 600, fontSize: 11, cursor: 'pointer', padding: 0 }}
+                        >
+                          Eliminar
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </td>
                 {state.models.map((m) => {
                   const role = u.access[m.id] || 'none';

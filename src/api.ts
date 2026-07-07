@@ -1,4 +1,4 @@
-import type { AccessLevel, AppUser, CurrentUser } from './types';
+import type { AccessLevel, AppUser, CurrentUser, UserRole } from './types';
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`/api${path}`, {
@@ -24,6 +24,7 @@ export function inviteUser(input: {
   name: string;
   email: string;
   org: string;
+  role: UserRole;
 }): Promise<{ ok: true; user: AppUser; devLink?: string }> {
   return request('/users/invite', { method: 'POST', body: JSON.stringify(input) });
 }
@@ -33,8 +34,17 @@ export function createUser(input: {
   email: string;
   org: string;
   password: string;
+  role: UserRole;
 }): Promise<{ ok: true; user: AppUser }> {
   return request('/users', { method: 'POST', body: JSON.stringify(input) });
+}
+
+export function setUserRole(userId: number, role: UserRole): Promise<{ ok: true; role: UserRole }> {
+  return request(`/users/${userId}/role`, { method: 'POST', body: JSON.stringify({ role }) });
+}
+
+export function deleteUser(userId: number): Promise<{ ok: true }> {
+  return request(`/users/${userId}`, { method: 'DELETE' });
 }
 
 export function getInvite(token: string): Promise<{ name: string; email: string }> {

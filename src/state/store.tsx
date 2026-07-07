@@ -10,6 +10,7 @@ import type {
   Scenario,
   Screen,
   TemplateKey,
+  UserRole,
 } from '../types';
 import { blankA, buildSeed } from '../data/seed';
 import { fmt2, parseNum } from '../engine/format';
@@ -36,6 +37,7 @@ export interface AppState {
   inviteEmail: string;
   inviteOrg: string;
   invitePassword: string;
+  inviteRole: UserRole;
   inviteError: string | null;
   inviteDevLink: string | null;
   invitePending: boolean;
@@ -72,6 +74,7 @@ function initialState(): AppState {
     inviteEmail: '',
     inviteOrg: '',
     invitePassword: '',
+    inviteRole: 'user',
     inviteError: null,
     inviteDevLink: null,
     invitePending: false,
@@ -116,7 +119,10 @@ export interface AppStore {
   setInviteEmail: (v: string) => void;
   setInviteOrg: (v: string) => void;
   setInvitePassword: (v: string) => void;
+  setInviteRole: (r: UserRole) => void;
   submitInvite: () => void;
+  setUserRole: (userId: number, role: UserRole) => void;
+  deleteUser: (userId: number) => void;
   openResetPassword: (userId: number) => void;
   closeResetPassword: () => void;
   setResetPassword: (v: string) => void;
@@ -305,6 +311,7 @@ export function useAppStore(): AppStore {
         inviteEmail: '',
         inviteOrg: '',
         invitePassword: '',
+        inviteRole: 'user',
         inviteError: null,
         inviteDevLink: null,
       })),
@@ -319,9 +326,10 @@ export function useAppStore(): AppStore {
   const setInviteEmail = useCallback((v: string) => setState((s) => ({ ...s, inviteEmail: v })), []);
   const setInviteOrg = useCallback((v: string) => setState((s) => ({ ...s, inviteOrg: v })), []);
   const setInvitePassword = useCallback((v: string) => setState((s) => ({ ...s, invitePassword: v })), []);
+  const setInviteRole = useCallback((r: UserRole) => setState((s) => ({ ...s, inviteRole: r })), []);
 
   const submitInvite = useCallback(() => {
-    const { inviteMode, inviteName, inviteEmail, inviteOrg, invitePassword } = state;
+    const { inviteMode, inviteName, inviteEmail, inviteOrg, invitePassword, inviteRole } = state;
     if (!inviteName.trim() || !inviteEmail.trim()) {
       setState((s) => ({ ...s, inviteError: 'Nombre y correo son obligatorios.' }));
       return;
@@ -341,7 +349,7 @@ export function useAppStore(): AppStore {
 
     if (inviteMode === 'direct') {
       api
-        .createUser({ name: inviteName, email: inviteEmail, org: inviteOrg, password: invitePassword })
+        .createUser({ name: inviteName, email: inviteEmail, org: inviteOrg, password: invitePassword, role: inviteRole })
         .then(({ user }) => {
           setState((s) => ({ ...addOrReplaceUser(user)(s), invitePending: false, showInvite: false }));
           flash('Usuario creado');
@@ -351,7 +359,7 @@ export function useAppStore(): AppStore {
         });
     } else {
       api
-        .inviteUser({ name: inviteName, email: inviteEmail, org: inviteOrg })
+        .inviteUser({ name: inviteName, email: inviteEmail, org: inviteOrg, role: inviteRole })
         .then(({ user, devLink }) => {
           setState((s) => ({
             ...addOrReplaceUser(user)(s),
@@ -365,7 +373,35 @@ export function useAppStore(): AppStore {
           setState((s) => ({ ...s, invitePending: false, inviteError: e.message }));
         });
     }
-  }, [state.inviteMode, state.inviteName, state.inviteEmail, state.inviteOrg, state.invitePassword, flash]);
+  }, [state.inviteMode, state.inviteName, state.inviteEmail, state.inviteOrg, state.invitePassword, state.inviteRole, flash]);
+
+  const setUserRole = useCallback(
+    (userId: number, role: UserRole) => {
+      setState((s) => ({
+        ...s,
+        users: s.users.map((u) => (u.id === userId ? { ...u, role } : u)),
+      }));
+      api.setUserRole(userId, role).catch(() => {
+        flash('No se pudo actualizar el rol');
+        loadUsers();
+      });
+    },
+    [flash, loadUsers],
+  );
+
+  const deleteUser = useCallback(
+    (userId: number) => {
+      const target = state.users.find((u) => u.id === userId);
+      if (!target) return;
+      if (!window.confirm(`¿Eliminar a ${target.name}? Perderá el acceso a todos los modelos.`)) return;
+      setState((s) => ({ ...s, users: s.users.filter((u) => u.id !== userId) }));
+      api.deleteUser(userId).catch(() => {
+        flash('No se pudo eliminar la persona');
+        loadUsers();
+      });
+    },
+    [state.users, flash, loadUsers],
+  );
 
   const openResetPassword = useCallback(
     (userId: number) =>
@@ -477,7 +513,10 @@ export function useAppStore(): AppStore {
       setInviteEmail,
       setInviteOrg,
       setInvitePassword,
+      setInviteRole,
       submitInvite,
+      setUserRole,
+      deleteUser,
       openResetPassword,
       closeResetPassword,
       setResetPassword,
@@ -524,7 +563,10 @@ export function useAppStore(): AppStore {
       setInviteEmail,
       setInviteOrg,
       setInvitePassword,
+      setInviteRole,
       submitInvite,
+      setUserRole,
+      deleteUser,
       openResetPassword,
       closeResetPassword,
       setResetPassword,
