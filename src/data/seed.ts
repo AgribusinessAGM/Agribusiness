@@ -22,6 +22,7 @@ export function baseA(ov?: Partial<Assumptions>): Assumptions {
       opexFee: 355,
       fondoCost: 1.5,
       equityFondo: 2930,
+      duracionProyecto: 35,
       capexGroups: buildCapex(),
       opexItems: buildOpex(),
     },

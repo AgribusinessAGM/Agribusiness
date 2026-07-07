@@ -2,7 +2,8 @@ import type { ComputeResult } from '../../engine/compute';
 import { buildPnlHeader, buildPnlLayers } from '../../engine/pnlLayers';
 
 export function RentabilidadTab({ r }: { r: ComputeResult }) {
-  const pnlHeader = buildPnlHeader();
+  const horizon = r.ingresos.length - 1;
+  const pnlHeader = buildPnlHeader(horizon);
   const pnlLayers = buildPnlLayers(r);
 
   return (
@@ -10,7 +11,7 @@ export function RentabilidadTab({ r }: { r: ComputeResult }) {
       <h2 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 6px' }}>3 · Rentabilidad — por capas</h2>
       <p style={{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 18px' }}>
         Misma estructura que el Excel: proyecto agrícola, SPV y Fondo, cada uno con su TIR. Cifras
-        en k€ · 35 años (horizonte completo del modelo).
+        en k€ · {horizon} años (horizonte completo del modelo).
       </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         {pnlLayers.map((L) => (

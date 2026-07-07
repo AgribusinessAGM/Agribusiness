@@ -1,6 +1,5 @@
 import type { CSSProperties } from 'react';
 import type { ComputeResult } from './compute';
-import { HZ } from './compute';
 import { nfAcc, pct } from './format';
 
 export interface PnlCell {
@@ -22,8 +21,6 @@ export interface PnlLayer {
   tir: string;
   rows: PnlRow[];
 }
-
-const NC = HZ;
 
 function cellStyle(strong?: boolean): CSSProperties {
   return {
@@ -49,20 +46,6 @@ function labelStyleFor(strong?: boolean): CSSProperties {
   };
 }
 
-function mkRow(label: string, arr: number[], opts?: { strong?: boolean }): PnlRow {
-  const cells: PnlCell[] = [];
-  for (let y = 1; y <= NC; y++) {
-    const v = arr[y];
-    cells.push({ v: v == null || isNaN(v) ? '—' : nfAcc(v), style: cellStyle(opts?.strong) });
-  }
-  return {
-    label,
-    cells,
-    rowBg: opts?.strong ? 'var(--brandL)' : undefined,
-    labelStyle: labelStyleFor(opts?.strong),
-  };
-}
-
 function negArr(arr: number[]): number[] {
   return arr.map((v) => (v == null || isNaN(v) || v === 0 ? v : -Math.abs(v)));
 }
@@ -80,55 +63,71 @@ const pctLabelStyle: CSSProperties = {
   fontSize: 12,
 };
 
-function mkPct(label: string, numArr: number[], ingresos: number[]): PnlRow {
-  const cells: PnlCell[] = [];
-  for (let y = 1; y <= NC; y++) {
-    const rev = ingresos[y];
-    const v = rev > 0 && numArr[y] != null && !isNaN(numArr[y]) ? numArr[y] / rev : null;
-    cells.push({
-      v: v == null ? '-' : (v * 100).toFixed(0) + '%',
-      style: {
-        textAlign: 'right',
-        padding: '4px 12px',
-        fontFamily: 'var(--num)',
-        whiteSpace: 'nowrap',
-        fontStyle: 'italic',
-        color: '#1E4423',
-        fontSize: 12,
-      },
-    });
-  }
-  return { label, cells, labelStyle: pctLabelStyle };
-}
-
-function mkHead(label: string): PnlRow {
-  const cells: PnlCell[] = [];
-  for (let y = 1; y <= NC; y++) cells.push({ v: '', style: { borderTop: '1px solid var(--line)' } });
-  return {
-    label,
-    cells,
-    rowBg: 'var(--brandL)',
-    labelStyle: {
-      textAlign: 'left',
-      padding: '8px 14px',
-      position: 'sticky',
-      left: 0,
-      background: 'var(--brandL)',
-      fontWeight: 800,
-      whiteSpace: 'nowrap',
-    },
-  };
-}
-
-export function buildPnlHeader() {
+export function buildPnlHeader(nc: number) {
   const header: { label: string }[] = [];
-  for (let y = 1; y <= NC; y++) header.push({ label: 'Año ' + y });
+  for (let y = 1; y <= nc; y++) header.push({ label: 'Año ' + y });
   return header;
 }
 
 export function buildPnlLayers(r: ComputeResult): PnlLayer[] {
+  const nc = r.ingresos.length - 1;
+
+  function mkRow(label: string, arr: number[], opts?: { strong?: boolean }): PnlRow {
+    const cells: PnlCell[] = [];
+    for (let y = 1; y <= nc; y++) {
+      const v = arr[y];
+      cells.push({ v: v == null || isNaN(v) ? '—' : nfAcc(v), style: cellStyle(opts?.strong) });
+    }
+    return {
+      label,
+      cells,
+      rowBg: opts?.strong ? 'var(--brandL)' : undefined,
+      labelStyle: labelStyleFor(opts?.strong),
+    };
+  }
+
+  function mkPct(label: string, numArr: number[], ingresos: number[]): PnlRow {
+    const cells: PnlCell[] = [];
+    for (let y = 1; y <= nc; y++) {
+      const rev = ingresos[y];
+      const v = rev > 0 && numArr[y] != null && !isNaN(numArr[y]) ? numArr[y] / rev : null;
+      cells.push({
+        v: v == null ? '-' : (v * 100).toFixed(0) + '%',
+        style: {
+          textAlign: 'right',
+          padding: '4px 12px',
+          fontFamily: 'var(--num)',
+          whiteSpace: 'nowrap',
+          fontStyle: 'italic',
+          color: '#1E4423',
+          fontSize: 12,
+        },
+      });
+    }
+    return { label, cells, labelStyle: pctLabelStyle };
+  }
+
+  function mkHead(label: string): PnlRow {
+    const cells: PnlCell[] = [];
+    for (let y = 1; y <= nc; y++) cells.push({ v: '', style: { borderTop: '1px solid var(--line)' } });
+    return {
+      label,
+      cells,
+      rowBg: 'var(--brandL)',
+      labelStyle: {
+        textAlign: 'left',
+        padding: '8px 14px',
+        position: 'sticky',
+        left: 0,
+        background: 'var(--brandL)',
+        fontWeight: 800,
+        whiteSpace: 'nowrap',
+      },
+    };
+  }
+
   const netOp: number[] = [];
-  for (let y = 0; y <= HZ; y++) netOp[y] = (r.ebit[y] || 0) + (r.tax[y] || 0);
+  for (let y = 0; y <= nc; y++) netOp[y] = (r.ebit[y] || 0) + (r.tax[y] || 0);
 
   return [
     {

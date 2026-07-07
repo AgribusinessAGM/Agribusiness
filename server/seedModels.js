@@ -173,6 +173,7 @@ function baseA(ov) {
       opexFee: 355,
       fondoCost: 1.5,
       equityFondo: 2930,
+      duracionProyecto: 35,
       capexGroups: buildCapex(),
       opexItems: buildOpex(),
     },

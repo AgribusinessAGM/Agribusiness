@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { ComputeResult } from '../../engine/compute';
-import { MP, opexItemScale, opexYear, HZ } from '../../engine/compute';
+import { MP, opexItemScale, opexYear } from '../../engine/compute';
 import { nf, pctShare } from '../../engine/format';
 import { NumberField } from '../NumberField';
 import { useApp } from '../../state/store';
@@ -51,7 +51,8 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
 
   const projHa = +state.projHa || 0;
   const inflFp = (y: number) => Math.pow(1 + a.inflacion / 100, y - 1);
-  const years = Array.from({ length: HZ }, (_, i) => i + 1);
+  const horizon = r.opex.length - 1;
+  const years = Array.from({ length: horizon }, (_, i) => i + 1);
 
   const opexProjRows = a.opexItems.map((cat) => {
     const cells = years.map((y) => {
@@ -199,7 +200,7 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
       <div>
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, margin: '26px 0 8px', flexWrap: 'wrap' }}>
           <div>
-            <h3 style={{ fontSize: 15, fontWeight: 800, margin: 0 }}>Proyección OPEX a 35 años</h3>
+            <h3 style={{ fontSize: 15, fontWeight: 800, margin: 0 }}>Proyección OPEX a {horizon} años</h3>
             <div style={{ fontSize: 11, color: 'var(--ink2)', marginTop: 3 }}>€/Ha por año · con inflación</div>
           </div>
           <div

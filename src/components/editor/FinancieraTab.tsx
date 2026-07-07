@@ -1,10 +1,11 @@
-import { HZ, type ComputeResult } from '../../engine/compute';
+import type { ComputeResult } from '../../engine/compute';
 import { k, nf } from '../../engine/format';
 
 export function FinancieraTab({ r }: { r: ComputeResult }) {
+  const horizon = r.interest.length - 1;
   const amortRows: { year: number; cuota: string; interes: string; principal: string; saldo: string }[] = [];
   let saldoA = r.deuda;
-  for (let y = 1; y <= HZ; y++) {
+  for (let y = 1; y <= horizon; y++) {
     saldoA -= r.principal[y];
     amortRows.push({
       year: y,
@@ -17,7 +18,7 @@ export function FinancieraTab({ r }: { r: ComputeResult }) {
 
   const depRows: { year: number; dep: string; acum: string; pend: string }[] = [];
   let acumD = 0;
-  for (let y = 1; y <= HZ; y++) {
+  for (let y = 1; y <= horizon; y++) {
     acumD += r.amort[y];
     depRows.push({
       year: y,
@@ -64,7 +65,7 @@ export function FinancieraTab({ r }: { r: ComputeResult }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
         <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow)', overflow: 'hidden' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 16px', fontWeight: 700, fontSize: 13, borderBottom: '1px solid var(--line)' }}>
-            <span>Cuadro de amortización · 35 años</span>
+            <span>Cuadro de amortización · {horizon} años</span>
             <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--ink2)' }}>Total intereses {k(r.totalIntereses)}</span>
           </div>
           <div style={{ maxHeight: 520, overflow: 'auto' }}>
@@ -94,7 +95,7 @@ export function FinancieraTab({ r }: { r: ComputeResult }) {
         </div>
         <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow)', overflow: 'hidden' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 16px', fontWeight: 700, fontSize: 13, borderBottom: '1px solid var(--line)' }}>
-            <span>Cuadro de depreciación · 35 años</span>
+            <span>Cuadro de depreciación · {horizon} años</span>
             <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--ink2)' }}>Base {k(r.totalCapex)}</span>
           </div>
           <div style={{ maxHeight: 520, overflow: 'auto' }}>

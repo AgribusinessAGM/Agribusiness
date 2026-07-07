@@ -112,6 +112,7 @@ export interface ComputeResult {
 
 // Réplica del motor de "3. Rentabilidad" del Excel Iberocrops. Años 1..35; el CAPEX se paga en el año 1.
 export function compute(a: Assumptions): ComputeResult {
+  const horizon = Math.max(1, Math.round(+a.duracionProyecto) || HZ);
   const sup = a.superficie;
   const densidad = 10000 / (a.marcoN * a.marcoM);
   const arboles = densidad * sup;
@@ -125,7 +126,7 @@ export function compute(a: Assumptions): ComputeResult {
   // OPEX por categoría y año, sumando sub-partidas (cada una escalada por cant×coste); inflación desde el año 2
   const opexByItem = a.opexItems.map((cat) => {
     const cells: number[] = [0];
-    for (let y = 1; y <= HZ; y++) {
+    for (let y = 1; y <= horizon; y++) {
       let cy = 0;
       for (const it of cat.items) cy += opexYear(it.sched, y) * opexItemScale(it);
       cells[y] = (cy * sup * inflF(y)) / 1000;
@@ -133,7 +134,7 @@ export function compute(a: Assumptions): ComputeResult {
     return { key: cat.key, label: cat.label, cells };
   });
   const opex: number[] = [0];
-  for (let y = 1; y <= HZ; y++) opex[y] = opexByItem.reduce((s, bi) => s + bi.cells[y], 0);
+  for (let y = 1; y <= horizon; y++) opex[y] = opexByItem.reduce((s, bi) => s + bi.cells[y], 0);
 
   // OPEX/Ha "pleno" (año de referencia MP, sin inflación) para las tarjetas y %
   const opexHa = a.opexItems.reduce(
@@ -153,7 +154,7 @@ export function compute(a: Assumptions): ComputeResult {
 
   // Amortización contable en dos tramos (años 3-12 y 13-22), fracciones calcadas del Excel
   const dep: number[] = [0];
-  for (let y = 1; y <= HZ; y++)
+  for (let y = 1; y <= horizon; y++)
     dep[y] = y >= 3 && y <= 12 ? depBase * 0.0393405 : y >= 13 && y <= 22 ? depBase * 0.0112316 : 0;
 
   // Ingresos a precio constante (sin inflación); alquiler, personal y auditoría con inflación
@@ -162,11 +163,11 @@ export function compute(a: Assumptions): ComputeResult {
   const pers: number[] = [0];
   const persS: number[] = [0];
   const audit: number[] = [0];
-  for (let y = 1; y <= HZ; y++) {
+  for (let y = 1; y <= horizon; y++) {
     ingresos[y] = (sup * a.prodPlena * pr(y) * a.precioEVOO) / 1000;
     rent[y] = ((+a.alquiler || 0) * sup * inflF(y)) / 1000;
     pers[y] = ((+a.personal || 0) * sup * inflF(y)) / 1000;
-    persS[y] = y < HZ ? ((+a.personal || 0) * sup * Math.pow(1 + infl, y)) / 1000 : 0; // el SPV lo lleva desplazado un año (como el Excel)
+    persS[y] = y < horizon ? ((+a.personal || 0) * sup * Math.pow(1 + infl, y)) / 1000 : 0; // el SPV lo lleva desplazado un año (como el Excel)
     audit[y] = 10.2 * (sup / 250) * inflF(y); // auditoría + otros del SPV
   }
 
@@ -178,7 +179,7 @@ export function compute(a: Assumptions): ComputeResult {
   const interest: number[] = [0];
   const principal: number[] = [0];
   let bal = deuda;
-  for (let y = 1; y <= HZ; y++) {
+  for (let y = 1; y <= horizon; y++) {
     if (y <= a.carencia) {
       interest[y] = bal * intr;
       principal[y] = 0;
@@ -237,7 +238,7 @@ export function compute(a: Assumptions): ComputeResult {
   const fcfFAcum: number[] = [0];
   let acumF = 0;
 
-  for (let y = 1; y <= HZ; y++) {
+  for (let y = 1; y <= horizon; y++) {
     opexCapRow[y] = y <= 2 ? opex[y] : 0;
     capexRow[y] = y === 1 ? -capexT : 0;
     ebitda[y] = ingresos[y] - opex[y] - rent[y] - pers[y] + opexCapRow[y];
@@ -293,7 +294,7 @@ export function compute(a: Assumptions): ComputeResult {
   const vanF = fcfF.slice(1).reduce((s, c, i) => s + c / Math.pow(1.08, i), 0);
   let payback: number | null = null;
   let wentNeg = false;
-  for (let y = 1; y <= HZ; y++) {
+  for (let y = 1; y <= horizon; y++) {
     if (fcfAcum[y] < 0) {
       wentNeg = true;
     } else if (wentNeg) {
@@ -304,7 +305,7 @@ export function compute(a: Assumptions): ComputeResult {
   const totalIntereses = interest.reduce((s, c) => s + c, 0);
 
   const ebitdaPostFees: number[] = [];
-  for (let y = 0; y <= HZ; y++)
+  for (let y = 0; y <= horizon; y++)
     ebitdaPostFees[y] = (ebitdaS[y] || 0) - (capexFeeRow[y] || 0) - (opexFeeRow[y] || 0) - (comExitoRow[y] || 0);
 
   return {
