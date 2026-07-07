@@ -292,7 +292,11 @@ export function EditorLayout() {
               <CapexTab a={a} r={r} />
             </TabWithPhoto>
           )}
-          {state.etab === 'opex' && <OpexTab a={a} r={r} />}
+          {state.etab === 'opex' && (
+            <TabWithPhoto photo="/assets/opex-detalle.webp" alt="Cosechadoras trabajando en el olivar">
+              <OpexTab a={a} r={r} />
+            </TabWithPhoto>
+          )}
           {state.etab === 'rent' && <RentabilidadTab r={r} />}
           {state.etab === 'fin' && <FinancieraTab r={r} />}
         </div>

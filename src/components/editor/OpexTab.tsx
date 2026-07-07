@@ -71,7 +71,7 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
 
   return (
     <>
-      <div style={{ maxWidth: 1080 }}>
+      <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
           <h2 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>2 · OPEX — Costes operativos</h2>
           <span
@@ -94,7 +94,7 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
           anual (rampa e inflación) se conserva y la línea escala con lo que edites. €/Ha pleno =
           año de referencia.
         </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 1080 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {opexDetail.map((g) => (
             <div
               key={g.key}
