@@ -4,7 +4,10 @@ import path from 'node:path';
 import { hashPassword } from './auth.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dbPath = path.join(__dirname, 'data.db');
+// En Railway (o cualquier host con filesystem efímero), define DB_PATH apuntando
+// a un Volume montado (ej. /data/data.db) para que los usuarios no se pierdan
+// en cada despliegue.
+const dbPath = process.env.DB_PATH || path.join(__dirname, 'data.db');
 
 export const db = new DatabaseSync(dbPath);
 

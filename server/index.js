@@ -1,4 +1,7 @@
 import { randomBytes } from 'node:crypto';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { db } from './db.js';
 import { hashPassword, verifyPassword } from './auth.js';
@@ -9,6 +12,9 @@ try {
 } catch {
   // no .env file present — fine, rely on process.env as-is
 }
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const DIST_DIR = path.join(__dirname, '../dist');
 
 const PORT = process.env.PORT || 8787;
 const APP_URL = process.env.APP_URL || 'http://localhost:5173';
@@ -173,6 +179,17 @@ app.post('/api/access', (req, res) => {
   }
   res.json({ ok: true });
 });
+
+// En producción, este mismo proceso sirve también el frontend ya compilado
+// (npm run build), incluida la ruta /set-password que abre el enlace del correo.
+if (existsSync(DIST_DIR)) {
+  app.use(express.static(DIST_DIR));
+  app.get(/^(?!\/api).*/, (_req, res) => {
+    res.sendFile(path.join(DIST_DIR, 'index.html'));
+  });
+} else {
+  console.warn(`[server] No se encontró ${DIST_DIR} — ejecuta "npm run build" para servir el frontend desde aquí.`);
+}
 
 app.listen(PORT, () => {
   console.log(`[server] API escuchando en http://localhost:${PORT}`);
