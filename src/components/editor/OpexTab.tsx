@@ -37,8 +37,9 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
     const items = cat.items.map((it) => {
       const scale = opexItemScale(it);
       const plena = opexYear(it.sched, MP) * scale;
+      const year1 = opexYear(it.sched, 1) * scale;
       catPlena += plena;
-      return { ...it, plenaFmt: nf(plena, 0) };
+      return { ...it, plenaFmt: nf(plena, 0), year1Fmt: nf(year1, 0) };
     });
     return {
       key: cat.key,
@@ -124,7 +125,7 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '2.2fr 1.9fr 1.3fr 1fr',
+                  gridTemplateColumns: '2.2fr 1.9fr 1.3fr 1fr 1fr',
                   padding: '8px 18px',
                   fontSize: 11,
                   color: 'var(--ink2)',
@@ -138,6 +139,7 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
                   <div style={{ width: 84, textAlign: 'right' }}>Coste unitario</div>
                 </div>
                 <div style={{ textAlign: 'center' }}>Unidad</div>
+                <div style={{ textAlign: 'right' }}>€/Ha 1er Año</div>
                 <div style={{ textAlign: 'right' }}>€/Ha pleno</div>
               </div>
               {g.items.map((it) => (
@@ -145,7 +147,7 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
                   key={it.key}
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: '2.2fr 1.9fr 1.3fr 1fr',
+                    gridTemplateColumns: '2.2fr 1.9fr 1.3fr 1fr 1fr',
                     alignItems: 'center',
                     padding: '8px 18px',
                     borderTop: '1px solid var(--line)',
@@ -170,6 +172,9 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
                   </div>
                   <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--ink2)', whiteSpace: 'nowrap' }}>
                     {it.unidad}
+                  </div>
+                  <div style={{ textAlign: 'right', fontFamily: 'var(--num)', fontSize: 14, color: 'var(--ink2)' }}>
+                    {it.year1Fmt}
                   </div>
                   <div style={{ textAlign: 'right', fontFamily: 'var(--num)', fontSize: 14 }}>{it.plenaFmt}</div>
                 </div>
