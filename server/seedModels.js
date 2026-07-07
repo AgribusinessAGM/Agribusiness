@@ -172,7 +172,6 @@ function baseA(ov) {
       capexFee: 1000,
       opexFee: 355,
       fondoCost: 1.5,
-      equityFondo: 2930,
       duracionProyecto: 35,
       capexGroups: buildCapex(),
       opexItems: buildOpex(),
@@ -197,7 +196,7 @@ export function buildSeedModels() {
       crop: 'almendro',
       region: 'Mérida, Extremadura · España',
       status: 'Borrador',
-      a: baseA({ superficie: 120, precioEVOO: 4.8, prodPlena: 1800, equityFondo: 1410 }),
+      a: baseA({ superficie: 120, precioEVOO: 4.8, prodPlena: 1800 }),
     },
     {
       id: 3,
@@ -205,7 +204,7 @@ export function buildSeedModels() {
       crop: 'olivo',
       region: 'Beja · Portugal',
       status: 'En revisión',
-      a: baseA({ superficie: 400, precioEVOO: 4.35, prodPlena: 2100, financiacion: 50, equityFondo: 5860 }),
+      a: baseA({ superficie: 400, precioEVOO: 4.35, prodPlena: 2100, financiacion: 50 }),
     },
   ];
 }

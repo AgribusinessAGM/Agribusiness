@@ -46,7 +46,6 @@ export interface Assumptions {
   capexFee: number;
   opexFee: number;
   fondoCost: number;
-  equityFondo: number;
   duracionProyecto: number;
   capexGroups: CapexGroup[];
   opexItems: OpexCategory[];

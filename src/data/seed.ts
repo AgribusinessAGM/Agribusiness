@@ -21,7 +21,6 @@ export function baseA(ov?: Partial<Assumptions>): Assumptions {
       capexFee: 1000,
       opexFee: 355,
       fondoCost: 1.5,
-      equityFondo: 2930,
       duracionProyecto: 35,
       capexGroups: buildCapex(),
       opexItems: buildOpex(),
@@ -52,7 +51,6 @@ export function blankA(superficie: number): Assumptions {
     capexFee: 0,
     opexFee: 0,
     fondoCost: 0,
-    equityFondo: 0,
     capexGroups: a.capexGroups.map((g) => ({
       ...g,
       items: g.items.map((it) => ({ ...it, v: 0 })),

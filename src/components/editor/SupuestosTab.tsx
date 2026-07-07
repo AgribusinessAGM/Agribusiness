@@ -61,7 +61,6 @@ const GROUPS: Group[] = [
       { key: 'capexFee', label: 'CAPEX Fee (año 1)', unit: '€/Ha' },
       { key: 'opexFee', label: 'OPEX Fee (anual, plano)', unit: '€/Ha' },
       { key: 'fondoCost', label: 'Costes del fondo', unit: '% equity/año' },
-      { key: 'equityFondo', label: 'Equity comprometido', unit: 'k€' },
     ],
   },
 ];
@@ -139,6 +138,37 @@ export function SupuestosTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
                   </div>
                 </div>
               ))}
+              {g.title === 'Fees y fondo' && (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '9px 0',
+                    borderBottom: '1px solid var(--line)',
+                  }}
+                >
+                  <div style={{ fontSize: 13.5 }}>Equity comprometido</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div
+                      style={{
+                        minWidth: 98,
+                        textAlign: 'right',
+                        background: 'var(--brandL)',
+                        color: 'var(--brandD)',
+                        fontFamily: 'var(--num)',
+                        fontSize: 14,
+                        fontWeight: 700,
+                        padding: '6px 8px',
+                        borderRadius: 6,
+                      }}
+                    >
+                      {nf(r.fondoEquity, 0)}
+                    </div>
+                    <span style={{ fontSize: 12, color: 'var(--ink2)', width: 74 }}>k€</span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         ))}

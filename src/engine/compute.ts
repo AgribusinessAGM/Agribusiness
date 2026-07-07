@@ -64,7 +64,6 @@ export interface ComputeResult {
   opex: number[];
   rent: number[];
   pers: number[];
-  persS: number[];
   audit: number[];
   opexCapRow: number[];
   capexRow: number[];
@@ -162,13 +161,11 @@ export function compute(a: Assumptions): ComputeResult {
   const ingresos: number[] = [0];
   const rent: number[] = [0];
   const pers: number[] = [0];
-  const persS: number[] = [0];
   const audit: number[] = [0];
   for (let y = 1; y <= horizon; y++) {
     ingresos[y] = (sup * a.prodPlena * pr(y) * a.precioEVOO) / 1000;
     rent[y] = ((+a.alquiler || 0) * sup * inflF(y)) / 1000;
     pers[y] = ((+a.personal || 0) * sup * inflF(y)) / 1000;
-    persS[y] = y < horizon ? ((+a.personal || 0) * sup * Math.pow(1 + infl, y)) / 1000 : 0; // el SPV lo lleva desplazado un año (como el Excel)
     audit[y] = 10.2 * (sup / 250) * inflF(y); // auditoría + otros del SPV
   }
 
@@ -228,7 +225,6 @@ export function compute(a: Assumptions): ComputeResult {
   let carry = 0;
 
   // Capa 3 · Fondo
-  const fondoEquity = +a.equityFondo || 0;
   const fundRev: number[] = [0];
   const spvInv: number[] = [0];
   const fundCosts: number[] = [0];
@@ -254,7 +250,7 @@ export function compute(a: Assumptions): ComputeResult {
     otrosOpS[y] = 0;
     comExitoRow[y] = 0;
     margenBrutoS[y] = ingresos[y] - opex[y] - rent[y] - audit[y] - otrosS[y] + opexCapRow[y];
-    ebitdaS[y] = margenBrutoS[y] - persS[y] - otrosOpS[y];
+    ebitdaS[y] = margenBrutoS[y] - pers[y] - otrosOpS[y];
     capexFeeRow[y] = y === 1 ? capexFeeT : 0;
     opexFeeRow[y] = opexFeeT; // fee plano, sin inflación
     ebitS[y] = ebitdaS[y] - capexFeeRow[y] - opexFeeRow[y] - comExitoRow[y] - dep[y];
@@ -278,6 +274,13 @@ export function compute(a: Assumptions): ComputeResult {
     // Fondo
     fundRev[y] = Math.max(0, fcfL[y]);
     spvInv[y] = Math.min(0, fcfL[y]);
+  }
+
+  // Equity comprometido: no es un input, es la suma de las llamadas de capital
+  // ("Inversión en SPV") que el Fondo tiene que aportar a lo largo del proyecto.
+  const fondoEquity = -spvInv.slice(1).reduce((s, v) => s + v, 0);
+
+  for (let y = 1; y <= horizon; y++) {
     fundCosts[y] = fondoEquity * ((+a.fondoCost || 0) / 100);
     impFondo[y] = fundRev[y] * 0.0125; // retención del 1,25% sobre los ingresos del fondo (como el Excel)
     otherF[y] = y <= 2 ? 10 * (sup / 250) : 0;
@@ -323,7 +326,6 @@ export function compute(a: Assumptions): ComputeResult {
     opex,
     rent,
     pers,
-    persS,
     audit,
     opexCapRow,
     capexRow,
