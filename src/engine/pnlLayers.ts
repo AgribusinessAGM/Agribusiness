@@ -167,7 +167,7 @@ export function buildPnlLayers(r: ComputeResult): PnlLayer[] {
         mkRow('Capitalización del OPEX', r.opexCapRow),
         mkRow('(=) Margen bruto', r.margenBrutoS, { strong: true }),
         mkPct('% sobre ventas', r.margenBrutoS, r.ingresos),
-        mkRow('Gastos de personal', negArr(r.pers)),
+        mkRow('Gastos de personal', negArr(r.persS)),
         mkRow('Otros gastos operativos', negArr(r.otrosOpS)),
         mkRow('(=) EBITDA', r.ebitdaS, { strong: true }),
         mkPct('% sobre ventas', r.ebitdaS, r.ingresos),

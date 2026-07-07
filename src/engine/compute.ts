@@ -64,6 +64,7 @@ export interface ComputeResult {
   opex: number[];
   rent: number[];
   pers: number[];
+  persS: number[];
   audit: number[];
   opexCapRow: number[];
   capexRow: number[];
@@ -257,19 +258,18 @@ export function compute(a: Assumptions): ComputeResult {
     capexFeeRow[y] = y === 1 ? capexFeeT : 0;
     opexFeeRow[y] = opexFeeT; // fee plano, sin inflación
     ebitS[y] = ebitdaS[y] - capexFeeRow[y] - opexFeeRow[y] - comExitoRow[y] - dep[y];
-    // IS del SPV (calibrado al Data Table del Excel): arrastre de pérdidas operativas (EBIT)
-    // + escudo fiscal de los intereses (deducibles, contra el beneficio operativo del año, sin arrastrar).
-    let opTaxable: number;
-    if (ebitS[y] > 0) {
-      opTaxable = Math.max(0, ebitS[y] - carry);
-      carry = Math.max(0, carry - ebitS[y]);
+    // IS del SPV: arrastre de pérdidas sobre el EBT (EBIT - intereses), como el Excel.
+    const ebtY = ebitS[y] - interest[y];
+    let taxable: number;
+    if (ebtY > 0) {
+      taxable = Math.max(0, ebtY - carry);
+      carry = Math.max(0, carry - ebtY);
     } else {
-      carry += -ebitS[y];
-      opTaxable = 0;
+      carry += -ebtY;
+      taxable = 0;
     }
-    const taxable = Math.max(0, opTaxable - interest[y]);
     taxS[y] = -taxable * isr;
-    ebtSd[y] = ebitS[y] - interest[y]; // EBT tras intereses (presentación)
+    ebtSd[y] = ebtY; // EBT tras intereses (presentación)
     netoS[y] = ebtSd[y] + taxS[y];
     fcfSin[y] = netoS[y] + dep[y] + capexRow[y];
     financ[y] = y === 1 ? deuda : 0;
@@ -279,7 +279,7 @@ export function compute(a: Assumptions): ComputeResult {
     fundRev[y] = Math.max(0, fcfL[y]);
     spvInv[y] = Math.min(0, fcfL[y]);
     fundCosts[y] = fondoEquity * ((+a.fondoCost || 0) / 100);
-    impFondo[y] = 0; // sin doble imposición: el SPV ya paga IS; el dividendo al Fondo no se vuelve a gravar (calibrado al Data Table del Excel)
+    impFondo[y] = fundRev[y] * 0.0125; // retención del 1,25% sobre los ingresos del fondo (como el Excel)
     otherF[y] = y <= 2 ? 10 * (sup / 250) : 0;
     costesF[y] = spvInv[y] - fundCosts[y] - impFondo[y] - otherF[y];
     fcfF[y] = fundRev[y] + costesF[y];
@@ -323,6 +323,7 @@ export function compute(a: Assumptions): ComputeResult {
     opex,
     rent,
     pers,
+    persS,
     audit,
     opexCapRow,
     capexRow,
