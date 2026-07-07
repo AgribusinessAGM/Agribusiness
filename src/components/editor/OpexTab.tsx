@@ -71,6 +71,12 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
       };
     });
 
+  // Orden visual pedido: Malezas/Sanidad · Nutrición/Terrenos · Poda/Riego · Cosecha/Otros.
+  const CARD_ORDER = ['malezas', 'sanidad', 'nutricion', 'terrenos', 'poda', 'riego', 'cosecha', 'otros'];
+  const orderedCards = CARD_ORDER.map((key) => opexCards.find((g) => g.key === key)).filter(
+    (g): g is (typeof opexCards)[number] => g != null,
+  );
+
   const projHa = +state.projHa || 0;
   const inflFp = (y: number) => Math.pow(1 + a.inflacion / 100, y - 1);
   const horizon = r.opex.length - 1;
@@ -117,7 +123,7 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
           año de referencia.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          {opexCards.map((g) => (
+          {orderedCards.map((g) => (
             <div
               key={g.key}
               style={{
