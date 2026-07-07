@@ -117,14 +117,14 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
                 }}
               >
                 <div style={{ fontWeight: 700, fontSize: 13.5 }}>{g.title}</div>
-                <div style={{ fontFamily: 'var(--num)', fontSize: 13, fontWeight: 700 }}>
+                <div style={{ fontSize: 13, fontWeight: 700 }}>
                   {g.subtotalFmt} · {g.pct}
                 </div>
               </div>
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '2.4fr 0.9fr 1fr 0.8fr 1fr',
+                  gridTemplateColumns: '2.2fr 1.9fr 1.3fr 1fr',
                   padding: '8px 18px',
                   fontSize: 11,
                   color: 'var(--ink2)',
@@ -133,8 +133,10 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
                 }}
               >
                 <div>Sub-partida</div>
-                <div style={{ textAlign: 'right' }}>Cantidad</div>
-                <div style={{ textAlign: 'right' }}>Coste unitario</div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                  <div style={{ width: 84, textAlign: 'right' }}>Cantidad</div>
+                  <div style={{ width: 84, textAlign: 'right' }}>Coste unitario</div>
+                </div>
                 <div style={{ textAlign: 'center' }}>Unidad</div>
                 <div style={{ textAlign: 'right' }}>€/Ha pleno</div>
               </div>
@@ -143,32 +145,32 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
                   key={it.key}
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: '2.4fr 0.9fr 1fr 0.8fr 1fr',
+                    gridTemplateColumns: '2.2fr 1.9fr 1.3fr 1fr',
                     alignItems: 'center',
                     padding: '8px 18px',
                     borderTop: '1px solid var(--line)',
                   }}
                 >
                   <div style={{ fontSize: 13.5 }}>{it.label}</div>
-                  <div style={{ textAlign: 'right' }}>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                     <NumberField
                       id={'op:cant:' + g.key + '.' + it.key}
                       value={it.cant}
-                      width={74}
+                      width={84}
                       style={{ fontSize: 13.5 }}
                       onChangeRaw={(raw) => onOpexField(g.key, it.key, 'cant', raw)}
                     />
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
                     <NumberField
                       id={'op:coste:' + g.key + '.' + it.key}
                       value={it.coste}
-                      width={92}
+                      width={84}
                       style={{ fontSize: 13.5 }}
                       onChangeRaw={(raw) => onOpexField(g.key, it.key, 'coste', raw)}
                     />
                   </div>
-                  <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--ink2)' }}>{it.unidad}</div>
+                  <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--ink2)', whiteSpace: 'nowrap' }}>
+                    {it.unidad}
+                  </div>
                   <div style={{ textAlign: 'right', fontFamily: 'var(--num)', fontSize: 14 }}>{it.plenaFmt}</div>
                 </div>
               ))}
