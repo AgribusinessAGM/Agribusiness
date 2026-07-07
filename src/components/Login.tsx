@@ -1,7 +1,12 @@
+import type { FormEvent } from 'react';
 import { useApp } from '../state/store';
 
 export function Login() {
-  const { login } = useApp();
+  const { state, setLoginEmail, setLoginPassword, login } = useApp();
+  const onSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!state.loginPending) login();
+  };
   return (
     <div style={{ minHeight: '100vh', display: 'grid', gridTemplateColumns: '1.05fr 0.95fr' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 48 }}>
@@ -37,60 +42,75 @@ export function Login() {
             Accede a tu modelo, ajusta las variables de tu proyecto y consulta la rentabilidad en
             tiempo real.
           </p>
-          <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
-            Correo electrónico
-          </label>
-          <input
-            defaultValue="cliente@iberocrops.com"
-            style={{
-              width: '100%',
-              padding: '12px 14px',
-              border: '1px solid var(--line)',
-              borderRadius: 'var(--radius)',
-              fontSize: 15,
-              marginBottom: 16,
-              background: 'var(--surface)',
-              color: 'var(--ink)',
-            }}
-          />
-          <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
-            Contraseña
-          </label>
-          <input
-            type="password"
-            defaultValue="••••••••••"
-            style={{
-              width: '100%',
-              padding: '12px 14px',
-              border: '1px solid var(--line)',
-              borderRadius: 'var(--radius)',
-              fontSize: 15,
-              marginBottom: 24,
-              background: 'var(--surface)',
-              color: 'var(--ink)',
-            }}
-          />
-          <button
-            onClick={login}
-            className="lift"
-            style={{
-              width: '100%',
-              background: 'var(--brand)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 'var(--radius)',
-              padding: 13,
-              fontSize: 15,
-              fontWeight: 700,
-              cursor: 'pointer',
-              boxShadow: 'var(--shadow)',
-            }}
-          >
-            Entrar
-          </button>
+          <form onSubmit={onSubmit}>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
+              Correo electrónico
+            </label>
+            <input
+              type="email"
+              value={state.loginEmail}
+              onChange={(e) => setLoginEmail(e.target.value)}
+              autoComplete="email"
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                border: '1px solid var(--line)',
+                borderRadius: 'var(--radius)',
+                fontSize: 15,
+                marginBottom: 16,
+                background: 'var(--surface)',
+                color: 'var(--ink)',
+              }}
+            />
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
+              Contraseña
+            </label>
+            <input
+              type="password"
+              value={state.loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+              autoComplete="current-password"
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                border: '1px solid var(--line)',
+                borderRadius: 'var(--radius)',
+                fontSize: 15,
+                marginBottom: state.loginError ? 8 : 24,
+                background: 'var(--surface)',
+                color: 'var(--ink)',
+              }}
+            />
+            {state.loginError && (
+              <div style={{ color: '#c0392b', fontSize: 13, marginBottom: 16 }}>{state.loginError}</div>
+            )}
+            <button
+              type="submit"
+              disabled={state.loginPending}
+              className="lift"
+              style={{
+                width: '100%',
+                background: 'var(--brand)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 'var(--radius)',
+                padding: 13,
+                fontSize: 15,
+                fontWeight: 700,
+                cursor: state.loginPending ? 'default' : 'pointer',
+                opacity: state.loginPending ? 0.7 : 1,
+                boxShadow: 'var(--shadow)',
+              }}
+            >
+              {state.loginPending ? 'Entrando…' : 'Entrar'}
+            </button>
+          </form>
           <div style={{ textAlign: 'center', marginTop: 18, fontSize: 13, color: 'var(--ink2)' }}>
             ¿Problemas para acceder?{' '}
             <span style={{ color: 'var(--brand)', fontWeight: 600 }}>Contacta con tu gestor</span>
+          </div>
+          <div style={{ textAlign: 'center', marginTop: 8, fontSize: 12, color: 'var(--ink2)' }}>
+            Demo: usa m.ferrer@iberocrops.com con la contraseña agromillora2026
           </div>
         </div>
       </div>

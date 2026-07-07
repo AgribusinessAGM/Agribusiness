@@ -1,27 +1,42 @@
-import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import type {
   AccessLevel,
+  AppUser,
   Assumptions,
+  CurrentUser,
   EditorTab,
   FinModel,
   Scenario,
   Screen,
   TemplateKey,
 } from '../types';
-import { blankA, buildSeed, buildUsers } from '../data/seed';
+import { blankA, buildSeed } from '../data/seed';
 import { fmt2, parseNum } from '../engine/format';
+import * as api from '../api';
 
 export interface AppState {
   screen: Screen;
   activeId: number;
   etab: EditorTab;
   models: FinModel[];
-  users: ReturnType<typeof buildUsers>;
+  users: AppUser[];
+  currentUser: CurrentUser | null;
+  loginEmail: string;
+  loginPassword: string;
+  loginError: string | null;
+  loginPending: boolean;
   showNew: boolean;
   newName: string;
   newHa: number;
   newTemplate: TemplateKey;
+  showInvite: boolean;
+  inviteName: string;
+  inviteEmail: string;
+  inviteOrg: string;
+  inviteError: string | null;
+  inviteDevLink: string | null;
+  invitePending: boolean;
   scenario: Scenario | null;
   toast: string | null;
   projHa: number;
@@ -35,11 +50,23 @@ function initialState(): AppState {
     activeId: 1,
     etab: 'supuestos',
     models: buildSeed(),
-    users: buildUsers(),
+    users: [],
+    currentUser: null,
+    loginEmail: 'm.ferrer@iberocrops.com',
+    loginPassword: '',
+    loginError: null,
+    loginPending: false,
     showNew: false,
     newName: '',
     newHa: 100,
     newTemplate: 'olivo',
+    showInvite: false,
+    inviteName: '',
+    inviteEmail: '',
+    inviteOrg: '',
+    inviteError: null,
+    inviteDevLink: null,
+    invitePending: false,
     scenario: null,
     toast: null,
     projHa: 1,
@@ -52,6 +79,8 @@ export interface AppStore {
   state: AppState;
   active: () => FinModel;
   edVal: (id: string, val: number) => string;
+  setLoginEmail: (v: string) => void;
+  setLoginPassword: (v: string) => void;
   login: () => void;
   logout: () => void;
   gotoDash: () => void;
@@ -67,8 +96,13 @@ export interface AppStore {
   onCapexField: (gkey: string, ikey: string, raw: string) => void;
   onOpexField: (catkey: string, itkey: string, field: 'cant' | 'coste', raw: string) => void;
   onProjHaField: (raw: string) => void;
-  cyclePerm: (userIndex: number, modelId: number) => void;
-  invite: () => void;
+  cyclePerm: (userId: number, modelId: number) => void;
+  openInvite: () => void;
+  closeInvite: () => void;
+  setInviteName: (v: string) => void;
+  setInviteEmail: (v: string) => void;
+  setInviteOrg: (v: string) => void;
+  submitInvite: () => void;
   save: () => void;
   exportXlsx: () => void;
   exportPdf: () => void;
@@ -88,6 +122,8 @@ function inpId(ds: { opfld?: string; catkey?: string; itkey?: string; gkey?: str
   if (ds.gkey) return 'cap:' + ds.gkey + '.' + ds.ikey;
   return 'sup:' + ds.key;
 }
+
+const PERM_ORDER: Record<AccessLevel, AccessLevel> = { none: 'view', view: 'edit', edit: 'none' };
 
 export function useAppStore(): AppStore {
   const [state, setState] = useState<AppState>(initialState);
@@ -109,10 +145,44 @@ export function useAppStore(): AppStore {
     toastTimer.current = setTimeout(() => setState((s) => ({ ...s, toast: null })), 2200);
   }, []);
 
-  const login = useCallback(() => setState((s) => ({ ...s, screen: 'dashboard' })), []);
-  const logout = useCallback(() => setState((s) => ({ ...s, screen: 'login' })), []);
+  const loadUsers = useCallback(async () => {
+    try {
+      const users = await api.fetchUsers();
+      setState((s) => ({ ...s, users }));
+    } catch {
+      // silent — la lista de usuarios solo importa en la pantalla de Admin
+    }
+  }, []);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
+
+  const setLoginEmail = useCallback((v: string) => setState((s) => ({ ...s, loginEmail: v, loginError: null })), []);
+  const setLoginPassword = useCallback((v: string) => setState((s) => ({ ...s, loginPassword: v, loginError: null })), []);
+
+  const login = useCallback(() => {
+    setState((s) => ({ ...s, loginPending: true, loginError: null }));
+    api
+      .login(state.loginEmail, state.loginPassword)
+      .then(({ user }) => {
+        setState((s) => ({ ...s, screen: 'dashboard', currentUser: user, loginPending: false, loginPassword: '' }));
+        loadUsers(); // el estado (invitado/activo) o los permisos pueden haber cambiado desde la última carga
+      })
+      .catch((e: Error) => {
+        setState((s) => ({ ...s, loginPending: false, loginError: e.message }));
+      });
+  }, [state.loginEmail, state.loginPassword, loadUsers]);
+
+  const logout = useCallback(
+    () => setState((s) => ({ ...s, screen: 'login', currentUser: null, loginPassword: '' })),
+    [],
+  );
   const gotoDash = useCallback(() => setState((s) => ({ ...s, screen: 'dashboard' })), []);
-  const gotoAdmin = useCallback(() => setState((s) => ({ ...s, screen: 'admin' })), []);
+  const gotoAdmin = useCallback(() => {
+    setState((s) => ({ ...s, screen: 'admin' }));
+    loadUsers();
+  }, [loadUsers]);
   const gotoResults = useCallback(() => setState((s) => ({ ...s, screen: 'results' })), []);
   const gotoEditor = useCallback(() => setState((s) => ({ ...s, screen: 'editor' })), []);
 
@@ -189,17 +259,69 @@ export function useAppStore(): AppStore {
     setState((s) => ({ ...s, editKey: 'ui:projHa', editRaw: raw, projHa: v }));
   }, []);
 
-  const cyclePerm = useCallback((userIndex: number, modelId: number) => {
-    const order: Record<AccessLevel, AccessLevel> = { none: 'view', view: 'edit', edit: 'none' };
-    setState((s) => ({
-      ...s,
-      users: s.users.map((u, i) =>
-        i === userIndex ? { ...u, access: { ...u.access, [modelId]: order[u.access[modelId]] } } : u,
-      ),
-    }));
-  }, []);
+  const cyclePerm = useCallback(
+    (userId: number, modelId: number) => {
+      const current = state.users.find((u) => u.id === userId);
+      if (!current) return;
+      const next = PERM_ORDER[current.access[modelId] || 'none'];
+      setState((s) => ({
+        ...s,
+        users: s.users.map((u) =>
+          u.id === userId ? { ...u, access: { ...u.access, [modelId]: next } } : u,
+        ),
+      }));
+      api.setAccess(userId, modelId, next).catch(() => {
+        flash('No se pudo actualizar el permiso');
+        loadUsers();
+      });
+    },
+    [state.users, flash, loadUsers],
+  );
 
-  const invite = useCallback(() => flash('Invitación enviada (demo)'), [flash]);
+  const openInvite = useCallback(
+    () =>
+      setState((s) => ({
+        ...s,
+        showInvite: true,
+        inviteName: '',
+        inviteEmail: '',
+        inviteOrg: '',
+        inviteError: null,
+        inviteDevLink: null,
+      })),
+    [],
+  );
+  const closeInvite = useCallback(() => setState((s) => ({ ...s, showInvite: false })), []);
+  const setInviteName = useCallback((v: string) => setState((s) => ({ ...s, inviteName: v })), []);
+  const setInviteEmail = useCallback((v: string) => setState((s) => ({ ...s, inviteEmail: v })), []);
+  const setInviteOrg = useCallback((v: string) => setState((s) => ({ ...s, inviteOrg: v })), []);
+
+  const submitInvite = useCallback(() => {
+    const { inviteName, inviteEmail, inviteOrg } = state;
+    if (!inviteName.trim() || !inviteEmail.trim()) {
+      setState((s) => ({ ...s, inviteError: 'Nombre y correo son obligatorios.' }));
+      return;
+    }
+    setState((s) => ({ ...s, invitePending: true, inviteError: null }));
+    api
+      .inviteUser({ name: inviteName, email: inviteEmail, org: inviteOrg })
+      .then(({ user, devLink }) => {
+        setState((s) => ({
+          ...s,
+          invitePending: false,
+          users: s.users.some((u) => u.id === user.id)
+            ? s.users.map((u) => (u.id === user.id ? user : u))
+            : s.users.concat([user]),
+          inviteDevLink: devLink || null,
+          showInvite: devLink ? s.showInvite : false,
+        }));
+        flash(devLink ? 'Invitación creada (sin proveedor de email real configurado)' : 'Invitación enviada por correo');
+      })
+      .catch((e: Error) => {
+        setState((s) => ({ ...s, invitePending: false, inviteError: e.message }));
+      });
+  }, [state.inviteName, state.inviteEmail, state.inviteOrg, flash]);
+
   const save = useCallback(() => flash('Modelo guardado'), [flash]);
   const exportXlsx = useCallback(() => flash('Exportando a Excel…'), [flash]);
   const exportPdf = useCallback(() => flash('Generando informe PDF…'), [flash]);
@@ -253,6 +375,8 @@ export function useAppStore(): AppStore {
       state,
       active,
       edVal,
+      setLoginEmail,
+      setLoginPassword,
       login,
       logout,
       gotoDash,
@@ -269,7 +393,12 @@ export function useAppStore(): AppStore {
       onOpexField,
       onProjHaField,
       cyclePerm,
-      invite,
+      openInvite,
+      closeInvite,
+      setInviteName,
+      setInviteEmail,
+      setInviteOrg,
+      submitInvite,
       save,
       exportXlsx,
       exportPdf,
@@ -287,6 +416,8 @@ export function useAppStore(): AppStore {
       state,
       active,
       edVal,
+      setLoginEmail,
+      setLoginPassword,
       login,
       logout,
       gotoDash,
@@ -303,7 +434,12 @@ export function useAppStore(): AppStore {
       onOpexField,
       onProjHaField,
       cyclePerm,
-      invite,
+      openInvite,
+      closeInvite,
+      setInviteName,
+      setInviteEmail,
+      setInviteOrg,
+      submitInvite,
       save,
       exportXlsx,
       exportPdf,

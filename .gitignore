@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Backend: secretos y base de datos local (no deben commitearse)
+.env
+server/data.db
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

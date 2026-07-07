@@ -1,6 +1,7 @@
-import type { CSSProperties } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { AppProvider, useApp } from './state/store';
 import { Login } from './components/Login';
+import { SetPassword } from './components/SetPassword';
 import { TopBar } from './components/TopBar';
 import { Dashboard } from './components/Dashboard';
 import { EditorLayout } from './components/editor/EditorLayout';
@@ -9,9 +10,14 @@ import { Admin } from './components/Admin';
 import { NewModelModal } from './components/NewModelModal';
 import { Toast } from './components/Toast';
 
+function getTokenFromUrl(): string | null {
+  return new URLSearchParams(window.location.search).get('token');
+}
+
 function AppShell() {
   const { state, active } = useApp();
   const model = active();
+  const [routeToken, setRouteToken] = useState<string | null>(getTokenFromUrl);
 
   const cropOverride: CSSProperties =
     model.crop === 'almendro'
@@ -22,6 +28,19 @@ function AppShell() {
           '--accent': '#8a5a1e',
         } as CSSProperties)
       : {};
+
+  const closeSetPassword = () => {
+    window.history.replaceState(null, '', window.location.pathname.replace(/set-password\/?$/, ''));
+    setRouteToken(null);
+  };
+
+  if (routeToken) {
+    return (
+      <div style={{ background: 'var(--bg)', color: 'var(--ink)', minHeight: '100vh' }}>
+        <SetPassword token={routeToken} onDone={closeSetPassword} />
+      </div>
+    );
+  }
 
   return (
     <div style={{ ...cropOverride, background: 'var(--bg)', color: 'var(--ink)', minHeight: '100vh' }}>

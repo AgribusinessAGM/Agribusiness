@@ -1,4 +1,5 @@
 import { useApp } from '../state/store';
+import { InviteModal } from './InviteModal';
 import type { AccessLevel } from '../types';
 
 const roleMap: Record<AccessLevel, { label: string; bg: string; fg: string }> = {
@@ -8,7 +9,7 @@ const roleMap: Record<AccessLevel, { label: string; bg: string; fg: string }> = 
 };
 
 export function Admin() {
-  const { state, cyclePerm, invite } = useApp();
+  const { state, cyclePerm, openInvite } = useApp();
 
   return (
     <main style={{ maxWidth: 1120, width: '100%', margin: '0 auto', padding: '30px 26px' }}>
@@ -20,7 +21,7 @@ export function Admin() {
           </p>
         </div>
         <button
-          onClick={invite}
+          onClick={openInvite}
           className="lift"
           style={{ background: 'var(--brand)', color: '#fff', border: 'none', borderRadius: 'var(--radius)', padding: '11px 18px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }}
         >
@@ -54,10 +55,27 @@ export function Admin() {
             </tr>
           </thead>
           <tbody>
-            {state.users.map((u, ui) => (
-              <tr key={u.email} style={{ borderTop: '1px solid var(--line)' }}>
+            {state.users.map((u) => (
+              <tr key={u.id} style={{ borderTop: '1px solid var(--line)' }}>
                 <td style={{ padding: '12px 18px' }}>
-                  <div style={{ fontWeight: 600, fontSize: 14 }}>{u.name}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ fontWeight: 600, fontSize: 14 }}>{u.name}</div>
+                    {u.status === 'invited' && (
+                      <span
+                        style={{
+                          fontSize: 10.5,
+                          fontWeight: 700,
+                          color: 'var(--accent)',
+                          background: 'var(--brandL)',
+                          border: '1px solid var(--editableLine)',
+                          padding: '1px 7px',
+                          borderRadius: 999,
+                        }}
+                      >
+                        invitación pendiente
+                      </span>
+                    )}
+                  </div>
                   <div style={{ fontSize: 12, color: 'var(--ink2)' }}>{u.email}</div>
                   <div style={{ fontSize: 11, color: 'var(--ink2)', marginTop: 2 }}>{u.org}</div>
                 </td>
@@ -67,7 +85,7 @@ export function Admin() {
                   return (
                     <td key={m.id} style={{ textAlign: 'center', padding: '10px 14px' }}>
                       <button
-                        onClick={() => cyclePerm(ui, m.id)}
+                        onClick={() => cyclePerm(u.id, m.id)}
                         className="lift"
                         style={{ background: rm.bg, color: rm.fg, border: 'none', borderRadius: 999, padding: '6px 16px', fontWeight: 700, fontSize: 12, cursor: 'pointer', minWidth: 70 }}
                       >
@@ -81,6 +99,7 @@ export function Admin() {
           </tbody>
         </table>
       </div>
+      <InviteModal />
     </main>
   );
 }

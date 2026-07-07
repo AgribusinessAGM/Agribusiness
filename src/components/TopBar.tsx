@@ -2,6 +2,12 @@ import { useApp } from '../state/store';
 
 export function TopBar() {
   const { state, gotoDash, gotoAdmin, logout } = useApp();
+  const initials = (state.currentUser?.name || '?')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase())
+    .join('');
 
   const navStyle = (on: boolean) => ({
     background: on ? 'var(--brandL)' : 'none',
@@ -48,6 +54,7 @@ export function TopBar() {
       <div style={{ width: 1, height: 26, background: 'var(--line)' }} />
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <div
+          title={state.currentUser?.name}
           style={{
             width: 32,
             height: 32,
@@ -61,7 +68,7 @@ export function TopBar() {
             fontSize: 13,
           }}
         >
-          MF
+          {initials}
         </div>
         <button
           onClick={logout}

@@ -1,4 +1,4 @@
-import type { Assumptions, AppUser, FinModel } from '../types';
+import type { Assumptions, FinModel } from '../types';
 import { buildCapex } from './capex';
 import { buildOpex } from './opex';
 
@@ -104,31 +104,5 @@ export function buildSeed(): FinModel[] {
   ];
 }
 
-export function buildUsers(): AppUser[] {
-  return [
-    {
-      name: 'María Ferrer',
-      email: 'm.ferrer@iberocrops.com',
-      org: 'Iberocrops (Cliente)',
-      access: { 1: 'edit', 2: 'view', 3: 'none' },
-    },
-    {
-      name: 'James Whitfield',
-      email: 'j.whitfield@greenfund.eu',
-      org: 'GreenFund (Inversor)',
-      access: { 1: 'view', 2: 'none', 3: 'view' },
-    },
-    {
-      name: 'Carlos Ruiz',
-      email: 'c.ruiz@agromillora.com',
-      org: 'Agromillora (Admin)',
-      access: { 1: 'edit', 2: 'edit', 3: 'edit' },
-    },
-    {
-      name: 'Ana Costa',
-      email: 'a.costa@alentejofarms.pt',
-      org: 'Alentejo Farms (Cliente)',
-      access: { 1: 'none', 2: 'none', 3: 'edit' },
-    },
-  ];
-}
+// Los usuarios y sus permisos ahora viven en el backend (server/db.js), que
+// siembra estos mismos cuatro usuarios de ejemplo — ver ese archivo.
