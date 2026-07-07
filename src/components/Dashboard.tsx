@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { compute } from '../engine/compute';
 import { nf, pct } from '../engine/format';
 import { useApp } from '../state/store';
@@ -9,6 +10,13 @@ const statusColor: Record<ModelStatus, string> = {
   'En revisión': 'var(--accent)',
 };
 
+const ALMENDRO_THEME: CSSProperties = {
+  '--brand': '#997300',
+  '--brandD': '#6b5000',
+  '--brandL': '#f4eeda',
+  '--accent': '#8a5a1e',
+} as CSSProperties;
+
 function ModelCard({ m }: { m: FinModel }) {
   const { openModel, openResults } = useApp();
   const r = compute(m.a);
@@ -17,6 +25,7 @@ function ModelCard({ m }: { m: FinModel }) {
     <div
       className="lift"
       style={{
+        ...(m.crop === 'almendro' ? ALMENDRO_THEME : {}),
         background: 'var(--surface)',
         border: '1px solid var(--line)',
         borderRadius: 'var(--radius)',
