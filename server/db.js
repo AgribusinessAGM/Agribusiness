@@ -164,3 +164,31 @@ function renameOpexItemLabel(oldLabel, newLabel) {
 }
 renameOpexItemLabel('Reabastecimiento (de agua)', 'Suministro (de agua)');
 renameOpexItemLabel('Poda manual en invierno', 'Poda manual\nen invierno');
+
+// Migración: normaliza cualquier variante histórica de la unidad "€/Kg/ Aceitunas"
+// (con espacio, sin salto de línea, singular/plural) al valor final en dos líneas,
+// también en modelos ya persistidos.
+function fixOpexKgAceitunasUnit() {
+  const correct = '€/Kg/\nAceitunas';
+  const rows = db.prepare('SELECT id, assumptions FROM models').all();
+  const update = db.prepare('UPDATE models SET assumptions = ? WHERE id = ?');
+  for (const row of rows) {
+    const a = JSON.parse(row.assumptions);
+    let changed = false;
+    for (const cat of a.opexItems || []) {
+      for (const it of cat.items || []) {
+        if (
+          typeof it.unidad === 'string' &&
+          it.unidad.startsWith('€/Kg') &&
+          it.unidad.includes('Aceitun') &&
+          it.unidad !== correct
+        ) {
+          it.unidad = correct;
+          changed = true;
+        }
+      }
+    }
+    if (changed) update.run(JSON.stringify(a), row.id);
+  }
+}
+fixOpexKgAceitunasUnit();
