@@ -296,13 +296,13 @@ export function EditorLayout() {
             </TabWithPhoto>
           )}
           {state.etab === 'opex' && (
-            <TabWithPhoto
+            <OpexTab
+              a={a}
+              r={r}
               photo={model.crop === 'almendro' ? '/assets/opex-almendro-detalle.webp' : '/assets/opex-detalle.webp'}
-              alt={model.crop === 'almendro' ? 'Cosechadora trabajando en el almendral' : 'Cosechadoras trabajando en el olivar'}
-              objectPosition={model.crop === 'almendro' ? '22% center' : 'center'}
-            >
-              <OpexTab a={a} r={r} />
-            </TabWithPhoto>
+              photoAlt={model.crop === 'almendro' ? 'Cosechadora trabajando en el almendral' : 'Cosechadoras trabajando en el olivar'}
+              photoObjectPosition={model.crop === 'almendro' ? '22% center' : 'center'}
+            />
           )}
           {state.etab === 'rent' && <RentabilidadTab r={r} />}
           {state.etab === 'fin' && <FinancieraTab r={r} />}

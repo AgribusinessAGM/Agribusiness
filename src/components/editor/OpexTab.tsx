@@ -29,7 +29,19 @@ const projLabel = (strong: boolean): CSSProperties => ({
   zIndex: 1,
 });
 
-export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
+export function OpexTab({
+  a,
+  r,
+  photo,
+  photoAlt,
+  photoObjectPosition = 'center',
+}: {
+  a: Assumptions;
+  r: ComputeResult;
+  photo?: string;
+  photoAlt?: string;
+  photoObjectPosition?: string;
+}) {
   const { state, onOpexField, onProjHaField, canEdit } = useApp();
 
   const opexDetail = a.opexItems.map((cat) => {
@@ -99,7 +111,8 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
 
   return (
     <>
-      <div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+        <div style={{ gridColumn: '1 / 4' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
           <h2 style={{ fontSize: 18, fontWeight: 800, margin: 0 }}>2 · OPEX — Costes operativos</h2>
           <span
@@ -230,6 +243,22 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
             </div>
           </div>
         </div>
+        </div>
+        {photo && (
+          <img
+            src={photo}
+            alt={photoAlt}
+            style={{
+              gridColumn: '4 / 5',
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: photoObjectPosition,
+              borderRadius: 'var(--radius)',
+              boxShadow: 'var(--shadow)',
+            }}
+          />
+        )}
       </div>
 
       <div>
