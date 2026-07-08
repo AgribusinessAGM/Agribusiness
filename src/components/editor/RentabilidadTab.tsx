@@ -10,8 +10,8 @@ export function RentabilidadTab({ r }: { r: ComputeResult }) {
     <div>
       <h2 style={{ fontSize: 18, fontWeight: 800, margin: '0 0 6px' }}>3 · Rentabilidad — por capas</h2>
       <p style={{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 18px' }}>
-        Misma estructura que el Excel: proyecto agrícola, SPV y Fondo, cada uno con su TIR. Cifras
-        en k€ · {horizon} años (horizonte completo del modelo).
+        Análisis de la rentabilidad del proyecto: Proyecto agrícola · Estructura SPV · Estructura
+        Fondo, cada uno con su TIR. Cifras en miles € ('000).
       </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         {pnlLayers.map((L) => (
