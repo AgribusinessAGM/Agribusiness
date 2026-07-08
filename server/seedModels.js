@@ -89,7 +89,7 @@ function buildOpex() {
       key: 'infra',
       label: 'Mantenimiento de infraestructura',
       items: [
-        I('Reabastecimiento (de agua)', 'Ha', 1, 20, rep([20, 20], 0, 11)),
+        I('Suministro (de agua)', 'Ha', 1, 20, rep([20, 20], 0, 11)),
         I('Mantenimiento de embalses', 'Ha', 1, 15, Array(13).fill(15)),
         I('Limpieza de alcantarillado', 'Ha', 1, 25, [0, 25, 0, 25, 0, 25, 0, 25, 0, 25, 0, 25, 0]),
       ],

@@ -142,3 +142,24 @@ function seedModelsIfEmpty(createdBy) {
 
 const seededAdminId = seedUsersIfEmpty();
 seedModelsIfEmpty(seededAdminId);
+
+// Migración: renombra una sub-partida de OPEX ya persistida en modelos existentes
+// (los modelos nuevos ya nacen con el nombre correcto vía seedModels.js).
+function renameOpexItemLabel(oldLabel, newLabel) {
+  const rows = db.prepare('SELECT id, assumptions FROM models').all();
+  const update = db.prepare('UPDATE models SET assumptions = ? WHERE id = ?');
+  for (const row of rows) {
+    const a = JSON.parse(row.assumptions);
+    let changed = false;
+    for (const cat of a.opexItems || []) {
+      for (const it of cat.items || []) {
+        if (it.label === oldLabel) {
+          it.label = newLabel;
+          changed = true;
+        }
+      }
+    }
+    if (changed) update.run(JSON.stringify(a), row.id);
+  }
+}
+renameOpexItemLabel('Reabastecimiento (de agua)', 'Suministro (de agua)');
