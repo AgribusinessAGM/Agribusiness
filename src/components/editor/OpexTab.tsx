@@ -180,7 +180,7 @@ export function OpexTab({ a, r }: { a: Assumptions; r: ComputeResult }) {
                     borderTop: '1px solid var(--line)',
                   }}
                 >
-                  <div style={{ fontSize: 13.5 }}>{it.label}</div>
+                  <div style={{ fontSize: 13.5, whiteSpace: 'pre-line' }}>{it.label}</div>
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                     <NumberField
                       id={'op:cant:' + it.catKey + '.' + it.key}

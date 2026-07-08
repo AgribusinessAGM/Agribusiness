@@ -163,3 +163,4 @@ function renameOpexItemLabel(oldLabel, newLabel) {
   }
 }
 renameOpexItemLabel('Reabastecimiento (de agua)', 'Suministro (de agua)');
+renameOpexItemLabel('Poda manual en invierno', 'Poda manual\nen invierno');

@@ -128,7 +128,7 @@ function buildOpex() {
         I('Poda terciaria en "U"', 'Ha', 1, 65, [0, 65].concat(Array(11).fill(0))),
         I('Poda mecánica de cobertura', 'Ha', 1, 50, [0].concat(Array(12).fill(50))),
         I('Poda mecánica lateral', 'Ha', 2, 50, [0].concat(Array(12).fill(100))),
-        I('Poda manual en invierno', 'Ha', 14, 18, [0, 0].concat(Array(11).fill(252))),
+        I('Poda manual\nen invierno', 'Ha', 14, 18, [0, 0].concat(Array(11).fill(252))),
       ],
     },
     {
