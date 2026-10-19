@@ -6,8 +6,16 @@
   Require all denied
 </FilesMatch>
 
-# Código fuente, diseño, transcripciones y el propio repositorio git.
+# Diseño, transcripciones y el propio repositorio git.
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteRule ^(frontend|chats|project|\.git)(/|$) - [F,L]
+  RewriteRule ^(chats|project|\.git)(/|$) - [F,L]
+</IfModule>
+
+# La interfaz (app/*.js) se edita sin compilar: que el navegador compruebe
+# siempre si hay una versión nueva en lugar de usar la copia de su caché.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|js|css)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
 </IfModule>

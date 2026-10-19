@@ -14,9 +14,9 @@ Node.js.
 - MySQL o MariaDB.
 - Apache. Los `.htaccess` incluidos protegen las carpetas internas.
 
-**No hace falta Node.js para ejecutar la app**: la interfaz ya está compilada
-en la raíz del repositorio. Node.js solo se necesita para modificar la interfaz
-(ver "Modificar la interfaz").
+**No hace falta Node.js ni ninguna compilación**, ni para ejecutar la app ni
+para modificarla: la interfaz son archivos JavaScript que el navegador carga
+tal cual (ver "Modificar la interfaz").
 
 ## Instalar en XAMPP (local)
 
@@ -55,30 +55,39 @@ la contraseña se muestra en la pantalla de administración.
 
 La raíz del repositorio es la app:
 
-- `index.html`, `assets/` — interfaz compilada (no editar a mano)
+- `index.html` — página de entrada (carga `app/main.js`)
+- `app/` — **código de la interfaz** (React en JavaScript, sin compilar)
+  - `components/` — pantallas y piezas de la interfaz
+  - `engine/` — motor de cálculo (`compute.js`, réplica del Excel)
+  - `state/store.js` — estado de la app y acciones
+  - `data/` — estructura base de CAPEX y OPEX
+  - `styles.css` — estilos globales
+- `assets/` — imágenes y `vendor/` (React, React DOM y htm, copiados aquí
+  para no depender de internet)
 - `api/index.php` — API (login, usuarios, invitaciones, permisos, modelos)
 - `api/lib/` — conexión a MySQL y envío de correo
 - `api/data/` — esquema de la base de datos y modelos de ejemplo
-- `frontend/` — código fuente de la interfaz (React + TypeScript, Vite)
 - `project/`, `chats/` — diseño original y transcripciones (referencia)
 
-El `.htaccess` de la raíz impide abrir desde el navegador `frontend/`,
-`project/`, `chats/`, `.git` y los `.md`.
+El `.htaccess` de la raíz impide abrir desde el navegador `project/`,
+`chats/`, `.git` y los `.md`, y hace que el navegador no use copias antiguas
+de los `.js` y `.css`.
 
-Para publicar en Plesk basta con subir `index.html`, `.htaccess`, `assets/` y
-`api/` (con su `config.php`).
+Para publicar en Plesk basta con subir `index.html`, `.htaccess`, `app/`,
+`assets/` y `api/` (con su `config.php`).
 
 ## Modificar la interfaz
 
-La interfaz está escrita en React + TypeScript y hay que compilarla tras
-cualquier cambio. Requiere Node.js 20 o superior:
+Edita el archivo que toque dentro de `app/` y recarga el navegador. No hay
+que instalar ni compilar nada.
 
-```bash
-cd frontend
-npm install
-npm run build   # compila y copia el resultado a la raíz del repositorio
+Los componentes usan React con plantillas `html` en lugar de JSX (librería
+[htm](https://github.com/developit/htm)). Se escribe casi igual que HTML:
+
+```js
+html`<button onClick=${guardar} style=${{ color: 'red' }}>Guardar</button>`
+html`<${NumberField} id="sup:superficie" value=${a.superficie} />`
 ```
 
-Para desarrollar con recarga automática, con XAMPP arrancado y el repositorio
-en `htdocs/Agribusiness`, ejecuta `npm run dev` dentro de `frontend/` y abre
-http://localhost:5173. Las llamadas a la API se redirigen al PHP de XAMPP.
+Si algo no se ve, abre la consola del navegador (F12): ahí aparecen los
+errores con el archivo y la línea.

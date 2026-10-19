@@ -8,8 +8,19 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <title>Plataforma AGRIBUSINESS — Agromillora</title>
-    <script type="module" crossorigin src="./assets/index-_UqJxpqJ.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-C783pqm7.css">
+    <link rel="stylesheet" href="app/styles.css">
+    <!-- Sin compilación: el navegador carga los módulos de app/ directamente.
+         React y htm están guardados en assets/vendor/ (no se descargan de internet). -->
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "./assets/vendor/react.js",
+          "react-dom/client": "./assets/vendor/react-dom-client.js",
+          "htm": "./assets/vendor/htm.js"
+        }
+      }
+    </script>
+    <script type="module" src="app/main.js"></script>
   </head>
   <body>
     <div id="root"></div>

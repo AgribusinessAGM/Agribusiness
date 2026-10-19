@@ -52,7 +52,7 @@ solo a sus modelos.
 | Rama actual (PHP + MySQL) | `php` |
 | Rama antigua (Node.js) | `main`, publicada en Railway |
 | Repo y app en local | `C:\xampp_marc\htdocs\Agribusiness` (clon completo, rama `php`) → http://localhost/Agribusiness/ |
-| Código fuente de la interfaz | `frontend/` (`src/`, `public/`, `package.json`, Vite) |
+| Código de la interfaz | `app/` (JavaScript sin compilar; React en `assets/vendor/`) |
 | Producción prevista | Plesk (dominio propio de Marc), aún sin desplegar |
 | Diseño original | `project/Plataforma Modelos.dc.html` (prototipo de Claude Design) |
 | Transcripciones del diseño | `chats/chat1.md` … `chat5.md` |
@@ -66,22 +66,36 @@ estaba en local: pedir a Marc la carpeta `C:\xampp_marc\htdocs\Agribusiness`
 ## 4. Arquitectura (rama `php`)
 
 ```
-Navegador ──► index.html + assets/   (raíz del repo; interfaz React compilada)
-          └─► api/index.php/<ruta>   (API PHP, JSON)
+Navegador ──► index.html → app/main.js   (interfaz React, módulos JS sin compilar)
+          └─► api/index.php/<ruta>      (API PHP, JSON)
                     └─► MySQL / MariaDB (base de datos "agribusiness")
 ```
 
-- **Estructura del repo (desde 2026-10-19):** la raíz del repositorio **es** la
-  app (`index.html`, `assets/`, `api/`, `.htaccess`). El código fuente de la
-  interfaz está en `frontend/`. El `.htaccess` de la raíz devuelve 403 para
-  `frontend/`, `chats/`, `project/`, `.git`, los `.md` y los archivos que
-  empiezan por punto (usa `mod_rewrite`).
-- **Interfaz:** React 19 + TypeScript, compilada con Vite. El código fuente está
-  en `frontend/src/`. Se compila con `npm run build` **dentro de `frontend/`**:
-  Vite deja el resultado en `frontend/dist/` y `frontend/scripts/build-web.mjs`
-  lo copia a la raíz del repo (borra antes `index.html` y `assets/` de la raíz,
-  nunca `api/`). **No editar `assets/index-*.js` a mano.** `frontend/index.html`
-  es la entrada de desarrollo de Vite, no la app.
+- **Sin Node.js (desde 2026-10-19):** no hay ningún paso de compilación ni
+  `package.json`. Para cambiar la interfaz se edita el `.js` de `app/` y se
+  recarga el navegador. **No volver a introducir Node, npm, Vite ni
+  TypeScript**: es un requisito de Marc.
+- **Estructura del repo:** la raíz del repositorio **es** la app
+  (`index.html`, `app/`, `assets/`, `api/`, `.htaccess`). El `.htaccess` de la
+  raíz devuelve 403 para `chats/`, `project/`, `.git`, los `.md` y los archivos
+  que empiezan por punto (usa `mod_rewrite`), y pone `Cache-Control: no-cache`
+  a `.html`, `.js` y `.css` (usa `mod_headers`) para que un cambio se vea con
+  solo recargar.
+- **Interfaz:** React 19.2.7 en JavaScript (módulos ES). En lugar de JSX se usa
+  la librería **htm** (plantillas `` html`…` `` de `app/lib/html.js`): valores
+  y eventos con `${…}`, componentes con `<${Comp} />`, cierre con `<//>`; las
+  entidades HTML (`&nbsp;`) no se traducen, se usa `${' '}`. Los tipos de
+  datos están documentados con JSDoc en `app/types.js`.
+  - `index.html` define un *import map*: `react`, `react-dom/client` y `htm`
+    apuntan a `assets/vendor/` (versiones de producción descargadas una vez de
+    jsDelivr, con sus imports reescritos a rutas locales; no se usa internet
+    en tiempo de ejecución salvo Google Fonts).
+  - Para actualizar React: descargar de jsDelivr `react@X/+esm`,
+    `react-dom@X/+esm`, `react-dom@X/client/+esm` y la versión de `scheduler`
+    que pida, y cambiar los `"/npm/…/+esm"` por `"./react.js"`, etc.
+  - `app/components/` pantallas; `app/engine/` motor de cálculo;
+    `app/state/store.js` estado y acciones; `app/data/` plantillas de
+    CAPEX/OPEX; `app/styles.css` estilos globales.
 - **API:** PHP 8.0+ sin frameworks ni Composer.
   - `api/index.php` — enrutado y las 14 operaciones.
   - `api/lib/db.php` — conexión PDO, creación automática de la base de datos,
@@ -197,7 +211,7 @@ permisos** (solo admin).
 Indicadores fijos arriba: TIR Fondo · Final, VAN Fondo (8%), Equity
 comprometido (calculado automáticamente) e Inversión total.
 
-### Motor de cálculo (`frontend/src/engine/compute.ts`)
+### Motor de cálculo (`app/engine/compute.js`)
 
 - Réplica del Excel original. `MP = 6` es el año de referencia del "€/Ha pleno".
   El horizonte de cálculo es la duración del proyecto (`duracionProyecto`), y
@@ -207,7 +221,7 @@ comprometido (calculado automáticamente) e Inversión total.
   escala en proporción (`opexItemScale`).
 - Los impuestos de SPV y Fondo se corrigieron para cuadrar con el Excel (commit
   `a3202aa`).
-- `irr()` calcula la TIR y `pnlLayers.ts` arma las tres capas.
+- `irr()` calcula la TIR y `pnlLayers.js` arma las tres capas.
 
 ### Diseño y estilo
 
@@ -222,7 +236,7 @@ comprometido (calculado automáticamente) e Inversión total.
   (convención de Excel para inputs). En solo lectura: transparentes, con texto
   normal. Al enfocar una celda con valor 0, se vacía.
 - **Fotos a la derecha** de las pestañas Supuestos, CAPEX y OPEX (en
-  `frontend/public/assets/`, versión de olivo y de almendro). En OPEX la foto **termina
+  `assets/`, versión de olivo y de almendro). En OPEX la foto **termina
   en el cuadro "Total OPEX"** y la proyección ocupa todo el ancho.
 - Textos con salto de línea forzado: "€/Kg/" + "Aceitunas" (unidad) y "Poda
   manual" + "en invierno" (se guardan con `\n` y se muestran con
@@ -235,7 +249,7 @@ comprometido (calculado automáticamente) e Inversión total.
 Se elige nombre, superficie y plantilla (Olivo SHD / Almendro SHD / En blanco).
 La plantilla solo decide el cultivo (`almendro` o, en otro caso, `olivo`), que
 fija el tema de color y las fotos. En todos los casos los supuestos empiezan
-con las celdas editables a 0 (`blankA` en `frontend/src/data/seed.ts`), salvo la
+con las celdas editables a 0 (`blankA` en `app/data/seed.js`), salvo la
 superficie, y con la estructura completa de CAPEX y OPEX.
 
 ## 6. Pendiente / limitaciones conocidas
@@ -249,8 +263,10 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   autenticado" activado en el buzón.
 - **Despliegue en Plesk:** sin hacer. Requiere PHP 8.0+ con `pdo_mysql`, crear
   la base de datos en el panel, `api/config.php` con credenciales y `app_url`,
-  y subir solo `index.html`, `.htaccess`, `assets/` y `api/` de la raíz del
-  repo (no hace falta `frontend/`, `chats/`, `project/` ni los `.md`).
+  y subir solo `index.html`, `.htaccess`, `app/`, `assets/` y `api/` de la
+  raíz del repo (no hace falta `chats/`, `project/` ni los `.md`). Comprobar
+  que el servidor sirve los `.js` como `text/javascript` (los módulos ES lo
+  exigen).
 - **Datos de producción en Railway** (rama `main`): no se han migrado a MySQL.
   Las contraseñas de allí (scrypt de Node) no valen en PHP: habría que volver a
   invitar a los usuarios.
@@ -263,18 +279,15 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 
 1. Leer esta memoria.
 2. Clonar el repositorio y cambiar a la rama `php`.
-3. Para cambios de **interfaz**: editar `frontend/src/` y, dentro de
-   `frontend/`, ejecutar `npm install` (una vez) y `npm run build`. El
-   resultado queda en la raíz del repo (`index.html` y `assets/`). Ojo: en el
-   equipo de Marc **Node.js no está instalado** (a 2026-10-19); hay que
-   instalarlo antes de poder compilar.
+3. Para cambios de **interfaz**: editar el `.js` correspondiente de `app/` y
+   recargar el navegador. No hay compilación (ver sección 4).
 4. Para cambios de **API o base de datos**: editar `api/`. Si
    cambia el esquema de una base de datos ya existente, añadir una migración
    idempotente en `api/lib/db.php`; `ensure_schema` solo crea tablas cuando no
    existen.
 5. Probar en local: Apache + PHP + MariaDB. En el equipo de Marc la app se
    sirve en http://localhost/Agribusiness/ directamente desde el repo, así que
-   tras `npm run build` ya se puede validar sin copiar nada.
+   cualquier cambio se valida recargando, sin copiar nada.
 6. Si se trabaja fuera de su equipo, entregar el repositorio (ZIP con `.git`).
 7. Commit local. **Push solo con su orden explícita.**
 8. Actualizar esta memoria (sección 8 y lo que haya cambiado).
@@ -347,3 +360,15 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   http://localhost/Agribusiness/ carga, el login de admin abre el dashboard
   con los 3 modelos, la API responde, y `frontend/`, `chats/`, `project/`,
   `.git`, `.md`, `api/lib` y `api/data` dan 403.
+- 2026-10-19: **Se elimina Node.js por completo** (petición de Marc: "que la
+  app no necesite para nada nodejs"). Los 35 archivos TypeScript/JSX de
+  `frontend/src/` se convierten a JavaScript en `app/` (misma estructura y
+  lógica; JSX → htm). React 19.2.7, React DOM y htm 3.1.1 se guardan en
+  `assets/vendor/` y se cargan con un import map. Se borran `frontend/`
+  (package.json, Vite, TypeScript) y el bundle compilado. Comprobado: se
+  capturó texto, valores de los campos e HTML de 20 pantallas (dashboard,
+  5 pestañas + resultados de los 3 modelos y usuarios) con la versión anterior
+  y la nueva da **exactamente el mismo resultado**; además, edición de celdas
+  (TIR 10,94% → 20,45% con precio 5,2 y vuelta), escenarios, modales,
+  validaciones, login correcto e incorrecto, usuario de solo lectura, tema
+  almendro e invitación inválida.
