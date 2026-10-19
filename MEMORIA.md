@@ -59,10 +59,20 @@ solo a sus modelos.
 | Diseño original | `project/Plataforma Modelos.dc.html` (prototipo de Claude Design) |
 | Transcripciones del diseño | `chats/chat1.md` … `chat5.md` |
 
-**Estado de la rama `php` a 2026-10-19:** subida a GitHub por primera vez
-(hasta el commit `4572cc0`, por orden de Marc), con seguimiento de
-`origin/php`. Los commits posteriores pueden estar solo en local hasta el
-siguiente push.
+**Estado de la rama `php` a 2026-10-19:** publicada en GitHub (por orden de
+Marc) y con seguimiento de `origin/php`; último commit subido `6a69a9a`. Los
+commits posteriores pueden estar solo en local hasta el siguiente push
+(comprobar con `git status -sb`).
+
+### Entorno del equipo de Marc (Windows 11)
+
+- XAMPP en `C:\xampp_marc` (Apache + MariaDB + PHP en `C:\xampp_marc\php`).
+- **Git** instalado en `C:\Users\mconesa\AppData\Local\Programs\Git`
+  (en el PATH de usuario; desde la sesión de IA conviene llamar a
+  `...\Git\cmd\git.exe` con la ruta completa). Identidad global: Marc Conesa
+  <mconesa@agromillora.com>.
+- **Node.js no está instalado** y no hace falta (ver sección 4).
+- `winget` no está disponible.
 
 ## 4. Arquitectura (rama `php`)
 
@@ -85,7 +95,7 @@ Navegador ──► index.html → app/main.js   (interfaz React, módulos JS si
 - **Interfaz:** React 19.2.7 en JavaScript (módulos ES). En lugar de JSX se usa
   la librería **htm** (plantillas `` html`…` `` de `app/lib/html.js`): valores
   y eventos con `${…}`, componentes con `<${Comp} />`, cierre con `<//>`; las
-  entidades HTML (`&nbsp;`) no se traducen, se usa `${' '}`. Los tipos de
+  entidades HTML (`&nbsp;`) no se traducen, se usa `${' '}` (espacio duro). Los tipos de
   datos están documentados con JSDoc en `app/types.js`.
   - `index.html` define un *import map*: `react`, `react-dom/client` y `htm`
     apuntan a `assets/vendor/` (versiones de producción descargadas una vez de
@@ -373,3 +383,7 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   (TIR 10,94% → 20,45% con precio 5,2 y vuelta), escenarios, modales,
   validaciones, login correcto e incorrecto, usuario de solo lectura, tema
   almendro e invitación inválida.
+- 2026-10-19: **Primer push de la rama `php` a GitHub** (orden de Marc), hecho
+  desde una pestaña de la terminal de la app con inicio de sesión en el
+  navegador (Git Credential Manager). Después se subió también `6a69a9a`
+  (memoria). Rama local y remota sincronizadas.
