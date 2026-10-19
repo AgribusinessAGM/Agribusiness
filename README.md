@@ -21,8 +21,9 @@ dentro de `agribusiness/`. Node.js solo se necesita para modificar la interfaz
 ## Instalar en XAMPP (local)
 
 1. Arranca **Apache** y **MySQL** desde el panel de XAMPP.
-2. Copia la carpeta `agribusiness/` de este repositorio dentro de
-   `C:\xampp\htdocs\`, de forma que quede `C:\xampp\htdocs\agribusiness\index.html`.
+2. Copia la carpeta `agribusiness/` de este repositorio dentro de la carpeta
+   `htdocs` de tu XAMPP (en este equipo, `C:\xampp_marc\htdocs\`), de forma que
+   quede `C:\xampp_marc\htdocs\agribusiness\index.html`.
 3. Abre http://localhost/agribusiness/
 
 La primera vez, la app crea sola la base de datos `agribusiness` con sus tablas
