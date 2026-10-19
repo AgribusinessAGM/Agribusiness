@@ -1,7 +1,7 @@
 # Plataforma AGRIBUSINESS
 
 Antes de hacer nada, lee la memoria completa del proyecto en
-`agribusiness/MEMORIA.md` (contexto, arquitectura, reglas de trabajo e historial)
+`MEMORIA.md` (contexto, arquitectura, reglas de trabajo e historial)
 y actualízala al terminar cada cambio.
 
 Reglas clave (detalle en la memoria):

@@ -1,0 +1,13 @@
+# La raíz del repositorio es también la raíz de la app. Desde el navegador solo
+# deben verse index.html, assets/ y api/ (que tiene sus propios .htaccess).
+
+# La memoria del proyecto y cualquier .md, y los archivos ocultos (.gitignore…).
+<FilesMatch "(\.md$|^\.)">
+  Require all denied
+</FilesMatch>
+
+# Código fuente, diseño, transcripciones y el propio repositorio git.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^(frontend|chats|project|\.git)(/|$) - [F,L]
+</IfModule>

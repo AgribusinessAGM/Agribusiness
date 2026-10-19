@@ -1,4 +1,0 @@
-# La memoria del proyecto (y cualquier .md) no debe verse desde el navegador.
-<FilesMatch "\.md$">
-  Require all denied
-</FilesMatch>

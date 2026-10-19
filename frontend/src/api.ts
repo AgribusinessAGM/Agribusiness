@@ -28,7 +28,7 @@ export function clearToken(): void {
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const token = getToken();
-  // Ruta relativa: la app puede vivir en cualquier carpeta (ej. htdocs/agribusiness).
+  // Ruta relativa: la app puede vivir en cualquier carpeta (ej. htdocs/Agribusiness).
   const res = await fetch(`api/index.php${path}`, {
     ...init,
     headers: {

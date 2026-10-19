@@ -28,4 +28,4 @@ server/data.db
 *.sw?
 
 # Configuración local de la API PHP (contraseñas): no se sube a git
-agribusiness/api/config.php
+api/config.php

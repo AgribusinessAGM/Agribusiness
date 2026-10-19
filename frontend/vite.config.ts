@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   // Rutas relativas: la app compilada funciona en cualquier carpeta del
-  // servidor (ej. htdocs/agribusiness en XAMPP, o la raíz del dominio en Plesk).
+  // servidor (ej. htdocs/Agribusiness en XAMPP, o la raíz del dominio en Plesk).
   base: './',
   build: {
     outDir: 'dist',
@@ -15,7 +15,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://localhost',
-        rewrite: (path) => '/agribusiness' + path,
+        rewrite: (path) => '/Agribusiness' + path,
       },
     },
   },
