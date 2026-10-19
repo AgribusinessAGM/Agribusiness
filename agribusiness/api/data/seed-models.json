@@ -1,0 +1,2732 @@
+[
+ {
+  "id": 1,
+  "name": "Iberocrops · Olivar Andalucía",
+  "crop": "olivo",
+  "region": "Écija, Sevilla · España",
+  "status": "Activo",
+  "a": {
+   "superficie": 250,
+   "marcoN": 3.75,
+   "marcoM": 1.35,
+   "precioEVOO": 4.55,
+   "prodPlena": 2075.06,
+   "alquiler": 1320,
+   "personal": 800,
+   "inflacion": 2,
+   "is": 25,
+   "financiacion": 60,
+   "interes": 3,
+   "plazo": 25,
+   "carencia": 3,
+   "capexFee": 1000,
+   "opexFee": 355,
+   "fondoCost": 1.5,
+   "duracionProyecto": 35,
+   "capexGroups": [
+    {
+     "key": "prep",
+     "title": "Preparación del suelo",
+     "unit": "ha",
+     "items": [
+      {
+       "key": "cond",
+       "label": "Condiciones generales de la parcela e infraestructuras",
+       "v": 300
+      },
+      {
+       "key": "arado",
+       "label": "Arado del suelo (Subsolado)",
+       "v": 500
+      },
+      {
+       "key": "cultivo",
+       "label": "Cultivo del suelo (x3) Chisel/Grada",
+       "v": 175
+      },
+      {
+       "key": "nivel",
+       "label": "Nivelación del suelo (Alomado)",
+       "v": 150
+      },
+      {
+       "key": "despedreg",
+       "label": "Despedregados",
+       "v": 150
+      },
+      {
+       "key": "otros",
+       "label": "Otros costes",
+       "v": 0
+      }
+     ]
+    },
+    {
+     "key": "plant",
+     "title": "Plantación",
+     "unit": "ud",
+     "items": [
+      {
+       "key": "smarttree",
+       "label": "Smarttree Olivo con protector",
+       "v": 2.15
+      },
+      {
+       "key": "royalties",
+       "label": "Royalties",
+       "v": 0
+      },
+      {
+       "key": "tutor",
+       "label": "Tutor en campo 1M 18-20 mm & colocación y atado",
+       "v": 0.4
+      },
+      {
+       "key": "plantacion",
+       "label": "Plantación",
+       "v": 0.25
+      },
+      {
+       "key": "fert",
+       "label": "Fertilizante",
+       "v": 0.15
+      }
+     ]
+    },
+    {
+     "key": "riego",
+     "title": "Sistema de riego",
+     "unit": "ha",
+     "items": [
+      {
+       "key": "riego",
+       "label": "Sistema de riego",
+       "v": 3394.39
+      },
+      {
+       "key": "energia",
+       "label": "Energía",
+       "v": 786
+      }
+     ]
+    },
+    {
+     "key": "viab",
+     "title": "Viabilidad, Proyecto, Dirección ejecución, Administración",
+     "unit": "ha",
+     "items": [
+      {
+       "key": "captacion",
+       "label": "Captación de Fincas",
+       "v": 693
+      },
+      {
+       "key": "topo",
+       "label": "Levantamiento topográfico",
+       "v": 45
+      },
+      {
+       "key": "suelo",
+       "label": "Estudio y Mapa Suelo",
+       "v": 75
+      },
+      {
+       "key": "dd",
+       "label": "Due Diligence Técnica Idoneidad ubicación",
+       "v": 75
+      }
+     ]
+    }
+   ],
+   "opexItems": [
+    {
+     "key": "malezas",
+     "label": "Control de malezas",
+     "items": [
+      {
+       "key": "productos_fitosanitarios_1",
+       "label": "Productos fitosanitarios",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 72.534,
+       "base": 72.534,
+       "sched": [
+        72.53,
+        72.53,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23
+       ]
+      },
+      {
+       "key": "tratamiento_con_herbicid_1",
+       "label": "Tratamiento con herbicidas",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 40,
+       "base": 40,
+       "sched": [
+        160,
+        160,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+       ]
+      }
+     ]
+    },
+    {
+     "key": "cosecha",
+     "label": "Cosecha y comercialización",
+     "items": [
+      {
+       "key": "cabalgante_1",
+       "label": "Cabalgante",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 350,
+       "base": 350,
+       "sched": [
+        0,
+        0,
+        350,
+        350,
+        350,
+        350,
+        350,
+        350,
+        350,
+        350,
+        350,
+        350,
+        350
+       ]
+      },
+      {
+       "key": "transporte_interno_1",
+       "label": "Transporte interno",
+       "unidad": "€/Kg/\nAceitunas",
+       "cant": 1,
+       "coste": 0.01,
+       "base": 0.01,
+       "sched": [
+        0,
+        0,
+        89.25,
+        107.1,
+        116.03,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88
+       ]
+      },
+      {
+       "key": "transporte_a_planta_cent_1",
+       "label": "Transporte a planta central",
+       "unidad": "€/Kg/\nAceitunas",
+       "cant": 1,
+       "coste": 0.01,
+       "base": 0.01,
+       "sched": [
+        0,
+        0,
+        89.25,
+        107.1,
+        116.03,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88
+       ]
+      },
+      {
+       "key": "maquila_1",
+       "label": "Maquila",
+       "unidad": "€/Kg/\nAceitunas",
+       "cant": 1,
+       "coste": 0.03,
+       "base": 0.03,
+       "sched": [
+        0,
+        0,
+        267.75,
+        321.3,
+        348.07,
+        401.63,
+        401.63,
+        401.63,
+        401.63,
+        401.63,
+        401.63,
+        401.63,
+        401.63
+       ]
+      }
+     ]
+    },
+    {
+     "key": "infra",
+     "label": "Mantenimiento de infraestructura",
+     "items": [
+      {
+       "key": "suministro_de_agua__1",
+       "label": "Suministro (de agua)",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 20,
+       "base": 20,
+       "sched": [
+        20,
+        20,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "mantenimiento_de_embalse_1",
+       "label": "Mantenimiento de embalses",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 15,
+       "base": 15,
+       "sched": [
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15
+       ]
+      },
+      {
+       "key": "limpieza_de_alcantarilla_1",
+       "label": "Limpieza de alcantarillado",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 25,
+       "base": 25,
+       "sched": [
+        0,
+        25,
+        0,
+        25,
+        0,
+        25,
+        0,
+        25,
+        0,
+        25,
+        0,
+        25,
+        0
+       ]
+      }
+     ]
+    },
+    {
+     "key": "terrenos",
+     "label": "Mantenimiento de terrenos",
+     "items": [
+      {
+       "key": "limpieza_mec_nica_1",
+       "label": "Limpieza mecánica",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 40,
+       "base": 40,
+       "sched": [
+        80,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40
+       ]
+      }
+     ]
+    },
+    {
+     "key": "nutricion",
+     "label": "Nutrición",
+     "items": [
+      {
+       "key": "fertilizantes_1",
+       "label": "Fertilizantes",
+       "unidad": "Kg/Ha",
+       "cant": 1,
+       "coste": 240,
+       "base": 240,
+       "sched": [
+        144,
+        192,
+        288,
+        336,
+        336,
+        336,
+        336,
+        336,
+        336,
+        336,
+        336,
+        336,
+        336
+       ]
+      },
+      {
+       "key": "an_lisis_1",
+       "label": "Análisis",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 5,
+       "base": 5,
+       "sched": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+       ]
+      },
+      {
+       "key": "enmiendas_org_nicas_3",
+       "label": "Enmiendas orgánicas",
+       "unidad": "Ha",
+       "cant": 3,
+       "coste": 44,
+       "base": 132,
+       "sched": [
+        66,
+        132,
+        132,
+        132,
+        132,
+        0,
+        132,
+        0,
+        132,
+        0,
+        132,
+        0,
+        132
+       ]
+      },
+      {
+       "key": "materia_org_nica_1",
+       "label": "Materia orgánica",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 40.5,
+       "base": 40.5,
+       "sched": [
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5
+       ]
+      }
+     ]
+    },
+    {
+     "key": "otros",
+     "label": "Otros",
+     "items": [
+      {
+       "key": "tramitaci_n_de_la_pac_1",
+       "label": "Tramitación de la PAC",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 3,
+       "base": 3,
+       "sched": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+       ]
+      },
+      {
+       "key": "abejas_1",
+       "label": "Abejas",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 0,
+       "base": 0,
+       "sched": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "otros_1",
+       "label": "Otros",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 0,
+       "base": 0,
+       "sched": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      }
+     ]
+    },
+    {
+     "key": "poda",
+     "label": "Poda y formación",
+     "items": [
+      {
+       "key": "poda_de_emergencia_5",
+       "label": "Poda de emergencia",
+       "unidad": "Ha",
+       "cant": 5,
+       "coste": 14.5,
+       "base": 72.5,
+       "sched": [
+        72.5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "2_poda_de_formaci_n_14",
+       "label": "2ª Poda de formación",
+       "unidad": "Ha",
+       "cant": 14,
+       "coste": 14.5,
+       "base": 203,
+       "sched": [
+        203,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "3_poda_de_formaci_n_7.5",
+       "label": "3ª Poda de formación",
+       "unidad": "Ha",
+       "cant": 7.5,
+       "coste": 14.5,
+       "base": 108.75,
+       "sched": [
+        108.75,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "poda_terciaria_en_u__1",
+       "label": "Poda terciaria en \"U\"",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 65,
+       "base": 65,
+       "sched": [
+        0,
+        65,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "poda_mec_nica_de_cobertu_1",
+       "label": "Poda mecánica de cobertura",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 50,
+       "base": 50,
+       "sched": [
+        0,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50
+       ]
+      },
+      {
+       "key": "poda_mec_nica_lateral_2",
+       "label": "Poda mecánica lateral",
+       "unidad": "Ha",
+       "cant": 2,
+       "coste": 50,
+       "base": 100,
+       "sched": [
+        0,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+       ]
+      },
+      {
+       "key": "poda_manual_en_invierno_14",
+       "label": "Poda manual\nen invierno",
+       "unidad": "Ha",
+       "cant": 14,
+       "coste": 18,
+       "base": 252,
+       "sched": [
+        0,
+        0,
+        252,
+        252,
+        252,
+        252,
+        252,
+        252,
+        252,
+        252,
+        252,
+        252,
+        252
+       ]
+      }
+     ]
+    },
+    {
+     "key": "riego",
+     "label": "Riego",
+     "items": [
+      {
+       "key": "canon_ccrr_chg_1",
+       "label": "Canon CCRR + CHG",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 100,
+       "base": 100,
+       "sched": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+       ]
+      },
+      {
+       "key": "consumo_de_energ_a_1",
+       "label": "Consumo de energía",
+       "unidad": "m³/Ha",
+       "cant": 1,
+       "coste": 0.07,
+       "base": 0.07,
+       "sched": [
+        70,
+        175,
+        245,
+        245,
+        245,
+        245,
+        245,
+        245,
+        245,
+        245,
+        245,
+        245,
+        245
+       ]
+      },
+      {
+       "key": "probabilidades_de_vegeta_1",
+       "label": "Probabilidades de vegetación",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 2,
+       "base": 2,
+       "sched": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+       ]
+      },
+      {
+       "key": "limpieza_de_riego_por_go_2",
+       "label": "Limpieza de riego por goteo",
+       "unidad": "Ha",
+       "cant": 2,
+       "coste": 14.5,
+       "base": 29,
+       "sched": [
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29
+       ]
+      }
+     ]
+    },
+    {
+     "key": "sanidad",
+     "label": "Sanidad vegetal",
+     "items": [
+      {
+       "key": "protecci_n_vegetal_produ_1",
+       "label": "Protección vegetal (productos)",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 258.38,
+       "base": 258.38,
+       "sched": [
+        25.35,
+        58.14,
+        164.41,
+        258.38,
+        258.38,
+        258.38,
+        258.38,
+        258.38,
+        258.38,
+        258.38,
+        258.38,
+        258.38,
+        258.38
+       ]
+      },
+      {
+       "key": "aplicaci_n_foliar_calle__7",
+       "label": "Aplicación foliar (calle sí/no)",
+       "unidad": "Ha",
+       "cant": 7,
+       "coste": 25,
+       "base": 175,
+       "sched": [
+        175,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "aplicaci_n_foliar_todas__5",
+       "label": "Aplicación foliar (todas hileras)",
+       "unidad": "Ha",
+       "cant": 5,
+       "coste": 40,
+       "base": 200,
+       "sched": [
+        33.34,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": 2,
+  "name": "Finca La Dehesa",
+  "crop": "almendro",
+  "region": "Mérida, Extremadura · España",
+  "status": "Borrador",
+  "a": {
+   "superficie": 120,
+   "marcoN": 3.75,
+   "marcoM": 1.35,
+   "precioEVOO": 4.8,
+   "prodPlena": 1800,
+   "alquiler": 1320,
+   "personal": 800,
+   "inflacion": 2,
+   "is": 25,
+   "financiacion": 60,
+   "interes": 3,
+   "plazo": 25,
+   "carencia": 3,
+   "capexFee": 1000,
+   "opexFee": 355,
+   "fondoCost": 1.5,
+   "duracionProyecto": 35,
+   "capexGroups": [
+    {
+     "key": "prep",
+     "title": "Preparación del suelo",
+     "unit": "ha",
+     "items": [
+      {
+       "key": "cond",
+       "label": "Condiciones generales de la parcela e infraestructuras",
+       "v": 300
+      },
+      {
+       "key": "arado",
+       "label": "Arado del suelo (Subsolado)",
+       "v": 500
+      },
+      {
+       "key": "cultivo",
+       "label": "Cultivo del suelo (x3) Chisel/Grada",
+       "v": 175
+      },
+      {
+       "key": "nivel",
+       "label": "Nivelación del suelo (Alomado)",
+       "v": 150
+      },
+      {
+       "key": "despedreg",
+       "label": "Despedregados",
+       "v": 150
+      },
+      {
+       "key": "otros",
+       "label": "Otros costes",
+       "v": 0
+      }
+     ]
+    },
+    {
+     "key": "plant",
+     "title": "Plantación",
+     "unit": "ud",
+     "items": [
+      {
+       "key": "smarttree",
+       "label": "Smarttree Olivo con protector",
+       "v": 2.15
+      },
+      {
+       "key": "royalties",
+       "label": "Royalties",
+       "v": 0
+      },
+      {
+       "key": "tutor",
+       "label": "Tutor en campo 1M 18-20 mm & colocación y atado",
+       "v": 0.4
+      },
+      {
+       "key": "plantacion",
+       "label": "Plantación",
+       "v": 0.25
+      },
+      {
+       "key": "fert",
+       "label": "Fertilizante",
+       "v": 0.15
+      }
+     ]
+    },
+    {
+     "key": "riego",
+     "title": "Sistema de riego",
+     "unit": "ha",
+     "items": [
+      {
+       "key": "riego",
+       "label": "Sistema de riego",
+       "v": 3394.39
+      },
+      {
+       "key": "energia",
+       "label": "Energía",
+       "v": 786
+      }
+     ]
+    },
+    {
+     "key": "viab",
+     "title": "Viabilidad, Proyecto, Dirección ejecución, Administración",
+     "unit": "ha",
+     "items": [
+      {
+       "key": "captacion",
+       "label": "Captación de Fincas",
+       "v": 693
+      },
+      {
+       "key": "topo",
+       "label": "Levantamiento topográfico",
+       "v": 45
+      },
+      {
+       "key": "suelo",
+       "label": "Estudio y Mapa Suelo",
+       "v": 75
+      },
+      {
+       "key": "dd",
+       "label": "Due Diligence Técnica Idoneidad ubicación",
+       "v": 75
+      }
+     ]
+    }
+   ],
+   "opexItems": [
+    {
+     "key": "malezas",
+     "label": "Control de malezas",
+     "items": [
+      {
+       "key": "productos_fitosanitarios_1",
+       "label": "Productos fitosanitarios",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 72.534,
+       "base": 72.534,
+       "sched": [
+        72.53,
+        72.53,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23
+       ]
+      },
+      {
+       "key": "tratamiento_con_herbicid_1",
+       "label": "Tratamiento con herbicidas",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 40,
+       "base": 40,
+       "sched": [
+        160,
+        160,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+       ]
+      }
+     ]
+    },
+    {
+     "key": "cosecha",
+     "label": "Cosecha y comercialización",
+     "items": [
+      {
+       "key": "cabalgante_1",
+       "label": "Cabalgante",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 350,
+       "base": 350,
+       "sched": [
+        0,
+        0,
+        350,
+        350,
+        350,
+        350,
+        350,
+        350,
+        350,
+        350,
+        350,
+        350,
+        350
+       ]
+      },
+      {
+       "key": "transporte_interno_1",
+       "label": "Transporte interno",
+       "unidad": "€/Kg/\nAceitunas",
+       "cant": 1,
+       "coste": 0.01,
+       "base": 0.01,
+       "sched": [
+        0,
+        0,
+        89.25,
+        107.1,
+        116.03,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88
+       ]
+      },
+      {
+       "key": "transporte_a_planta_cent_1",
+       "label": "Transporte a planta central",
+       "unidad": "€/Kg/\nAceitunas",
+       "cant": 1,
+       "coste": 0.01,
+       "base": 0.01,
+       "sched": [
+        0,
+        0,
+        89.25,
+        107.1,
+        116.03,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88
+       ]
+      },
+      {
+       "key": "maquila_1",
+       "label": "Maquila",
+       "unidad": "€/Kg/\nAceitunas",
+       "cant": 1,
+       "coste": 0.03,
+       "base": 0.03,
+       "sched": [
+        0,
+        0,
+        267.75,
+        321.3,
+        348.07,
+        401.63,
+        401.63,
+        401.63,
+        401.63,
+        401.63,
+        401.63,
+        401.63,
+        401.63
+       ]
+      }
+     ]
+    },
+    {
+     "key": "infra",
+     "label": "Mantenimiento de infraestructura",
+     "items": [
+      {
+       "key": "suministro_de_agua__1",
+       "label": "Suministro (de agua)",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 20,
+       "base": 20,
+       "sched": [
+        20,
+        20,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "mantenimiento_de_embalse_1",
+       "label": "Mantenimiento de embalses",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 15,
+       "base": 15,
+       "sched": [
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15
+       ]
+      },
+      {
+       "key": "limpieza_de_alcantarilla_1",
+       "label": "Limpieza de alcantarillado",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 25,
+       "base": 25,
+       "sched": [
+        0,
+        25,
+        0,
+        25,
+        0,
+        25,
+        0,
+        25,
+        0,
+        25,
+        0,
+        25,
+        0
+       ]
+      }
+     ]
+    },
+    {
+     "key": "terrenos",
+     "label": "Mantenimiento de terrenos",
+     "items": [
+      {
+       "key": "limpieza_mec_nica_1",
+       "label": "Limpieza mecánica",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 40,
+       "base": 40,
+       "sched": [
+        80,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40
+       ]
+      }
+     ]
+    },
+    {
+     "key": "nutricion",
+     "label": "Nutrición",
+     "items": [
+      {
+       "key": "fertilizantes_1",
+       "label": "Fertilizantes",
+       "unidad": "Kg/Ha",
+       "cant": 1,
+       "coste": 240,
+       "base": 240,
+       "sched": [
+        144,
+        192,
+        288,
+        336,
+        336,
+        336,
+        336,
+        336,
+        336,
+        336,
+        336,
+        336,
+        336
+       ]
+      },
+      {
+       "key": "an_lisis_1",
+       "label": "Análisis",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 5,
+       "base": 5,
+       "sched": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+       ]
+      },
+      {
+       "key": "enmiendas_org_nicas_3",
+       "label": "Enmiendas orgánicas",
+       "unidad": "Ha",
+       "cant": 3,
+       "coste": 44,
+       "base": 132,
+       "sched": [
+        66,
+        132,
+        132,
+        132,
+        132,
+        0,
+        132,
+        0,
+        132,
+        0,
+        132,
+        0,
+        132
+       ]
+      },
+      {
+       "key": "materia_org_nica_1",
+       "label": "Materia orgánica",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 40.5,
+       "base": 40.5,
+       "sched": [
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5
+       ]
+      }
+     ]
+    },
+    {
+     "key": "otros",
+     "label": "Otros",
+     "items": [
+      {
+       "key": "tramitaci_n_de_la_pac_1",
+       "label": "Tramitación de la PAC",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 3,
+       "base": 3,
+       "sched": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+       ]
+      },
+      {
+       "key": "abejas_1",
+       "label": "Abejas",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 0,
+       "base": 0,
+       "sched": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "otros_1",
+       "label": "Otros",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 0,
+       "base": 0,
+       "sched": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      }
+     ]
+    },
+    {
+     "key": "poda",
+     "label": "Poda y formación",
+     "items": [
+      {
+       "key": "poda_de_emergencia_5",
+       "label": "Poda de emergencia",
+       "unidad": "Ha",
+       "cant": 5,
+       "coste": 14.5,
+       "base": 72.5,
+       "sched": [
+        72.5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "2_poda_de_formaci_n_14",
+       "label": "2ª Poda de formación",
+       "unidad": "Ha",
+       "cant": 14,
+       "coste": 14.5,
+       "base": 203,
+       "sched": [
+        203,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "3_poda_de_formaci_n_7.5",
+       "label": "3ª Poda de formación",
+       "unidad": "Ha",
+       "cant": 7.5,
+       "coste": 14.5,
+       "base": 108.75,
+       "sched": [
+        108.75,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "poda_terciaria_en_u__1",
+       "label": "Poda terciaria en \"U\"",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 65,
+       "base": 65,
+       "sched": [
+        0,
+        65,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "poda_mec_nica_de_cobertu_1",
+       "label": "Poda mecánica de cobertura",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 50,
+       "base": 50,
+       "sched": [
+        0,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50
+       ]
+      },
+      {
+       "key": "poda_mec_nica_lateral_2",
+       "label": "Poda mecánica lateral",
+       "unidad": "Ha",
+       "cant": 2,
+       "coste": 50,
+       "base": 100,
+       "sched": [
+        0,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+       ]
+      },
+      {
+       "key": "poda_manual_en_invierno_14",
+       "label": "Poda manual\nen invierno",
+       "unidad": "Ha",
+       "cant": 14,
+       "coste": 18,
+       "base": 252,
+       "sched": [
+        0,
+        0,
+        252,
+        252,
+        252,
+        252,
+        252,
+        252,
+        252,
+        252,
+        252,
+        252,
+        252
+       ]
+      }
+     ]
+    },
+    {
+     "key": "riego",
+     "label": "Riego",
+     "items": [
+      {
+       "key": "canon_ccrr_chg_1",
+       "label": "Canon CCRR + CHG",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 100,
+       "base": 100,
+       "sched": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+       ]
+      },
+      {
+       "key": "consumo_de_energ_a_1",
+       "label": "Consumo de energía",
+       "unidad": "m³/Ha",
+       "cant": 1,
+       "coste": 0.07,
+       "base": 0.07,
+       "sched": [
+        70,
+        175,
+        245,
+        245,
+        245,
+        245,
+        245,
+        245,
+        245,
+        245,
+        245,
+        245,
+        245
+       ]
+      },
+      {
+       "key": "probabilidades_de_vegeta_1",
+       "label": "Probabilidades de vegetación",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 2,
+       "base": 2,
+       "sched": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+       ]
+      },
+      {
+       "key": "limpieza_de_riego_por_go_2",
+       "label": "Limpieza de riego por goteo",
+       "unidad": "Ha",
+       "cant": 2,
+       "coste": 14.5,
+       "base": 29,
+       "sched": [
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29
+       ]
+      }
+     ]
+    },
+    {
+     "key": "sanidad",
+     "label": "Sanidad vegetal",
+     "items": [
+      {
+       "key": "protecci_n_vegetal_produ_1",
+       "label": "Protección vegetal (productos)",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 258.38,
+       "base": 258.38,
+       "sched": [
+        25.35,
+        58.14,
+        164.41,
+        258.38,
+        258.38,
+        258.38,
+        258.38,
+        258.38,
+        258.38,
+        258.38,
+        258.38,
+        258.38,
+        258.38
+       ]
+      },
+      {
+       "key": "aplicaci_n_foliar_calle__7",
+       "label": "Aplicación foliar (calle sí/no)",
+       "unidad": "Ha",
+       "cant": 7,
+       "coste": 25,
+       "base": 175,
+       "sched": [
+        175,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "aplicaci_n_foliar_todas__5",
+       "label": "Aplicación foliar (todas hileras)",
+       "unidad": "Ha",
+       "cant": 5,
+       "coste": 40,
+       "base": 200,
+       "sched": [
+        33.34,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ {
+  "id": 3,
+  "name": "Projeto Alentejo",
+  "crop": "olivo",
+  "region": "Beja · Portugal",
+  "status": "En revisión",
+  "a": {
+   "superficie": 400,
+   "marcoN": 3.75,
+   "marcoM": 1.35,
+   "precioEVOO": 4.35,
+   "prodPlena": 2100,
+   "alquiler": 1320,
+   "personal": 800,
+   "inflacion": 2,
+   "is": 25,
+   "financiacion": 50,
+   "interes": 3,
+   "plazo": 25,
+   "carencia": 3,
+   "capexFee": 1000,
+   "opexFee": 355,
+   "fondoCost": 1.5,
+   "duracionProyecto": 35,
+   "capexGroups": [
+    {
+     "key": "prep",
+     "title": "Preparación del suelo",
+     "unit": "ha",
+     "items": [
+      {
+       "key": "cond",
+       "label": "Condiciones generales de la parcela e infraestructuras",
+       "v": 300
+      },
+      {
+       "key": "arado",
+       "label": "Arado del suelo (Subsolado)",
+       "v": 500
+      },
+      {
+       "key": "cultivo",
+       "label": "Cultivo del suelo (x3) Chisel/Grada",
+       "v": 175
+      },
+      {
+       "key": "nivel",
+       "label": "Nivelación del suelo (Alomado)",
+       "v": 150
+      },
+      {
+       "key": "despedreg",
+       "label": "Despedregados",
+       "v": 150
+      },
+      {
+       "key": "otros",
+       "label": "Otros costes",
+       "v": 0
+      }
+     ]
+    },
+    {
+     "key": "plant",
+     "title": "Plantación",
+     "unit": "ud",
+     "items": [
+      {
+       "key": "smarttree",
+       "label": "Smarttree Olivo con protector",
+       "v": 2.15
+      },
+      {
+       "key": "royalties",
+       "label": "Royalties",
+       "v": 0
+      },
+      {
+       "key": "tutor",
+       "label": "Tutor en campo 1M 18-20 mm & colocación y atado",
+       "v": 0.4
+      },
+      {
+       "key": "plantacion",
+       "label": "Plantación",
+       "v": 0.25
+      },
+      {
+       "key": "fert",
+       "label": "Fertilizante",
+       "v": 0.15
+      }
+     ]
+    },
+    {
+     "key": "riego",
+     "title": "Sistema de riego",
+     "unit": "ha",
+     "items": [
+      {
+       "key": "riego",
+       "label": "Sistema de riego",
+       "v": 3394.39
+      },
+      {
+       "key": "energia",
+       "label": "Energía",
+       "v": 786
+      }
+     ]
+    },
+    {
+     "key": "viab",
+     "title": "Viabilidad, Proyecto, Dirección ejecución, Administración",
+     "unit": "ha",
+     "items": [
+      {
+       "key": "captacion",
+       "label": "Captación de Fincas",
+       "v": 693
+      },
+      {
+       "key": "topo",
+       "label": "Levantamiento topográfico",
+       "v": 45
+      },
+      {
+       "key": "suelo",
+       "label": "Estudio y Mapa Suelo",
+       "v": 75
+      },
+      {
+       "key": "dd",
+       "label": "Due Diligence Técnica Idoneidad ubicación",
+       "v": 75
+      }
+     ]
+    }
+   ],
+   "opexItems": [
+    {
+     "key": "malezas",
+     "label": "Control de malezas",
+     "items": [
+      {
+       "key": "productos_fitosanitarios_1",
+       "label": "Productos fitosanitarios",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 72.534,
+       "base": 72.534,
+       "sched": [
+        72.53,
+        72.53,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23,
+        60.23
+       ]
+      },
+      {
+       "key": "tratamiento_con_herbicid_1",
+       "label": "Tratamiento con herbicidas",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 40,
+       "base": 40,
+       "sched": [
+        160,
+        160,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+       ]
+      }
+     ]
+    },
+    {
+     "key": "cosecha",
+     "label": "Cosecha y comercialización",
+     "items": [
+      {
+       "key": "cabalgante_1",
+       "label": "Cabalgante",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 350,
+       "base": 350,
+       "sched": [
+        0,
+        0,
+        350,
+        350,
+        350,
+        350,
+        350,
+        350,
+        350,
+        350,
+        350,
+        350,
+        350
+       ]
+      },
+      {
+       "key": "transporte_interno_1",
+       "label": "Transporte interno",
+       "unidad": "€/Kg/\nAceitunas",
+       "cant": 1,
+       "coste": 0.01,
+       "base": 0.01,
+       "sched": [
+        0,
+        0,
+        89.25,
+        107.1,
+        116.03,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88
+       ]
+      },
+      {
+       "key": "transporte_a_planta_cent_1",
+       "label": "Transporte a planta central",
+       "unidad": "€/Kg/\nAceitunas",
+       "cant": 1,
+       "coste": 0.01,
+       "base": 0.01,
+       "sched": [
+        0,
+        0,
+        89.25,
+        107.1,
+        116.03,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88,
+        133.88
+       ]
+      },
+      {
+       "key": "maquila_1",
+       "label": "Maquila",
+       "unidad": "€/Kg/\nAceitunas",
+       "cant": 1,
+       "coste": 0.03,
+       "base": 0.03,
+       "sched": [
+        0,
+        0,
+        267.75,
+        321.3,
+        348.07,
+        401.63,
+        401.63,
+        401.63,
+        401.63,
+        401.63,
+        401.63,
+        401.63,
+        401.63
+       ]
+      }
+     ]
+    },
+    {
+     "key": "infra",
+     "label": "Mantenimiento de infraestructura",
+     "items": [
+      {
+       "key": "suministro_de_agua__1",
+       "label": "Suministro (de agua)",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 20,
+       "base": 20,
+       "sched": [
+        20,
+        20,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "mantenimiento_de_embalse_1",
+       "label": "Mantenimiento de embalses",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 15,
+       "base": 15,
+       "sched": [
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15
+       ]
+      },
+      {
+       "key": "limpieza_de_alcantarilla_1",
+       "label": "Limpieza de alcantarillado",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 25,
+       "base": 25,
+       "sched": [
+        0,
+        25,
+        0,
+        25,
+        0,
+        25,
+        0,
+        25,
+        0,
+        25,
+        0,
+        25,
+        0
+       ]
+      }
+     ]
+    },
+    {
+     "key": "terrenos",
+     "label": "Mantenimiento de terrenos",
+     "items": [
+      {
+       "key": "limpieza_mec_nica_1",
+       "label": "Limpieza mecánica",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 40,
+       "base": 40,
+       "sched": [
+        80,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40,
+        40
+       ]
+      }
+     ]
+    },
+    {
+     "key": "nutricion",
+     "label": "Nutrición",
+     "items": [
+      {
+       "key": "fertilizantes_1",
+       "label": "Fertilizantes",
+       "unidad": "Kg/Ha",
+       "cant": 1,
+       "coste": 240,
+       "base": 240,
+       "sched": [
+        144,
+        192,
+        288,
+        336,
+        336,
+        336,
+        336,
+        336,
+        336,
+        336,
+        336,
+        336,
+        336
+       ]
+      },
+      {
+       "key": "an_lisis_1",
+       "label": "Análisis",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 5,
+       "base": 5,
+       "sched": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+       ]
+      },
+      {
+       "key": "enmiendas_org_nicas_3",
+       "label": "Enmiendas orgánicas",
+       "unidad": "Ha",
+       "cant": 3,
+       "coste": 44,
+       "base": 132,
+       "sched": [
+        66,
+        132,
+        132,
+        132,
+        132,
+        0,
+        132,
+        0,
+        132,
+        0,
+        132,
+        0,
+        132
+       ]
+      },
+      {
+       "key": "materia_org_nica_1",
+       "label": "Materia orgánica",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 40.5,
+       "base": 40.5,
+       "sched": [
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5,
+        40.5
+       ]
+      }
+     ]
+    },
+    {
+     "key": "otros",
+     "label": "Otros",
+     "items": [
+      {
+       "key": "tramitaci_n_de_la_pac_1",
+       "label": "Tramitación de la PAC",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 3,
+       "base": 3,
+       "sched": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+       ]
+      },
+      {
+       "key": "abejas_1",
+       "label": "Abejas",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 0,
+       "base": 0,
+       "sched": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "otros_1",
+       "label": "Otros",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 0,
+       "base": 0,
+       "sched": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      }
+     ]
+    },
+    {
+     "key": "poda",
+     "label": "Poda y formación",
+     "items": [
+      {
+       "key": "poda_de_emergencia_5",
+       "label": "Poda de emergencia",
+       "unidad": "Ha",
+       "cant": 5,
+       "coste": 14.5,
+       "base": 72.5,
+       "sched": [
+        72.5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "2_poda_de_formaci_n_14",
+       "label": "2ª Poda de formación",
+       "unidad": "Ha",
+       "cant": 14,
+       "coste": 14.5,
+       "base": 203,
+       "sched": [
+        203,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "3_poda_de_formaci_n_7.5",
+       "label": "3ª Poda de formación",
+       "unidad": "Ha",
+       "cant": 7.5,
+       "coste": 14.5,
+       "base": 108.75,
+       "sched": [
+        108.75,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "poda_terciaria_en_u__1",
+       "label": "Poda terciaria en \"U\"",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 65,
+       "base": 65,
+       "sched": [
+        0,
+        65,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "poda_mec_nica_de_cobertu_1",
+       "label": "Poda mecánica de cobertura",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 50,
+       "base": 50,
+       "sched": [
+        0,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50,
+        50
+       ]
+      },
+      {
+       "key": "poda_mec_nica_lateral_2",
+       "label": "Poda mecánica lateral",
+       "unidad": "Ha",
+       "cant": 2,
+       "coste": 50,
+       "base": 100,
+       "sched": [
+        0,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+       ]
+      },
+      {
+       "key": "poda_manual_en_invierno_14",
+       "label": "Poda manual\nen invierno",
+       "unidad": "Ha",
+       "cant": 14,
+       "coste": 18,
+       "base": 252,
+       "sched": [
+        0,
+        0,
+        252,
+        252,
+        252,
+        252,
+        252,
+        252,
+        252,
+        252,
+        252,
+        252,
+        252
+       ]
+      }
+     ]
+    },
+    {
+     "key": "riego",
+     "label": "Riego",
+     "items": [
+      {
+       "key": "canon_ccrr_chg_1",
+       "label": "Canon CCRR + CHG",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 100,
+       "base": 100,
+       "sched": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+       ]
+      },
+      {
+       "key": "consumo_de_energ_a_1",
+       "label": "Consumo de energía",
+       "unidad": "m³/Ha",
+       "cant": 1,
+       "coste": 0.07,
+       "base": 0.07,
+       "sched": [
+        70,
+        175,
+        245,
+        245,
+        245,
+        245,
+        245,
+        245,
+        245,
+        245,
+        245,
+        245,
+        245
+       ]
+      },
+      {
+       "key": "probabilidades_de_vegeta_1",
+       "label": "Probabilidades de vegetación",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 2,
+       "base": 2,
+       "sched": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+       ]
+      },
+      {
+       "key": "limpieza_de_riego_por_go_2",
+       "label": "Limpieza de riego por goteo",
+       "unidad": "Ha",
+       "cant": 2,
+       "coste": 14.5,
+       "base": 29,
+       "sched": [
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29,
+        29
+       ]
+      }
+     ]
+    },
+    {
+     "key": "sanidad",
+     "label": "Sanidad vegetal",
+     "items": [
+      {
+       "key": "protecci_n_vegetal_produ_1",
+       "label": "Protección vegetal (productos)",
+       "unidad": "Ha",
+       "cant": 1,
+       "coste": 258.38,
+       "base": 258.38,
+       "sched": [
+        25.35,
+        58.14,
+        164.41,
+        258.38,
+        258.38,
+        258.38,
+        258.38,
+        258.38,
+        258.38,
+        258.38,
+        258.38,
+        258.38,
+        258.38
+       ]
+      },
+      {
+       "key": "aplicaci_n_foliar_calle__7",
+       "label": "Aplicación foliar (calle sí/no)",
+       "unidad": "Ha",
+       "cant": 7,
+       "coste": 25,
+       "base": 175,
+       "sched": [
+        175,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "key": "aplicaci_n_foliar_todas__5",
+       "label": "Aplicación foliar (todas hileras)",
+       "unidad": "Ha",
+       "cant": 5,
+       "coste": 40,
+       "base": 200,
+       "sched": [
+        33.34,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ }
+]

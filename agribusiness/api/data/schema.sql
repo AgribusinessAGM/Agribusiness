@@ -1,0 +1,51 @@
+-- Esquema MySQL/MariaDB de la Plataforma AGRIBUSINESS.
+-- La API lo aplica sola la primera vez que arranca con la base de datos vacía.
+-- Todas las fechas se guardan en UTC.
+
+CREATE TABLE IF NOT EXISTS users (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(190) NOT NULL,
+  email VARCHAR(190) NOT NULL UNIQUE,
+  org VARCHAR(190) NOT NULL DEFAULT '',
+  password_hash VARCHAR(255) NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'invited',
+  role VARCHAR(20) NOT NULL DEFAULT 'user',
+  created_at DATETIME NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS invites (
+  token VARCHAR(64) NOT NULL PRIMARY KEY,
+  user_id INT UNSIGNED NOT NULL,
+  expires_at DATETIME NOT NULL,
+  used_at DATETIME NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS sessions (
+  token VARCHAR(64) NOT NULL PRIMARY KEY,
+  user_id INT UNSIGNED NOT NULL,
+  created_at DATETIME NOT NULL,
+  expires_at DATETIME NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS models (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(190) NOT NULL,
+  crop VARCHAR(20) NOT NULL DEFAULT 'olivo',
+  region VARCHAR(190) NOT NULL DEFAULT '',
+  status VARCHAR(40) NOT NULL DEFAULT 'Borrador',
+  created_by INT UNSIGNED NULL,
+  updated_at DATETIME NOT NULL,
+  assumptions LONGTEXT NOT NULL,
+  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS access (
+  user_id INT UNSIGNED NOT NULL,
+  model_id INT UNSIGNED NOT NULL,
+  level VARCHAR(10) NOT NULL,
+  PRIMARY KEY (user_id, model_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (model_id) REFERENCES models(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

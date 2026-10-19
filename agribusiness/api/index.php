@@ -1,0 +1,469 @@
+<?php
+// API de la Plataforma AGRIBUSINESS. Equivale a server/index.js de la versión
+// Node: mismas rutas y mismas respuestas JSON, para que el frontend no cambie.
+//
+// La ruta llega como PATH_INFO (api/index.php/login) o, si el servidor no lo
+// soporta, como parámetro (api/index.php?r=/login).
+
+require __DIR__ . '/lib/db.php';
+require __DIR__ . '/lib/mailer.php';
+
+const INVITE_TTL = 7 * 24 * 3600;
+const SESSION_TTL = 30 * 24 * 3600;
+
+header('Content-Type: application/json; charset=utf-8');
+header('Cache-Control: no-store');
+
+// ---------- Utilidades ----------
+
+class HttpError extends Exception
+{
+    public function __construct(public int $status, string $message)
+    {
+        parent::__construct($message);
+    }
+}
+
+function respond($data, int $status = 200): void
+{
+    http_response_code($status);
+    echo json_out($data);
+    exit;
+}
+
+function body(): array
+{
+    static $body = null;
+    if ($body === null) {
+        $decoded = json_decode(file_get_contents('php://input') ?: '', true);
+        $body = is_array($decoded) ? $decoded : [];
+    }
+    return $body;
+}
+
+function str_field(array $b, string $key): string
+{
+    return isset($b[$key]) && is_scalar($b[$key]) ? trim((string) $b[$key]) : '';
+}
+
+function public_user(array $row): array
+{
+    return [
+        'id' => (int) $row['id'],
+        'name' => $row['name'],
+        'email' => $row['email'],
+        'org' => $row['org'],
+        'status' => $row['status'],
+        'role' => normalize_role($row['role']),
+    ];
+}
+
+function normalize_role($role): string
+{
+    return $role === 'admin' ? 'admin' : 'user';
+}
+
+function is_expired(string $utc): bool
+{
+    return strtotime($utc . ' UTC') < time();
+}
+
+function relative_label(string $utc): string
+{
+    $days = (int) floor((time() - strtotime($utc . ' UTC')) / 86400);
+    if ($days <= 0) return 'hoy';
+    if ($days === 1) return 'ayer';
+    if ($days < 14) return "hace $days días";
+    if ($days < 60) return 'hace ' . intdiv($days, 7) . ' semanas';
+    return 'hace ' . intdiv($days, 30) . ' meses';
+}
+
+function new_token(): string
+{
+    return rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
+}
+
+function require_password(array $b): string
+{
+    $password = isset($b['password']) && is_string($b['password']) ? $b['password'] : '';
+    if (mb_strlen($password) < 8) throw new HttpError(400, 'La contraseña debe tener al menos 8 caracteres.');
+    return $password;
+}
+
+function find_user(int $id): array
+{
+    $stmt = db()->prepare('SELECT * FROM users WHERE id = ?');
+    $stmt->execute([$id]);
+    $user = $stmt->fetch();
+    if (!$user) throw new HttpError(404, 'No existe esa persona.');
+    return $user;
+}
+
+// ---------- Autenticación ----------
+
+function auth_token(): ?string
+{
+    // Algunos servidores (PHP como FastCGI, habitual en Plesk) no pasan la
+    // cabecera Authorization a PHP; por eso el frontend envía también X-Auth-Token.
+    $header = $_SERVER['HTTP_X_AUTH_TOKEN']
+        ?? $_SERVER['HTTP_AUTHORIZATION']
+        ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION']
+        ?? '';
+    if (str_starts_with($header, 'Bearer ')) $header = substr($header, 7);
+    return $header !== '' ? $header : null;
+}
+
+function require_auth(): array
+{
+    $token = auth_token();
+    if (!$token) throw new HttpError(401, 'No has iniciado sesión.');
+
+    $stmt = db()->prepare('SELECT * FROM sessions WHERE token = ?');
+    $stmt->execute([$token]);
+    $session = $stmt->fetch();
+    if (!$session || is_expired($session['expires_at'])) {
+        throw new HttpError(401, 'Tu sesión ha caducado. Vuelve a iniciar sesión.');
+    }
+    $stmt = db()->prepare('SELECT * FROM users WHERE id = ?');
+    $stmt->execute([$session['user_id']]);
+    $user = $stmt->fetch();
+    if (!$user) throw new HttpError(401, 'No has iniciado sesión.');
+    return $user;
+}
+
+function require_admin(): array
+{
+    $user = require_auth();
+    if ($user['role'] !== 'admin') throw new HttpError(403, 'Solo un administrador puede hacer esto.');
+    return $user;
+}
+
+function create_session(int $userId): string
+{
+    $token = new_token();
+    db()->prepare('INSERT INTO sessions (token, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)')
+        ->execute([$token, $userId, now_utc(), now_utc(SESSION_TTL)]);
+    return $token;
+}
+
+// ---------- Usuarios e invitaciones ----------
+
+function route_me(): void
+{
+    respond(['ok' => true, 'user' => public_user(require_auth())]);
+}
+
+function route_list_users(): void
+{
+    require_admin();
+    $users = db()->query('SELECT id, name, email, org, status, role FROM users ORDER BY id')->fetchAll();
+    $byUser = [];
+    foreach (db()->query('SELECT user_id, model_id, level FROM access')->fetchAll() as $r) {
+        $byUser[$r['user_id']][(string) $r['model_id']] = $r['level'];
+    }
+    respond(array_map(
+        fn ($u) => public_user($u) + ['access' => (object) ($byUser[$u['id']] ?? [])],
+        $users
+    ));
+}
+
+function find_user_by_email(string $email): ?array
+{
+    $stmt = db()->prepare('SELECT * FROM users WHERE email = ?');
+    $stmt->execute([$email]);
+    return $stmt->fetch() ?: null;
+}
+
+function route_invite(): void
+{
+    require_admin();
+    $b = body();
+    $name = str_field($b, 'name');
+    $email = mb_strtolower(str_field($b, 'email'));
+    $org = str_field($b, 'org');
+    $role = normalize_role($b['role'] ?? null);
+    if ($name === '' || $email === '') throw new HttpError(400, 'Nombre y correo son obligatorios.');
+
+    $existing = find_user_by_email($email);
+    if ($existing) {
+        if ($existing['status'] === 'active') throw new HttpError(409, 'Ya existe una cuenta activa con ese correo.');
+        $userId = (int) $existing['id'];
+        db()->prepare('UPDATE users SET name = ?, org = ?, role = ? WHERE id = ?')->execute([$name, $org, $role, $userId]);
+    } else {
+        db()->prepare('INSERT INTO users (name, email, org, status, role, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+            ->execute([$name, $email, $org, 'invited', $role, now_utc()]);
+        $userId = (int) db()->lastInsertId();
+    }
+
+    $token = new_token();
+    db()->prepare('INSERT INTO invites (token, user_id, expires_at) VALUES (?, ?, ?)')
+        ->execute([$token, $userId, now_utc(INVITE_TTL)]);
+
+    $link = rtrim(config()['app_url'], '/') . '/?token=' . $token;
+    try {
+        $mail = send_invite_email($email, $name, $link);
+    } catch (RuntimeException $e) {
+        throw new HttpError(502, $e->getMessage());
+    }
+
+    $out = ['ok' => true, 'user' => public_user(find_user($userId)) + ['access' => (object) []]];
+    // Solo cuando no hay correo real configurado: así se puede probar el flujo sin bandeja de entrada.
+    if (!$mail['sent']) $out['devLink'] = $link;
+    respond($out);
+}
+
+function route_create_user(): void
+{
+    require_admin();
+    $b = body();
+    $name = str_field($b, 'name');
+    $email = mb_strtolower(str_field($b, 'email'));
+    $org = str_field($b, 'org');
+    $role = normalize_role($b['role'] ?? null);
+    if ($name === '' || $email === '') throw new HttpError(400, 'Nombre y correo son obligatorios.');
+    $hash = password_hash(require_password($b), PASSWORD_DEFAULT);
+
+    $existing = find_user_by_email($email);
+    if ($existing && $existing['status'] === 'active') {
+        throw new HttpError(409, 'Ya existe una cuenta activa con ese correo.');
+    }
+    if ($existing) {
+        $userId = (int) $existing['id'];
+        db()->prepare("UPDATE users SET name = ?, org = ?, password_hash = ?, status = 'active', role = ? WHERE id = ?")
+            ->execute([$name, $org, $hash, $role, $userId]);
+    } else {
+        db()->prepare('INSERT INTO users (name, email, org, password_hash, status, role, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
+            ->execute([$name, $email, $org, $hash, 'active', $role, now_utc()]);
+        $userId = (int) db()->lastInsertId();
+    }
+    respond(['ok' => true, 'user' => public_user(find_user($userId)) + ['access' => (object) []]]);
+}
+
+function route_set_role(int $userId): void
+{
+    require_admin();
+    find_user($userId);
+    $role = normalize_role(body()['role'] ?? null);
+    db()->prepare('UPDATE users SET role = ? WHERE id = ?')->execute([$role, $userId]);
+    respond(['ok' => true, 'role' => $role]);
+}
+
+function route_delete_user(int $userId): void
+{
+    require_admin();
+    find_user($userId);
+    // access, invites y sessions se borran en cascada.
+    db()->prepare('DELETE FROM users WHERE id = ?')->execute([$userId]);
+    respond(['ok' => true]);
+}
+
+function route_reset_password(int $userId): void
+{
+    require_admin();
+    $password = require_password(body());
+    find_user($userId);
+    db()->prepare("UPDATE users SET password_hash = ?, status = 'active' WHERE id = ?")
+        ->execute([password_hash($password, PASSWORD_DEFAULT), $userId]);
+    respond(['ok' => true]);
+}
+
+function valid_invite(string $token): array
+{
+    $stmt = db()->prepare('SELECT * FROM invites WHERE token = ?');
+    $stmt->execute([$token]);
+    $invite = $stmt->fetch();
+    if (!$invite) throw new HttpError(404, 'Este enlace no es válido.');
+    if ($invite['used_at']) throw new HttpError(410, 'Este enlace ya se ha utilizado.');
+    if (is_expired($invite['expires_at'])) throw new HttpError(410, 'Este enlace ha caducado.');
+    return $invite;
+}
+
+function route_get_invite(string $token): void
+{
+    $user = find_user((int) valid_invite($token)['user_id']);
+    respond(['name' => $user['name'], 'email' => $user['email']]);
+}
+
+function route_accept_invite(string $token): void
+{
+    $password = require_password(body());
+    $invite = valid_invite($token);
+    db()->prepare("UPDATE users SET password_hash = ?, status = 'active' WHERE id = ?")
+        ->execute([password_hash($password, PASSWORD_DEFAULT), $invite['user_id']]);
+    db()->prepare('UPDATE invites SET used_at = ? WHERE token = ?')->execute([now_utc(), $token]);
+    respond(['ok' => true]);
+}
+
+function route_login(): void
+{
+    $b = body();
+    $user = find_user_by_email(mb_strtolower(str_field($b, 'email')));
+    $password = isset($b['password']) && is_string($b['password']) ? $b['password'] : '';
+    if (!$user || !$user['password_hash'] || !password_verify($password, $user['password_hash'])) {
+        throw new HttpError(401, 'Correo o contraseña incorrectos.');
+    }
+    respond(['ok' => true, 'token' => create_session((int) $user['id']), 'user' => public_user($user)]);
+}
+
+function upsert_access(int $userId, int $modelId, string $level): void
+{
+    db()->prepare(
+        'INSERT INTO access (user_id, model_id, level) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE level = VALUES(level)'
+    )->execute([$userId, $modelId, $level]);
+}
+
+function route_set_access(): void
+{
+    require_admin();
+    $b = body();
+    $userId = (int) ($b['userId'] ?? 0);
+    $modelId = (int) ($b['modelId'] ?? 0);
+    $level = str_field($b, 'level');
+    if (!$userId || !$modelId || $level === '') throw new HttpError(400, 'Faltan datos.');
+    if (!in_array($level, ['none', 'view', 'edit'], true)) throw new HttpError(400, 'Nivel de acceso no válido.');
+
+    if ($level === 'none') {
+        db()->prepare('DELETE FROM access WHERE user_id = ? AND model_id = ?')->execute([$userId, $modelId]);
+    } else {
+        upsert_access($userId, $modelId, $level);
+    }
+    respond(['ok' => true]);
+}
+
+// ---------- Modelos ----------
+
+function model_access_level(int $userId, int $modelId): string
+{
+    $stmt = db()->prepare('SELECT level FROM access WHERE user_id = ? AND model_id = ?');
+    $stmt->execute([$userId, $modelId]);
+    return $stmt->fetchColumn() ?: 'none';
+}
+
+function shared_label(int $modelId): string
+{
+    $stmt = db()->prepare("SELECT COUNT(*) FROM access WHERE model_id = ? AND level != 'none'");
+    $stmt->execute([$modelId]);
+    $c = (int) $stmt->fetchColumn();
+    return $c <= 1 ? 'solo tú' : "$c personas";
+}
+
+function serialize_model(array $row, string $myAccess): array
+{
+    return [
+        'id' => (int) $row['id'],
+        'name' => $row['name'],
+        'crop' => $row['crop'],
+        'region' => $row['region'],
+        'status' => $row['status'],
+        'updated' => relative_label($row['updated_at']),
+        'shared' => shared_label((int) $row['id']),
+        'myAccess' => $myAccess,
+        // Sin "true": así los objetos vacíos siguen siendo {} y no [].
+        'a' => json_decode($row['assumptions']),
+    ];
+}
+
+function find_model(int $id): array
+{
+    $stmt = db()->prepare('SELECT * FROM models WHERE id = ?');
+    $stmt->execute([$id]);
+    $row = $stmt->fetch();
+    if (!$row) throw new HttpError(404, 'No existe ese modelo.');
+    return $row;
+}
+
+function crop_of(array $b): string
+{
+    return ($b['crop'] ?? null) === 'almendro' ? 'almendro' : 'olivo';
+}
+
+function route_list_models(): void
+{
+    $user = require_auth();
+    $isAdmin = $user['role'] === 'admin';
+    $out = [];
+    foreach (db()->query('SELECT * FROM models ORDER BY id')->fetchAll() as $row) {
+        $level = $isAdmin ? 'edit' : model_access_level((int) $user['id'], (int) $row['id']);
+        if ($level !== 'none') $out[] = serialize_model($row, $level);
+    }
+    respond($out);
+}
+
+function route_create_model(): void
+{
+    $user = require_auth();
+    $b = body();
+    $name = str_field($b, 'name');
+    if ($name === '' || empty($b['a'])) throw new HttpError(400, 'Faltan datos del modelo.');
+
+    // Se re-decodifica el cuerpo como objetos para guardar los supuestos tal cual llegaron.
+    $raw = json_decode(file_get_contents('php://input'));
+    db()->prepare(
+        'INSERT INTO models (name, crop, region, status, created_by, updated_at, assumptions) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    )->execute([
+        $name, crop_of($b), str_field($b, 'region'), str_field($b, 'status') ?: 'Borrador',
+        $user['id'], now_utc(), json_out($raw->a),
+    ]);
+    $modelId = (int) db()->lastInsertId();
+    upsert_access((int) $user['id'], $modelId, 'edit');
+    respond(['ok' => true, 'model' => serialize_model(find_model($modelId), 'edit')]);
+}
+
+function route_update_model(int $modelId): void
+{
+    $user = require_auth();
+    $row = find_model($modelId);
+    $level = $user['role'] === 'admin' ? 'edit' : model_access_level((int) $user['id'], $modelId);
+    if ($level !== 'edit') throw new HttpError(403, 'No tienes permiso de edición sobre este modelo.');
+
+    $b = body();
+    $raw = json_decode(file_get_contents('php://input'));
+    db()->prepare(
+        'UPDATE models SET name = ?, crop = ?, region = ?, status = ?, assumptions = ?, updated_at = ? WHERE id = ?'
+    )->execute([
+        str_field($b, 'name') ?: $row['name'],
+        crop_of($b),
+        array_key_exists('region', $b) ? str_field($b, 'region') : $row['region'],
+        str_field($b, 'status') ?: $row['status'],
+        !empty($b['a']) ? json_out($raw->a) : $row['assumptions'],
+        now_utc(),
+        $modelId,
+    ]);
+    respond(['ok' => true, 'model' => serialize_model(find_model($modelId), $level)]);
+}
+
+// ---------- Enrutado ----------
+
+$method = $_SERVER['REQUEST_METHOD'];
+$path = '/' . trim($_SERVER['PATH_INFO'] ?? ($_GET['r'] ?? ''), '/');
+
+$routes = [
+    ['GET', '#^/me$#', 'route_me'],
+    ['GET', '#^/users$#', 'route_list_users'],
+    ['POST', '#^/users/invite$#', 'route_invite'],
+    ['POST', '#^/users$#', 'route_create_user'],
+    ['POST', '#^/users/(\d+)/role$#', 'route_set_role'],
+    ['DELETE', '#^/users/(\d+)$#', 'route_delete_user'],
+    ['POST', '#^/users/(\d+)/password$#', 'route_reset_password'],
+    ['GET', '#^/invites/([\w-]+)$#', 'route_get_invite'],
+    ['POST', '#^/invites/([\w-]+)/accept$#', 'route_accept_invite'],
+    ['POST', '#^/login$#', 'route_login'],
+    ['POST', '#^/access$#', 'route_set_access'],
+    ['GET', '#^/models$#', 'route_list_models'],
+    ['POST', '#^/models$#', 'route_create_model'],
+    ['PUT', '#^/models/(\d+)$#', 'route_update_model'],
+];
+
+try {
+    foreach ($routes as [$m, $pattern, $handler]) {
+        if ($m === $method && preg_match($pattern, $path, $match)) {
+            $handler(...array_slice($match, 1));
+        }
+    }
+    throw new HttpError(404, 'Ruta no encontrada.');
+} catch (HttpError $e) {
+    respond(['error' => $e->getMessage()], $e->status);
+} catch (Throwable $e) {
+    error_log('[api] ' . $e);
+    respond(['error' => 'Error interno del servidor: ' . $e->getMessage()], 500);
+}

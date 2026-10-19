@@ -280,7 +280,7 @@ export function EditorLayout() {
         <div style={{ flex: 1, overflow: 'auto', padding: 26 }}>
           {state.etab === 'supuestos' && (
             <TabWithPhoto
-              photo={model.crop === 'almendro' ? '/assets/supuestos-almendro-detalle.webp' : '/assets/olivar-detalle.webp'}
+              photo={model.crop === 'almendro' ? 'assets/supuestos-almendro-detalle.webp' : 'assets/olivar-detalle.webp'}
               alt={model.crop === 'almendro' ? 'Detalle de almendras' : 'Detalle de olivar'}
             >
               <SupuestosTab a={a} r={r} />
@@ -288,7 +288,7 @@ export function EditorLayout() {
           )}
           {state.etab === 'capex' && (
             <TabWithPhoto
-              photo={model.crop === 'almendro' ? '/assets/capex-almendro-detalle.webp' : '/assets/capex-detalle.webp'}
+              photo={model.crop === 'almendro' ? 'assets/capex-almendro-detalle.webp' : 'assets/capex-detalle.webp'}
               alt={model.crop === 'almendro' ? 'Plantones de almendro en filas' : 'Vivero de plantones en filas'}
               objectPosition="right center"
             >
@@ -299,7 +299,7 @@ export function EditorLayout() {
             <OpexTab
               a={a}
               r={r}
-              photo={model.crop === 'almendro' ? '/assets/opex-almendro-detalle.webp' : '/assets/opex-detalle.webp'}
+              photo={model.crop === 'almendro' ? 'assets/opex-almendro-detalle.webp' : 'assets/opex-detalle.webp'}
               photoAlt={model.crop === 'almendro' ? 'Cosechadora trabajando en el almendral' : 'Cosechadoras trabajando en el olivar'}
               photoObjectPosition={model.crop === 'almendro' ? '22% center' : 'center'}
             />

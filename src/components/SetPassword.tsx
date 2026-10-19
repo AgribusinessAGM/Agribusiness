@@ -55,7 +55,7 @@ export function SetPassword({ token, onDone }: { token: string; onDone: (email: 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
       <div style={{ width: '100%', maxWidth: 400 }}>
-        <img src="/assets/agromillora-logo.png" alt="Agromillora" style={{ height: 30, marginBottom: 28 }} />
+        <img src="assets/agromillora-logo.png" alt="Agromillora" style={{ height: 30, marginBottom: 28 }} />
 
         {status === 'loading' && (
           <p style={{ color: 'var(--ink2)', fontSize: 14 }}>Comprobando tu enlace…</p>

@@ -28,11 +28,14 @@ export function clearToken(): void {
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const token = getToken();
-  const res = await fetch(`/api${path}`, {
+  // Ruta relativa: la app puede vivir en cualquier carpeta (ej. htdocs/agribusiness).
+  const res = await fetch(`api/index.php${path}`, {
     ...init,
     headers: {
       'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      // X-Auth-Token además de Authorization: algunos servidores PHP (FastCGI) no
+      // pasan Authorization a PHP.
+      ...(token ? { Authorization: `Bearer ${token}`, 'X-Auth-Token': token } : {}),
       ...(init?.headers || {}),
     },
   });

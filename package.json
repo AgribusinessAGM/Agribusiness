@@ -1,22 +1,14 @@
 {
-  "name": "plataforma-modelos",
+  "name": "plataforma-agribusiness",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "engines": {
-    "node": ">=22.5.0"
-  },
   "scripts": {
     "dev": "vite",
-    "server": "node server/index.js",
-    "build": "tsc -b && vite build",
-    "start": "node server/index.js",
-    "lint": "oxlint",
-    "preview": "vite preview"
+    "build": "tsc -b && vite build && node scripts/build-web.mjs",
+    "lint": "oxlint"
   },
   "dependencies": {
-    "express": "^5.2.1",
-    "nodemailer": "^9.0.3",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },

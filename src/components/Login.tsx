@@ -12,7 +12,7 @@ export function Login() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 48 }}>
         <div style={{ width: '100%', maxWidth: 380 }}>
           <img
-            src="/assets/agromillora-logo.png"
+            src="assets/agromillora-logo.png"
             alt="Agromillora"
             style={{ height: 34, marginBottom: 40 }}
           />
@@ -25,7 +25,7 @@ export function Login() {
               color: 'var(--brand)',
             }}
           >
-            Plataforma de modelos
+            Plataforma AGRIBUSINESS
           </div>
           <h1
             style={{
@@ -142,7 +142,7 @@ export function Login() {
             }}
           >
             <img
-              src="/assets/portada-olivar.png"
+              src="assets/portada-olivar.png"
               alt="Olivar en cosecha"
               style={{
                 display: 'block',

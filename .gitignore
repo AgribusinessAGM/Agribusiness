@@ -26,3 +26,6 @@ server/data.db
 *.njsproj
 *.sln
 *.sw?
+
+# Configuración local de la API PHP (contraseñas): no se sube a git
+agribusiness/api/config.php

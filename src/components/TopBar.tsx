@@ -38,7 +38,7 @@ export function TopBar() {
       }}
     >
       <img
-        src="/assets/agromillora-logo.png"
+        src="assets/agromillora-logo.png"
         alt="Agromillora"
         style={{ height: 24, cursor: 'pointer' }}
         onClick={gotoDash}
