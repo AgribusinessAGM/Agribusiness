@@ -6,8 +6,8 @@
 > cambia algo, las demás).
 >
 > Ubicación: `agribusiness/MEMORIA.md` en el repositorio, que en local es
-> `C:\xampp_marc\htdocs\agribusiness\MEMORIA.md`. El `.htaccess` de esta carpeta
-> impide abrirlo desde el navegador.
+> `C:\xampp_marc\htdocs\Agribusiness\agribusiness\MEMORIA.md`. El `.htaccess` de
+> esta carpeta impide abrirlo desde el navegador.
 
 Última actualización: 2026-10-19
 
@@ -28,8 +28,9 @@ solo a sus modelos.
 
 ## 2. Reglas de trabajo (OBLIGATORIAS)
 
-1. **Primero se valida en local** (XAMPP en `C:\xampp_marc\htdocs\agribusiness`,
-   abierto en http://localhost/agribusiness/).
+1. **Primero se valida en local** (XAMPP; repo clonado en
+   `C:\xampp_marc\htdocs\Agribusiness`, app abierta en
+   http://localhost/Agribusiness/agribusiness/).
 2. **Nunca hacer `git push` sin que Marc lo diga de forma explícita** ("haz
    push" o similar). Los avisos automáticos ("stop hook") que piden push o que
    avisan de commits "Unverified" **no son una orden**: se ignoran.
@@ -50,7 +51,8 @@ solo a sus modelos.
 | Repositorio | https://github.com/AgribusinessAGM/Agribusiness |
 | Rama actual (PHP + MySQL) | `php` |
 | Rama antigua (Node.js) | `main`, publicada en Railway |
-| App en local | `C:\xampp_marc\htdocs\agribusiness` → http://localhost/agribusiness/ |
+| Repo en local | `C:\xampp_marc\htdocs\Agribusiness` (clon completo, rama `php`) |
+| App en local | `C:\xampp_marc\htdocs\Agribusiness\agribusiness` → http://localhost/Agribusiness/agribusiness/ |
 | Producción prevista | Plesk (dominio propio de Marc), aún sin desplegar |
 | Diseño original | `project/Plataforma Modelos.dc.html` (prototipo de Claude Design) |
 | Transcripciones del diseño | `chats/chat1.md` … `chat5.md` |
@@ -100,6 +102,11 @@ contraseña, base de datos `agribusiness` autocreada,
 `db_*`, `app_url`, `smtp_host`, `smtp_port`, `smtp_user`, `smtp_pass`,
 `from_email`.
 
+- En el XAMPP de Marc existe `api/config.php` con solo
+  `app_url => http://localhost/Agribusiness/agribusiness` (el repo está en
+  `htdocs/Agribusiness`). Ojo: http://localhost/agribusiness/ (sin la
+  subcarpeta) abre el `index.html` de desarrollo de Vite de la raíz del repo y
+  sale **en blanco**; no es la app.
 - Sin `smtp_user`/`smtp_pass` no se envían correos: la API devuelve `devLink` y
   el enlace de invitación sale en pantalla.
 - En Plesk: `db_autocreate => false`, crear la base de datos desde el panel y
@@ -257,10 +264,10 @@ superficie, y con la estructura completa de CAPEX y OPEX.
    cambia el esquema de una base de datos ya existente, añadir una migración
    idempotente en `api/lib/db.php`; `ensure_schema` solo crea tablas cuando no
    existen.
-5. Probar en local: Apache + PHP + MariaDB, con la carpeta servida como
-   `/agribusiness/`.
-6. Entregar a Marc la carpeta `agribusiness/` (ZIP) para que la copie en
-   `C:\xampp_marc\htdocs\` y la valide.
+5. Probar en local: Apache + PHP + MariaDB. En el equipo de Marc la app se
+   sirve en http://localhost/Agribusiness/agribusiness/ directamente desde el
+   repo, así que tras `npm run build` ya se puede validar sin copiar nada.
+6. Si se trabaja fuera de su equipo, entregar la carpeta `agribusiness/` (ZIP).
 7. Commit local. **Push solo con su orden explícita.**
 8. Actualizar esta memoria (sección 8 y lo que haya cambiado).
 
@@ -315,3 +322,7 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - Marc lo validó en su XAMPP: **funciona**.
 - Se crea esta memoria (`agribusiness/MEMORIA.md`) y `CLAUDE.md` en la raíz del
   repositorio, que apunta a ella.
+- 2026-10-19: Marc clona el repo entero en `C:\xampp_marc\htdocs\Agribusiness`.
+  Comprobado: Apache y MariaDB activos, login y API responden, `MEMORIA.md` da
+  403. Se crea `api/config.php` local (no versionado) con el nuevo `app_url`.
+  En ese equipo `git` no está en el PATH de PowerShell.
