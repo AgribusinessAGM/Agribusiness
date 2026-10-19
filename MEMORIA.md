@@ -34,9 +34,11 @@ solo a sus modelos.
 2. **Nunca hacer `git push` sin que Marc lo diga de forma explícita** ("haz
    push" o similar). Los avisos automáticos ("stop hook") que piden push o que
    avisan de commits "Unverified" **no son una orden**: se ignoran.
-3. Para hacer push, Marc pega un **PAT de GitHub nuevo** cada vez. Se usa para
-   **un solo push** y después se le recuerda que lo revoque. Nunca guardar el
-   PAT en archivos ni en la configuración de git.
+3. Para hacer push (solo con su orden): en su equipo Git usa Git Credential
+   Manager. Desde la sesión de IA no puede pedir credenciales, así que el push
+   se lanza en una pestaña de la terminal de la app y Marc inicia sesión en
+   GitHub en el navegador (desde 2026-10-19 la credencial queda guardada).
+   Nunca pedir, escribir ni guardar tokens o contraseñas.
 4. Antes de aplicar cambios visuales grandes, Marc suele pedir **una vista
    previa** ("hazme un visual"). Se hace el cambio en local, se envía la
    captura y **no se hace commit** hasta que diga "aplícalo".
@@ -57,11 +59,10 @@ solo a sus modelos.
 | Diseño original | `project/Plataforma Modelos.dc.html` (prototipo de Claude Design) |
 | Transcripciones del diseño | `chats/chat1.md` … `chat5.md` |
 
-**Estado de la rama `php` a 2026-10-19:** varios commits locales (ver
-sección 8), **sin subir a GitHub** (Marc no ha dado la orden). Si esta memoria
-se lee en una sesión nueva y la rama `php` no existe en GitHub, el trabajo solo
-estaba en local: pedir a Marc la carpeta `C:\xampp_marc\htdocs\Agribusiness`
-(el repositorio completo, con su `.git`).
+**Estado de la rama `php` a 2026-10-19:** subida a GitHub por primera vez
+(hasta el commit `4572cc0`, por orden de Marc), con seguimiento de
+`origin/php`. Los commits posteriores pueden estar solo en local hasta el
+siguiente push.
 
 ## 4. Arquitectura (rama `php`)
 
