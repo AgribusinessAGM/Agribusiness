@@ -74,7 +74,7 @@ export function RentTable({ rows, pad = 60, vAdj = 0, labW: labWProp }) {
                 fontWeight: 800,
               }}
             >
-              Concepto<br />(Miles €)
+              Concepto<br /><span style=${{ fontStyle: 'italic', fontWeight: 400, fontSize: 10, textTransform: 'none' }}>(Miles €)</span>
             </th>
             ${years.map(
               (y) => html`

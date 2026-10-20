@@ -622,3 +622,6 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   sin relleno vertical para que la fila no crezca. Reajustados `labW45` (94,1 /
   91,65 px) y la hoja 5 (`vAdj=-0.78`): siguen los 5 px hasta el año 1 y los
   26 px arriba y abajo de la tabla del SPV. Con commit y push.
+- 2026-10-20: **"(Miles €)"** de esa cabecera en cursiva, sin negrita, 10 px y
+  sin mayúsculas; `labW45` en inglés vuelve a 90 px (5 px hasta el año 1).
+  Con commit y push.

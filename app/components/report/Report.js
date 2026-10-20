@@ -323,7 +323,7 @@ export function Report({ title }) {
   // ---- tablas de rentabilidad
   // Columna de etiquetas de las hojas 4 y 5 ajustada a la etiqueta más larga de cada idioma:
   // deja unos 5 px hasta las cifras del año 1
-  const labW45 = T(94.1, 91.65);
+  const labW45 = T(94.1, 90);
   const projectRows = renRows(layers[0], true).map((row) =>
     row.label === 'Beneficio Neto de Explotación' || row.label === 'Beneficio neto'
       ? { ...row, label: T('Beneficio Neto', 'Net income') }
