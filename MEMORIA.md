@@ -643,3 +643,6 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   en almendro `supuestos-almendro-detalle.webp`). Mismos bordes que CAPEX
   (contenido 256-798 px, foto 810-983 px medidos). Se quita el ajuste propio de
   la tabla del IS. Con commit y push.
+- 2026-10-20: **Pestaña Financiero:** quitado el `maxWidth: 1080` de su raíz;
+  en pantallas anchas se quedaba más estrecha que CAPEX. Medido a 1700 px: los
+  dos cuadros van de 256 a 1305 px. Con commit y push.

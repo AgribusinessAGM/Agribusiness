@@ -162,7 +162,7 @@ export function FinancieraTab({ a, r }) {
   const tableHead = { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 16px', fontWeight: 700, fontSize: 13, borderBottom: '1px solid var(--line)' };
 
   return html`
-    <div style=${{ maxWidth: 1080 }}>
+    <div style=${{ minWidth: 0 }}>
       <h2 style=${{ fontSize: 18, fontWeight: 800, margin: '0 0 6px' }}>Estructura financiera</h2>
       <p style=${{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 20px' }}>
         Préstamo francés sobre la deuda, con años de carencia. Ajusta financiación e interés en Supuestos.
