@@ -12,7 +12,11 @@ import { RentTable } from './RentTable.js';
 // estilo institucional). Se ve en la pestaña Informe del editor. Son páginas A4 que
 // se imprimen con el cuadro de impresión del navegador (impresora o "Guardar como
 // PDF"); las de rentabilidad van en horizontal.
-// Modelo IAG: 7 páginas. Modelo normal: 8 (añade la capa Fondo).
+// Modelo IAG: 6 páginas. Modelo normal: 7 (añade la capa Fondo). Con la hoja
+// "Estructura financiera" (SHOW_FIN), una más.
+
+// Mostrar la hoja "Estructura financiera" (oculta de momento)
+const SHOW_FIN = false;
 
 const HEAD_FONT = "Rockwell, 'Rockwell Nova', 'Roboto Slab', serif";
 const BODY_FONT = 'Arial, Helvetica, sans-serif';
@@ -101,7 +105,7 @@ function SectionHead({ num, kicker, title, intro }) {
         <span style=${{ fontFamily: HEAD_FONT, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', color: C.muted }}>${kicker}</span>
       </div>
       <h3 style=${{ fontFamily: HEAD_FONT, fontWeight: 700, fontSize: 32, margin: intro ? '0 0 4px' : 0, color: C.text }}>${title}</h3>
-      ${intro && html`<p style=${{ margin: 0, fontSize: 12, color: C.sub }}>${intro}</p>`}
+      ${intro && html`<p style=${{ margin: 0, fontSize: 14, color: C.sub }}>${intro}</p>`}
     </div>
   `;
 }
@@ -281,13 +285,14 @@ export function Report({ title }) {
     : T('olivar superintensivo en regadío', 'irrigated super-high-density olive grove');
   const intro1 = T('Rentabilidad del proyecto sobre ' + supTxt + ' de ' + cropTxt + '.', 'Project profitability over ' + supTxt + ' of ' + cropTxt + '.');
   const vanSub = nf(vanHa) + ' €/Ha' + T(' · Tasa Dcto. ', ' · Disc. rate ') + fmt2(dr) + '%';
-  const op = (orchard) => (isIAG ? ' · Orchard 1' : orchard);
 
   // Página en la que va cada sección (el modelo normal tiene una más: el Fondo)
+  // La hoja "Estructura financiera" está oculta por decisión de Marc (2026-10-20);
+  // para recuperarla basta con poner SHOW_FIN a true.
   const pFin = isIAG ? 6 : 7;
-  const pLegal = isIAG ? 7 : 8;
   const sFin = isIAG ? '05' : '06';
-  const sLegal = isIAG ? '06' : '07';
+  const pLegal = SHOW_FIN ? pFin + 1 : pFin;
+  const sLegal = SHOW_FIN ? (isIAG ? '06' : '07') : sFin;
 
   const kpiCell = (label, value, sub, opts = {}) => html`
     <div
@@ -499,8 +504,8 @@ export function Report({ title }) {
         <${Page} landscape>
           <${SectionHead}
             num="03"
-            kicker=${'Rentabilidad' + op(' · Proyecto')}
-            title=${isIAG ? 'Standalone returns — Orchard 1 (EBITDA → FCF)' : 'Cuenta de resultados y FCF — proyecto agrícola'}
+            kicker=${isIAG ? T('Rentabilidad · Modelo financiero', 'Profitability · Financial Model') : 'Rentabilidad · Proyecto'}
+            title=${isIAG ? 'Standalone returns' : 'Cuenta de resultados y FCF — proyecto agrícola'}
             intro=${T('Explotación del olivar sin apalancar · TIR agrícola ', 'Unlevered olive grove operation · agricultural IRR ') + kpis.tirA}
           />
           <${RentTable} rows=${projectRows} />
@@ -548,8 +553,9 @@ export function Report({ title }) {
           <//>
         `}
 
-        <!-- Estructura financiera -->
-        <${Page}>
+        <!-- Estructura financiera (oculta si SHOW_FIN es false) -->
+        ${SHOW_FIN &&
+        html`<${Page}>
           <${SectionHead}
             num=${sFin}
             kicker="Estructura financiera"
@@ -616,7 +622,7 @@ export function Report({ title }) {
             </div>
           </div>
           <${Footer} page=${pFin} />
-        <//>
+        <//>`}
 
         <!-- Aviso legal -->
         <${Page}>

@@ -1,4 +1,4 @@
-# MEMORIA DEL PROYECTO — Plataforma AGRIBUSINESS
+﻿# MEMORIA DEL PROYECTO — Plataforma AGRIBUSINESS
 
 > Documento vivo. Es la fuente de verdad para continuar el proyecto en
 > cualquier sesión nueva (persona o IA). **Léelo entero antes de tocar nada** y
@@ -291,9 +291,13 @@ contra el motor anterior en los 3 modelos de ejemplo).
 
 ### Informe PDF
 
-7 páginas (IAG) u 8 (normal, con la página del Fondo): portada, resumen
+6 páginas (IAG) o 7 (normal, con la página del Fondo): portada, resumen
 ejecutivo, CAPEX, rentabilidad del proyecto y del SPV (y del Fondo) en
-horizontal, estructura financiera y aviso legal. Estilo del diseño "Informe PDF
+horizontal y aviso legal. **La hoja "Estructura financiera" ("Del cultivo al
+SPV/fondo": capas con sus TIR, préstamo y condiciones, fees) está oculta por
+decisión de Marc (2026-10-20), pero el código sigue en `Report.js`: para
+recuperarla basta con poner `SHOW_FIN = true` al principio del archivo** (la
+numeración de secciones y páginas se ajusta sola). Estilo del diseño "Informe PDF
 Torrimpietra" (el más reciente) para todos los modelos; tablas a 35 años. En la
 tabla del SPV normal se omiten "Otros", "Otros gastos operativos" y "Comisión de
 éxito" cuando son cero (si no, no cabe en la hoja). Imágenes:
@@ -525,3 +529,10 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   (`SectionHead` ya no admite otra fuente ni tamaño; antes CAPEX, Estructura
   financiera y Aviso legal iban en Arial). El título del aviso legal ocupa dos
   líneas; nada se sale de la hoja. Con commit y push.
+- 2026-10-20: **Oculta la hoja "Estructura financiera" del informe** (Marc;
+  se recupera con `SHOW_FIN = true` en `Report.js`). El aviso legal pasa a ser
+  la sección 05 (IAG) / 06 (normal). Comprobada la numeración. Con commit y push.
+- 2026-10-20: **Informe, retoques de Marc:** entradilla de las cabeceras a
+  14 px; en Torrimpietra la hoja 03 se titula "Standalone returns" con el
+  antetítulo "Rentabilidad · Modelo financiero" / "Profitability · Financial
+  Model". Comprobado en ES y EN; nada se sale de la hoja. Con commit y push.
