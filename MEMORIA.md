@@ -638,3 +638,8 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-20: **Pestaña Financiero:** la tabla "IS - Impuesto diferido" ocupa
   el mismo ancho que las columnas de la pestaña OPEX (3 de 4 columnas; 542 px
   medidos en ambas). Con commit y push.
+- 2026-10-20: **Pestaña Financiero con foto**, como CAPEX: todo el contenido
+  ocupa las columnas 1-3 y la foto la 4 (`TabWithPhoto`; `foto-olivar.jpg`,
+  en almendro `supuestos-almendro-detalle.webp`). Mismos bordes que CAPEX
+  (contenido 256-798 px, foto 810-983 px medidos). Se quita el ajuste propio de
+  la tabla del IS. Con commit y push.

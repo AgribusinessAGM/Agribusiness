@@ -340,7 +340,15 @@ export function EditorLayout() {
             />
           `}
           ${etab === 'rent' && html`<${RentabilidadTab} a=${a} r=${r} />`}
-          ${etab === 'fin' && html`<${FinancieraTab} a=${a} r=${r} />`}
+          ${etab === 'fin' &&
+          html`
+            <${TabWithPhoto}
+              photo=${model.crop === 'almendro' ? 'assets/supuestos-almendro-detalle.webp' : 'assets/foto-olivar.jpg'}
+              alt=${model.crop === 'almendro' ? 'Detalle de almendras' : 'Olivar en seto'}
+            >
+              <${FinancieraTab} a=${a} r=${r} />
+            <//>
+          `}
           ${etab === 'precio' && html`<${PrecioTab} a=${a} r=${r} title=${isIAG ? '4. Precio' : '4. Precio'} />`}
           ${etab === 'informe' && html`<${Report} title=${isIAG ? '7. Informe' : '7. Informe'} />`}
         </div>
