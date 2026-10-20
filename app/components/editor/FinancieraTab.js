@@ -117,16 +117,18 @@ function DeferredTaxTable({ r }) {
 export function FinancieraTab({ a, r }) {
   const isIAG = a.engine === 'iag';
   const horizon = r.interest.length - 1;
+  // En los cuadros, los ceros se muestran como "-"
+  const nz = (v) => (Math.round(v) === 0 ? '-' : nf(v));
   const amortRows = [];
   let saldoA = r.deuda;
   for (let y = 1; y <= horizon; y++) {
     saldoA -= r.principal[y];
     amortRows.push({
       year: y,
-      cuota: nf(r.interest[y] + r.principal[y]),
-      interes: nf(r.interest[y]),
-      principal: nf(r.principal[y]),
-      saldo: nf(Math.max(0, saldoA)),
+      cuota: nz(r.interest[y] + r.principal[y]),
+      interes: nz(r.interest[y]),
+      principal: nz(r.principal[y]),
+      saldo: nz(Math.max(0, saldoA)),
     });
   }
 
@@ -136,9 +138,9 @@ export function FinancieraTab({ a, r }) {
     acumD += r.amort[y];
     depRows.push({
       year: y,
-      dep: nf(r.amort[y]),
-      acum: nf(acumD),
-      pend: nf(Math.max(0, (r.depBase || r.totalCapex) - acumD)),
+      dep: nz(r.amort[y]),
+      acum: nz(acumD),
+      pend: nz(Math.max(0, (r.depBase || r.totalCapex) - acumD)),
     });
   }
 

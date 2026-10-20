@@ -18,7 +18,7 @@ const TAB_DEFS = [
   ['opex', '3. OPEX', true],
   ['precio', '4. Precio', true],
   ['rent', '5. Rentabilidad', false],
-  ['fin', '6. E. Financiera', false],
+  ['fin', '6. Est. Financiera', false],
   ['informe', '7. Informe', false],
 ];
 // Modelo IAG: las hojas de su Excel, más el ciclo de precios
@@ -28,7 +28,7 @@ const TAB_DEFS_IAG = [
   ['opex', '3. OPEX', true],
   ['precio', '4. Precio', true],
   ['rent', '5. Rentabilidad', false],
-  ['fin', '6. Financiero', false],
+  ['fin', '6. Est. Financiera', false],
   ['informe', '7. Informe', false],
 ];
 

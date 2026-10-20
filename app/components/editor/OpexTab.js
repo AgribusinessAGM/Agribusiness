@@ -173,7 +173,8 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
                         gridTemplateColumns: '2.2fr 1.9fr 1.3fr 1fr 1fr',
                         alignItems: 'center',
                         padding: '8px 18px',
-                        borderTop: '1px solid var(--line)',
+                        // línea gris debajo de cada sub-partida, también de la última
+                        borderBottom: '1px solid var(--line)',
                       }}
                     >
                       <div style=${{ fontSize: 13.5, whiteSpace: 'pre-line' }}>${it.label}</div>

@@ -70,7 +70,7 @@ const GROUPS_IAG = [
   {
     title: 'Producción y precio',
     rows: [
-      { key: 'kgTree', label: 'Kg/árbol (olivo) · producción plena', unit: 'kg' },
+      { key: 'kgTree', label: 'Kg/Aceituna/Árbol (olivo) · Plena Producción', unit: 'kg' },
       { key: 'oilYield', label: 'Rendimiento graso', unit: '%' },
       { key: 'precioEVOO', label: 'Precio inicial (EVOO)', unit: '€/kg' },
     ],
@@ -109,6 +109,8 @@ const GROUPS_IAG = [
   },
 ];
 
+const unitStyle = { fontSize: 12, fontFamily: 'var(--font)', fontWeight: 400, color: 'var(--ink2)' };
+
 export function SupuestosTab({ a, r }) {
   const { onField, canEdit } = useApp();
   const groups = a.engine === 'iag' ? GROUPS_IAG : GROUPS;
@@ -131,16 +133,42 @@ export function SupuestosTab({ a, r }) {
         </span>
       </div>
       <p style=${{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 22px' }}>
-        Ajusta las variables de tu proyecto. Los valores en gris se calculan automáticamente y no se pueden editar.
+        Ajusta las variables de tu proyecto.
       </p>
-      <div style=${{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
+      <div
+        style=${{
+          background: 'var(--surface)',
+          border: '1px dashed var(--line)',
+          borderRadius: 'var(--radius)',
+          padding: 16,
+          marginBottom: 18,
+        }}
+      >
+        <div style=${{ fontWeight: 700, fontSize: 13, color: 'var(--ink2)', marginBottom: 12 }}>
+          Resumen del Proyecto
+        </div>
+        <!-- misma estructura que la banda de la hoja CAPEX del informe: etiqueta y, debajo, cifra con su unidad en la misma línea -->
+        <div style=${{ display: 'flex', justifyContent: 'space-between', gap: 24 }}>
+          ${[
+            ['Marco', html`${nf(a.marcoN, 2)}${' '}<span style=${unitStyle}>m</span>${' × '}${nf(a.marcoM, 2)}${' '}<span style=${unitStyle}>m</span>`],
+            ['Densidad', html`${nf(r.densidad)}${' '}<span style=${unitStyle}>Árboles/Ha</span>`],
+            ['Superficie', html`${nf(a.superficie)}${' '}<span style=${unitStyle}>Ha</span>`],
+            ['Nº árboles', nf(r.arboles)],
+          ].map(
+            ([label, value]) => html`
+              <div key=${label}>
+                <div style=${{ fontSize: 11, color: 'var(--ink2)', textTransform: 'uppercase', fontWeight: 700, marginBottom: 4 }}>${label}</div>
+                <div style=${{ fontFamily: 'var(--num)', fontSize: 17, fontWeight: 600, whiteSpace: 'nowrap' }}>${value}</div>
+              </div>
+            `,
+          )}
+        </div>
+      </div>      <div style=${{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
         ${groups.map(
           (g) => html`
             <div
               key=${g.title}
               style=${{
-                marginLeft: 20,
-                width: 'calc(100% - 20px)',
                 background: 'var(--surface)',
                 border: '1px solid var(--line)',
                 borderRadius: 'var(--radius)',
@@ -221,46 +249,6 @@ export function SupuestosTab({ a, r }) {
             </div>
           `,
         )}
-        <div
-          style=${{
-            gridColumn: '1 / -1',
-            background: 'var(--surface)',
-            border: '1px dashed var(--line)',
-            borderRadius: 'var(--radius)',
-            padding: 16,
-          }}
-        >
-          <div style=${{ fontWeight: 700, fontSize: 13, color: 'var(--ink2)', marginBottom: 12 }}>
-            Resumen del Proyecto
-          </div>
-          <div style=${{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }}>
-            <div>
-              <div style=${{ fontSize: 11, color: 'var(--ink2)' }}>Densidad</div>
-              <div style=${{ fontFamily: 'var(--num)', fontSize: 17, fontWeight: 600 }}>
-                ${nf(r.densidad)}
-              </div>
-              <div style=${{ fontSize: 11, color: 'var(--ink2)' }}>árboles/Ha</div>
-            </div>
-            <div>
-              <div style=${{ fontSize: 11, color: 'var(--ink2)' }}>Árboles totales</div>
-              <div style=${{ fontFamily: 'var(--num)', fontSize: 17, fontWeight: 600 }}>
-                ${nf(r.arboles)}
-              </div>
-            </div>
-            <div>
-              <div style=${{ fontSize: 11, color: 'var(--ink2)' }}>CAPEX por Ha</div>
-              <div style=${{ fontFamily: 'var(--num)', fontSize: 17, fontWeight: 600 }}>
-                ${nf(r.capexHa)} €
-              </div>
-            </div>
-            <div>
-              <div style=${{ fontSize: 11, color: 'var(--ink2)' }}>OPEX/Ha (pleno)</div>
-              <div style=${{ fontFamily: 'var(--num)', fontSize: 17, fontWeight: 600 }}>
-                ${nf(r.opexHa)} €
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   `;

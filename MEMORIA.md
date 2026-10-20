@@ -646,3 +646,28 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-20: **Pestaña Financiero:** quitado el `maxWidth: 1080` de su raíz;
   en pantallas anchas se quedaba más estrecha que CAPEX. Medido a 1700 px: los
   dos cuadros van de 256 a 1305 px. Con commit y push.
+- 2026-10-20: **Pestaña Financiero:** en el cuadro de amortización del préstamo
+  y en el de amortización/depreciación, los valores 0 se muestran como "-".
+  Con commit y push.
+- 2026-10-20: **OPEX de Torrimpietra:** la partida "CAP processing (Common
+  Agricultural Policy)" se muestra en español como "Tramitación PAC" (antes
+  "Tramitación PAC (Política Agrícola Común)"; solo cambia el diccionario, en
+  inglés sigue igual). Con commit y push.
+- 2026-10-20: **Pestaña 6:** se llama "6. Est. Financiera" en todos los modelos
+  (EN "6. Fin. Structure"). Con commit y push.
+- 2026-10-20: **Supuestos:** quitada la frase "Los valores en gris se calculan
+  automáticamente y no se pueden editar.". Con commit y push.
+- 2026-10-20: **Supuestos de Torrimpietra:** "Kg/árbol (olivo) · producción plena" pasa a
+  "Kg/Aceituna/Árbol (olivo) · Plena Producción" (EN "Kg olives/tree (olive) ·
+  Full production"). Con commit y push.
+- 2026-10-20: **Supuestos, "Resumen del Proyecto":** pasa arriba (antes de las
+  tarjetas) con los mismos campos que la banda de la hoja CAPEX del informe:
+  Marco (m) · Densidad (Árboles/Ha) · Superficie (Ha) · Nº árboles. Mismo
+  estilo; salen CAPEX por Ha y OPEX/Ha (pleno). Misma estructura que el
+  informe: etiqueta en mayúsculas y, debajo, cifra y unidad en una línea
+  ("3,80 m × 1,40 m", "1.880 Árboles/Ha", "300 Ha", "563.910"), repartidas
+  en una fila. Con commit y push.
+- 2026-10-20: **Supuestos:** las tarjetas de grupos pierden el margen izquierdo
+  de 20 px; quedan alineadas con el título y el resumen. Con commit y push.
+- 2026-10-20: **OPEX:** cada sub-partida lleva línea gris debajo (antes encima),
+  así la última fila de cada tarjeta también queda cerrada. Con commit y push.
