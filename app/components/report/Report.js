@@ -497,7 +497,7 @@ export function Report({ title }) {
               </div>
             </div>
             <div style=${{ margin: '0 0 8px', paddingLeft: '0.2cm', fontSize: 13, fontWeight: 700, textTransform: 'uppercase', color: C.green }}>
-              CAPEX - Inversión inicial
+              CAPEX · Inversión inicial
             </div>
             <${SummaryTable}
               first="Partida"

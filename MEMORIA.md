@@ -587,5 +587,5 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-20: **Hoja 3:** el "OPEX total" incluye ahora "Otros" (es
   `r.opexHa`; "Otros" sigue sin fila propia) y el % de cada bloque es sobre
   ese total; la cabecera de la tabla OPEX es "Partida"; nuevo título
-  "CAPEX - Inversión inicial" sobre la tabla CAPEX. La foto baja a ≈118 px.
+  "CAPEX · Inversión inicial" sobre la tabla CAPEX. La foto baja a ≈118 px.
   Con commit y push.
