@@ -32,7 +32,7 @@ export const PAIRS = [
 ['editable','editable'],['solo lectura','read only'],['Solo lectura','Read only'],
 ['Supuestos','Assumptions'],['1. Supuestos','1. Assumptions'],['1. Supuestos','1. Assumptions'],['5. Rentabilidad','5. Profitability'],['E. Financiera','E. Financial'],['6. E. Financiera','6. E. Financial'],
 ['5. Rentabilidad','5. Profitability'],['6. Est. Financiera','6. Fin. Structure'],['4. Precio','4. Price'],['4. Precio','4. Price'],['2. CAPEX','2. CAPEX'],['3. OPEX','3. OPEX'],
-['7. Informe','7. Report'],['Bloque','Block'],['Nº árboles','No. of trees'],['Concepto','Concept'],['(miles €)','(€ thousand)'],['Beneficio Neto','Net income'],['Árboles/Ha','Trees/Ha'],['OPEX · Plena producción','OPEX · Full production'],['OPEX total','Total OPEX'],['CAPEX · Inversión inicial','CAPEX · Initial investment'],['7. Informe','7. Report'],['Imprimir','Print'],
+['7. Informe','7. Report'],['Bloque','Block'],['Nº árboles','No. of trees'],['€ total','€ total'],['Due Diligence','Due Diligence'],['Concepto','Concept'],['(miles €)','(€ thousand)'],['Beneficio Neto','Net income'],['Árboles/Ha','Trees/Ha'],['OPEX · Plena producción','OPEX · Full production'],['OPEX total','Total OPEX'],['CAPEX · Inversión inicial','CAPEX · Initial investment'],['7. Informe','7. Report'],['Imprimir','Print'],
 ['Informe PDF con los resultados del modelo. Las páginas de rentabilidad salen en horizontal.','PDF report with the model results. The profitability pages are printed in landscape.'],
 ['TIR Fondo · final','Fund IRR · final'],['TIR SPV · Orchard 1','SPV IRR · Orchard 1'],['Inversión total','Total investment'],['Equity comprometido','Committed equity'],
 ['VAN Fondo (8%)','Fund NPV (8%)'],['VAN Fondo (8%) k€','Fund NPV (8%) k€'],['Precio medio','Average price'],
@@ -137,7 +137,7 @@ export const PAIRS = [
 ['Ciclo de precios','Price cycle'],['Var. % editable','Editable var. %'],['Precio €/kg EVOO','Price €/kg EVOO'],['Var. % vs. año anterior','Var. % vs. previous year'],
 ['Precio €/kg','Price €/kg'],['Media','Average'],['Var. % positiva','Var. % positive'],['negativa','negative'],['Restablecer','Reset'],
 // ---- financiera
-['Préstamo francés sobre la deuda, con años de carencia. Ajusta financiación e interés en Supuestos.','French-style loan on the debt, with grace years. Adjust financing and interest in Assumptions.'],
+['Préstamo francés sobre la deuda, con años de carencia.','French-style loan on the debt, with grace years.'],
 ['Deuda','Debt'],['Cuota anual','Annual instalment'],['Cuadro de amortización · 35 años','Amortisation schedule · 35 years'],
 ['Año','Year'],['Cuota','Instalment'],['Interés','Interest'],['Pendiente','Outstanding'],['Depreciación','Depreciation'],['Acumulada','Accumulated'],['Amort.','Repaid'],
 ['Total intereses','Total interest'],['Cuadro de depreciación · 35 años','Depreciation schedule · 35 years'],['Base','Base'],

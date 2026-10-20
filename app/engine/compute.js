@@ -74,6 +74,14 @@ export function discountPct(a) {
 // Cada modelo usa el motor de su Excel: el de Iberocrops (por defecto) o el de
 // IAG (a.engine === 'iag', modelo Torrimpietra).
 /** @param {Assumptions} a */
+// €/Ha de una partida de CAPEX: por árbol (grupo 'ud') × densidad, por Ha, o
+// importe total de la finca (it.total, p. ej. la Due Diligence) ÷ superficie
+export function capexItemHa(it, g, densidad, sup) {
+  const v = +it.v || 0;
+  if (it.total) return sup > 0 ? v / sup : 0;
+  return v * (g.unit === 'ud' ? densidad : 1);
+}
+
 export function compute(a) {
   return a.engine === 'iag' ? computeIAG(a) : computeStd(a);
 }
@@ -113,7 +121,7 @@ function computeStd(a) {
   );
 
   // CAPEX (€/Ha, año 1) y capitalización del OPEX (años 1-2)
-  const grpHa = (g) => g.items.reduce((s, it) => s + (+it.v || 0), 0) * (g.unit === 'ud' ? densidad : 1);
+  const grpHa = (g) => g.items.reduce((s, it) => s + capexItemHa(it, g, densidad, +a.superficie || 0), 0);
   const capexEstab = a.capexGroups.reduce((s, g) => s + grpHa(g), 0);
   const capexT = (capexEstab * sup) / 1000;
   const capexOpex = ((opex[1] + opex[2]) * 1000) / sup;

@@ -158,17 +158,18 @@ export function SupuestosTab({ a, r }) {
               >
                 ${g.title}
               </div>
-              <div style=${{ padding: '6px 16px' }}>
+              <div style=${{ padding: '0 16px' }}>
                 ${g.rows.map(
-                  (row) => html`
+                  (row, ri) => html`
                     <div
                       key=${row.key}
                       style=${{
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        padding: '9px 0',
-                        borderBottom: '1px solid var(--line)',
+                        padding: '8px 0',
+                        // sin línea en la última fila antes del borde de la tarjeta
+                        borderBottom: ri < g.rows.length - 1 || g.title === 'Fees y fondo' ? '1px solid var(--line)' : 'none',
                       }}
                     >
                       <div style=${{ fontSize: 13.5 }}>${row.label}</div>
@@ -190,8 +191,7 @@ export function SupuestosTab({ a, r }) {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      padding: '9px 0',
-                      borderBottom: '1px solid var(--line)',
+                      padding: '8px 0',
                     }}
                   >
                     <div style=${{ fontSize: 13.5 }}>Equity comprometido</div>

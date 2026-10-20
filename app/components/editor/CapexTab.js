@@ -1,5 +1,6 @@
 import { html } from '../../lib/html.js';
 import { nf, pctShare } from '../../engine/format.js';
+import { capexItemHa } from '../../engine/compute.js';
 import { NumberField } from '../NumberField.js';
 import { useApp } from '../../state/store.js';
 
@@ -10,10 +11,10 @@ export function CapexTab({ a, r }) {
 
   const capexDetail = a.capexGroups.map((g) => {
     const items = g.items.map((it) => {
-      const ha = (+it.v || 0) * (g.unit === 'ud' ? r.densidad : 1);
-      return { ...it, ha: nf(ha, 0) };
+      const ha = capexItemHa(it, g, r.densidad, +a.superficie || 0);
+      return { ...it, ha: nf(ha, 0), unitLabel: it.total ? '€ total' : CAP_UNIT[g.unit] };
     });
-    const subtotal = g.items.reduce((s, it) => s + (+it.v || 0) * (g.unit === 'ud' ? r.densidad : 1), 0);
+    const subtotal = g.items.reduce((s, it) => s + capexItemHa(it, g, r.densidad, +a.superficie || 0), 0);
     return {
       key: g.key,
       title: g.title,
@@ -145,7 +146,7 @@ export function CapexTab({ a, r }) {
                         onChangeRaw=${(raw) => onCapexField(g.key, it.key, raw)}
                       />
                     </div>
-                    <div style=${{ textAlign: 'center', fontSize: 12, color: 'var(--ink2)' }}>${g.unitLabel}</div>
+                    <div style=${{ textAlign: 'center', fontSize: 12, color: 'var(--ink2)' }}>${it.unitLabel}</div>
                     <div style=${{ textAlign: 'right', fontFamily: 'var(--num)', fontSize: 14 }}>${it.ha}</div>
                   </div>
                 `,

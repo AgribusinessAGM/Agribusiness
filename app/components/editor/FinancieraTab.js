@@ -167,7 +167,7 @@ export function FinancieraTab({ a, r }) {
     <div style=${{ minWidth: 0 }}>
       <h2 style=${{ fontSize: 18, fontWeight: 800, margin: '0 0 6px' }}>Estructura financiera</h2>
       <p style=${{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 20px' }}>
-        Préstamo francés sobre la deuda, con años de carencia. Ajusta financiación e interés en Supuestos.
+        Préstamo francés sobre la deuda, con años de carencia.
       </p>
       <div style=${{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 22 }}>
         <div style=${kpiCard}>

@@ -47,7 +47,7 @@ export function buildCapexIAG() {
         { key: 'topo', label: 'Topographic survey', v: 200 },
         { key: 'soil', label: 'Soil study and mapping', v: 350 },
         { key: 'irrproj', label: 'Irrigation project', v: 200 },
-        { key: 'dd', label: 'Due Diligence (15.000 € / 300 ha)', v: 50 },
+        { key: 'dd', label: 'Due Diligence', v: 15000, total: true },
       ],
     },
   ];

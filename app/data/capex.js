@@ -43,7 +43,7 @@ export function buildCapex() {
         { key: 'captacion', label: 'Captación de Fincas', v: 693 },
         { key: 'topo', label: 'Levantamiento topográfico', v: 45 },
         { key: 'suelo', label: 'Estudio y Mapa Suelo', v: 75 },
-        { key: 'dd', label: 'Due Diligence Técnica Idoneidad ubicación', v: 75 },
+        { key: 'dd', label: 'Due Diligence Técnica Idoneidad ubicación', v: 7500, total: true },
       ],
     },
   ];

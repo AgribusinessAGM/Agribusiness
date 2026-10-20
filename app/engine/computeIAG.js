@@ -1,4 +1,4 @@
-import { HZ, MP, discountPct, irr, kgOlivesHa, opexItemYear } from './compute.js';
+import { HZ, MP, capexItemHa, discountPct, irr, kgOlivesHa, opexItemYear } from './compute.js';
 
 // Réplica de "3. Profitability" del Excel IAG (sección 4 · Orchard 1 en solitario)
 // más la capa SPV aplicada a sus Ha. Años 1..35; sin capa Fondo.
@@ -31,7 +31,7 @@ export function computeIAG(a) {
     0,
   );
 
-  const grpHa = (g) => g.items.reduce((s, it) => s + (+it.v || 0), 0) * (g.unit === 'ud' ? densidad : 1);
+  const grpHa = (g) => g.items.reduce((s, it) => s + capexItemHa(it, g, densidad, +a.superficie || 0), 0);
   const capexEstab = a.capexGroups.reduce((s, g) => s + grpHa(g), 0);
   const capexT = (capexEstab * sup) / 1000;
   const capexOpex = sup > 0 ? ((opex[1] + opex[2]) * 1000) / sup : 0;
@@ -45,7 +45,7 @@ export function computeIAG(a) {
   const line = (gk, ik) => {
     const g = a.capexGroups.find((x) => x.key === gk);
     const it = g && g.items.find((x) => x.key === ik);
-    return it ? (+it.v || 0) * (g.unit === 'ud' ? densidad : 1) : 0;
+    return it ? capexItemHa(it, g, densidad, +a.superficie || 0) : 0;
   };
   const plantHa = line('plant', 'olive');
   const irrHa = line('riego', 'irrsys');

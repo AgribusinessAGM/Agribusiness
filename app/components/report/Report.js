@@ -3,7 +3,7 @@ import { createPortal, flushSync } from 'react-dom';
 import { html } from '../../lib/html.js';
 import { fmt2, nf } from '../../engine/format.js';
 import { buildPnlLayers } from '../../engine/pnlLayers.js';
-import { MP, discountPct, opexItemYear } from '../../engine/compute.js';
+import { MP, capexItemHa, discountPct, opexItemYear } from '../../engine/compute.js';
 import { useApp } from '../../state/store.js';
 import { useActiveCompute } from '../../state/useActiveCompute.js';
 import { RentTable } from './RentTable.js';
@@ -307,7 +307,7 @@ export function Report({ title }) {
     { k: 'Inflación', v: fmt2(a.inflacion) + ' %' },
     { k: 'Impuesto de sociedades', v: fmt2(a.is) + ' %' },
   ];
-  const grpHa = (g) => g.items.reduce((s, it) => s + (+it.v || 0), 0) * (g.unit === 'ud' ? r.densidad : 1);
+  const grpHa = (g) => g.items.reduce((s, it) => s + capexItemHa(it, g, r.densidad, sup), 0);
   // Resumen del OPEX en plena producción por bloque (sin la fila "Otros"); el % es sobre el OPEX total
   const opexBlocks = a.opexItems
     .filter((cat) => cat.key !== 'otros' && cat.key !== 'other')

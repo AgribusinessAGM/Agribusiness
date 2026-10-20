@@ -93,8 +93,26 @@ export function resetPassword(userId, password) {
   return request(`/users/${userId}/password`, { method: 'POST', body: JSON.stringify({ password }) });
 }
 
-export function fetchModels() {
-  return request('/models');
+// La Due Diligence se guarda como importe total de la finca (it.total). Los modelos
+// guardados antes la tenían en €/Ha: se convierten al cargarlos (€/Ha × superficie).
+export function normalizeModel(m) {
+  if (!m || !m.a || !Array.isArray(m.a.capexGroups)) return m;
+  const sup = +m.a.superficie || 0;
+  let changed = false;
+  const capexGroups = m.a.capexGroups.map((g) => ({
+    ...g,
+    items: g.items.map((it) => {
+      if (it.key !== 'dd' || it.total) return it;
+      changed = true;
+      const label = it.label === 'Due Diligence (15.000 € / 300 ha)' ? 'Due Diligence' : it.label;
+      return { ...it, label, v: Math.round((+it.v || 0) * sup * 100) / 100, total: true };
+    }),
+  }));
+  return changed ? { ...m, a: { ...m.a, capexGroups } } : m;
+}
+
+export async function fetchModels() {
+  return (await request('/models')).map(normalizeModel);
 }
 
 // input: { name, crop, region, status, a }

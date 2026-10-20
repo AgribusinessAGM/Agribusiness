@@ -674,3 +674,21 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-20: **Supuestos:** quitada del todo la banda "Resumen del Proyecto"
   (Marco, Densidad, Superficie, Nº árboles) a petición de Marc, para que la
   página sea más baja. Con commit y push.
+- 2026-10-20: **Supuestos:** la última fila de cada tarjeta ya no lleva línea
+  gris antes del borde (en "Fees y fondo" la última es Equity comprometido).
+  Con commit y push.
+- 2026-10-20: **Supuestos:** filas con 8 px de relleno (49 px de alto, como en
+  CAPEX y OPEX) y sin relleno vertical en el cuerpo de la tarjeta: del último
+  campo al borde quedan 9 px, como en OPEX. Con commit y push.
+- 2026-10-20: **CAPEX, Due Diligence como importe total:** la partida `dd` se
+  introduce en € totales de la finca (`it.total: true`, unidad "€ total") y el
+  motor la pasa a €/Ha dividiendo por la superficie (`capexItemHa` en
+  `compute.js`, usado por los dos motores, la pestaña CAPEX y el informe).
+  Torrimpietra: 15.000 € (= 50 €/Ha; etiqueta "Due Diligence"); normales: 75 €/Ha
+  × superficie (Iberocrops 18.750 €). Los modelos guardados se convierten al
+  cargarlos (`normalizeModel` en `api.js`); se guardan ya convertidos la
+  próxima vez que se pulse Guardar. Cifras sin cambios (TIR e inversión
+  iguales). `api/data/seed-*.json` siguen en €/Ha (los convierte la carga), así
+  que `baseIAG` ya no coincide byte a byte con `seed-iag.json`. Con commit y push.
+- 2026-10-20: **Est. Financiera:** la entradilla queda en "Préstamo francés sobre
+  la deuda, con años de carencia." (sin la segunda frase). Con commit y push.
