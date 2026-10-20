@@ -540,3 +540,16 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   (`RentTable vAdj=-1.05`) para que el hueco entre la tabla y la línea del pie
   sea igual al que hay entre la entradilla y la tabla (≈26 px en ambos, en los
   dos tipos de modelo). Con commit y push.
+- 2026-10-20: **Hojas 4 y 5 del informe:** márgenes laterales de la tabla a
+  1 cm (`RentTable pad=38`; la cabecera y el pie siguen a 60 px). Columnas de
+  año de 25,3 a 26,5 px. Pendiente: en Iberocrops, "Beneficio Neto de
+  Explotación" e "IS (Impuesto de Sociedades)" no caben en la columna de
+  etiquetas (115 px) y montan sobre el año 1; ya pasaba antes. Con commit y push.
+- 2026-10-20: **Hoja 5, en inglés:** la fila del IS se llama "Corp. Income
+  Tax" (en vez de "CIT (Corporate Income Tax)"; solo en el informe, el
+  editor no cambia) y ya cabe; en español, "Imp. Sociedades". Con commit y push.
+- 2026-10-20: **Títulos de las hojas de rentabilidad de Torrimpietra:**
+  sección 03 "Modelo Financiero Agrícola" / "Agricultural Financial Model"
+  (antes "Standalone returns") y sección 04 "Modelo Financiero SPV" / "SPV
+  Financial Model" (antes "SPV — deuda, fees y auditoría sobre 300 Ha"). Los
+  modelos normales no cambian. Con commit y push.

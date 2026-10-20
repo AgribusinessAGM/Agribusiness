@@ -272,7 +272,10 @@ export function Report({ title }) {
 
   // ---- tablas de rentabilidad
   const projectRows = renRows(layers[0], true);
-  const spvRows = renRows(layers[1], false);
+  // La fila del IS va abreviada para que quepa en la columna de etiquetas
+  const spvRows = renRows(layers[1], false).map((row) =>
+    row.label === 'IS (Impuesto de Sociedades)' ? { ...row, label: T('Imp. Sociedades', 'Corp. Income Tax') } : row,
+  );
   const fundRows = isIAG ? null : renRows(layers[2], false);
 
   // ---- textos
@@ -505,10 +508,10 @@ export function Report({ title }) {
           <${SectionHead}
             num="03"
             kicker=${isIAG ? T('Rentabilidad · Modelo financiero', 'Profitability · Financial Model') : 'Rentabilidad · Proyecto'}
-            title=${isIAG ? 'Standalone returns' : 'Cuenta de resultados y FCF — proyecto agrícola'}
+            title=${isIAG ? T('Modelo Financiero Agrícola', 'Agricultural Financial Model') : 'Cuenta de resultados y FCF — proyecto agrícola'}
             intro=${T('Explotación del olivar sin apalancar · TIR agrícola ', 'Unlevered olive grove operation · agricultural IRR ') + kpis.tirA}
           />
-          <${RentTable} rows=${projectRows} />
+          <${RentTable} rows=${projectRows} pad=${38} />
           <${Footer} page=${4} />
         <//>
 
@@ -517,11 +520,11 @@ export function Report({ title }) {
           <${SectionHead}
             num="04"
             kicker=${isIAG ? 'Rentabilidad · SPV — Orchard 1' : 'Rentabilidad · SPV'}
-            title=${isIAG ? T('SPV — deuda, fees y auditoría sobre ', 'SPV — debt, fees and audit over ') + supTxt : 'Cuenta de resultados y FCF — vehículo SPV'}
+            title=${isIAG ? T('Modelo Financiero SPV', 'SPV Financial Model') : 'Cuenta de resultados y FCF — vehículo SPV'}
             intro=${T('Vehículo con deuda, fees y auditoría · TIR SPV ', 'Vehicle with debt, fees and audit · SPV IRR ') + kpis.tirL}
           />
           <!-- filas algo más bajas: el hueco entre la tabla y el pie es igual al que hay entre la entradilla y la tabla -->
-          <${RentTable} rows=${spvRows} vAdj=${-1.05} />
+          <${RentTable} rows=${spvRows} pad=${38} vAdj=${-1.05} />
           <${Footer} page=${5} />
         <//>
 
