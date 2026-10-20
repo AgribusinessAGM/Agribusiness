@@ -92,12 +92,9 @@ export function buildOpexIAG() {
         I('Water replenishment', 'Ha', 0, 0, z),
         I('Reservoir maintenance', 'Ha', 1, 10, f(10)),
         I('Sewer cleaning', 'Ha', 1, 15, f(15)),
+        // En el Excel va en "Farm maintenance"; Marc la quiere dentro de infraestructura
+        I('Roads, facilities, etc.', 'Ha', 1, 40, rp([80, 80], 40)),
       ],
-    },
-    {
-      key: 'farm',
-      label: 'Farm maintenance',
-      items: [I('Roads, facilities, etc.', 'Ha', 1, 40, rp([80, 80], 40))],
     },
     {
       key: 'nutrition',

@@ -4,7 +4,7 @@ import { capexItemHa } from '../../engine/compute.js';
 import { NumberField } from '../NumberField.js';
 import { useApp } from '../../state/store.js';
 
-const CAP_UNIT = { ud: '€/árbol', ha: '€/Ha' };
+const CAP_UNIT = { ud: '€/Árbol', ha: '€/Ha' };
 
 export function CapexTab({ a, r }) {
   const { onField, onCapexField, canEdit } = useApp();
@@ -53,7 +53,7 @@ export function CapexTab({ a, r }) {
         </span>
       </div>
       <p style=${{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 20px' }}>
-        Coste de establecimiento por hectárea, con el mismo detalle que la hoja Excel. Las partidas de plantación se introducen en €/árbol y se multiplican por la densidad (${nf(r.densidad)}${' '}árboles/Ha); el resto en €/Ha.
+        Coste de establecimiento por hectárea, con el mismo detalle que la hoja Excel. Las partidas de plantación se introducen en €/Árbol y se multiplican por la densidad (${nf(r.densidad)}${' '}árboles/Ha); el resto en €/Ha.
       </p>
 
       <div style=${{ display: 'flex', flexDirection: 'column', gap: 16 }}>

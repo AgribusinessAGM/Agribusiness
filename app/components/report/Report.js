@@ -292,10 +292,10 @@ export function Report({ title }) {
     { k: 'Árboles totales', v: nf(r.arboles) },
     { k: 'Producción plena', v: nf(prodPlena) + ' kg EVOO/Ha' },
     hasCycle
-      ? { k: 'Precio EVOO inicial', v: nf(a.precioEVOO, 2) + T(' €/kg · con ciclo', ' €/kg · with cycle') }
-      : { k: 'Precio EVOO', v: nf(a.precioEVOO, 2) + ' €/kg' },
-    { k: 'Alquiler', v: nf(a.alquiler) + T(' €/Ha/año', ' €/Ha/year') },
-    { k: 'Coste personal', v: nf(a.personal) + T(' €/Ha/año', ' €/Ha/year') },
+      ? { k: 'Precio EVOO inicial', v: nf(a.precioEVOO, 2) + T(' €/Kg · con ciclo', ' €/Kg · with cycle') }
+      : { k: 'Precio EVOO', v: nf(a.precioEVOO, 2) + ' €/Kg' },
+    { k: 'Alquiler', v: nf(a.alquiler) + T(' €/Ha/Año', ' €/Ha/Year') },
+    { k: 'Coste personal', v: nf(a.personal) + T(' €/Ha/Año', ' €/Ha/Year') },
   ];
   const fin = [
     { k: 'Financiación', v: finPct },

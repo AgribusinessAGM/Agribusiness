@@ -2,6 +2,7 @@ import { html } from '../../lib/html.js';
 import { MP, opexItemYear } from '../../engine/compute.js';
 import { nf, pctShare } from '../../engine/format.js';
 import { NumberField } from '../NumberField.js';
+import { FillLine } from '../FillLine.js';
 import { useApp } from '../../state/store.js';
 
 const projCell = (strong) => ({
@@ -32,7 +33,12 @@ const TWO_LINES = {
   'Aplicación foliar (calle sí/no)': 'Aplicación foliar\n(calle sí/no)',
   'Aplicación foliar (todas hileras)': 'Aplicación foliar\n(todas hileras)',
 };
-const splitLabel = (label) => TWO_LINES[label] || label;
+// En Sanidad vegetal la partida de productos se llama "Protección vegetal" (en
+// Control de malezas el mismo texto del Excel sigue como "Productos fitosanitarios")
+const splitLabel = (label, catKey) =>
+  (catKey === 'health' || catKey === 'sanidad') && label === 'Plant protection products'
+    ? 'Protección vegetal'
+    : TWO_LINES[label] || label;
 
 export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' }) {
   const { state, onOpexField, onProjHaField, canEdit } = useApp();
@@ -75,13 +81,36 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
       };
     });
 
-  // Orden visual pedido: Malezas/Sanidad · Nutrición/Terrenos · Poda/Riego · Cosecha/Otros.
-  // El modelo IAG tiene sus propias categorías (las de su Excel): se muestran tal cual.
+  // Orden base: el modelo IAG, el de su Excel; el resto, CARD_ORDER.
   const CARD_ORDER = ['malezas', 'sanidad', 'nutricion', 'terrenos', 'poda', 'riego', 'cosecha', 'otros'];
-  const orderedCards =
+  const baseCards =
     a.engine === 'iag'
       ? opexDetail
       : CARD_ORDER.map((key) => opexCards.find((g) => g.key === key)).filter((g) => g != null);
+  // Columna izquierda (pedido de Marc): Poda · Nutrición · Sanidad vegetal · Control de
+  // malezas (en IAG, Mantenimiento de infraestructura va antes de malezas, a la altura de Riego);
+  // el resto, a la derecha en su orden.
+  // La cuadrícula es de 2 columnas, así que se intercalan izquierda/derecha.
+  const LEFT = ['poda', 'pruning', 'nutricion', 'nutrition', 'sanidad', 'health', 'infra', 'malezas', 'weed'];
+  // En IAG la derecha va fila a fila: Cosecha · Riego (junto a Nutrición) · Control de
+  // malezas (junto a Sanidad) · Otros (junto a Mantenimiento de infraestructura)
+  const RIGHT_IAG = ['harvest', 'irrigation', 'weed', 'other'];
+  const leftCards = LEFT.filter((key) => !(a.engine === 'iag' && RIGHT_IAG.includes(key)))
+    .map((key) => baseCards.find((g) => g.key === key))
+    .filter((g) => g != null);
+
+  const rest = baseCards.filter((g) => !leftCards.includes(g));
+  const rightCards =
+    a.engine === 'iag'
+      ? RIGHT_IAG.map((key) => (key ? rest.find((g) => g.key === key) || null : null)).concat(
+          rest.filter((g) => !RIGHT_IAG.includes(g.key)),
+        )
+      : rest;
+  const orderedCards = [];
+  for (let i = 0; i < Math.max(leftCards.length, rightCards.length); i++) {
+    // un hueco vacío cuando una columna tiene menos tarjetas, para no descolocar la otra
+    orderedCards.push(leftCards[i] || null, rightCards[i] || null);
+  }
 
   const projHa = +state.projHa || 0;
   const inflFp = (y) => Math.pow(1 + a.inflacion / 100, y - 1);
@@ -133,9 +162,11 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
           Misma estructura que la hoja OPEX del Excel: 9 categorías con sus sub-partidas. Cada una tiene <strong>Cantidad</strong> y <strong>Coste unitario</strong> editables; el perfil anual (rampa e inflación) se conserva y la línea escala con lo que edites. €/Ha pleno = año de referencia.
         </p>
         <div style=${{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          ${orderedCards.map(
-            (g) => html`
-              <div key=${g.key} style=${{ ...card, overflow: 'hidden' }}>
+          ${orderedCards.map((g, gi) =>
+            !g
+              ? html`<div key=${'hueco' + gi} />`
+              : html`
+              <div key=${g.key} style=${{ ...card, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                 <div
                   style=${{
                     display: 'flex',
@@ -172,7 +203,7 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
                   <div style=${{ textAlign: 'right' }}>€/Ha pleno</div>
                 </div>
                 ${g.items.map(
-                  (it) => html`
+                  (it, ii) => html`
                     <div
                       key=${it.key}
                       style=${{
@@ -180,11 +211,11 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
                         gridTemplateColumns: '2.2fr 1.9fr 1.3fr 1fr 1fr',
                         alignItems: 'center',
                         padding: '8px 18px',
-                        // línea gris debajo de cada sub-partida, también de la última
-                        borderBottom: '1px solid var(--line)',
+                        // línea gris entre sub-partidas; la de la última la pone el relleno de abajo
+                        borderBottom: ii < g.items.length - 1 ? '1px solid var(--line)' : 'none',
                       }}
                     >
-                      <div style=${{ fontSize: 13.5, whiteSpace: 'pre-line' }}>${splitLabel(it.label)}</div>
+                      <div style=${{ fontSize: 13.5, whiteSpace: 'pre-line' }}>${splitLabel(it.label, it.catKey)}</div>
                       <div style=${{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                         <${NumberField}
                           id=${'op:cant:' + it.catKey + '.' + it.key}
@@ -207,6 +238,9 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
                     </div>
                   `,
                 )}
+                <!-- relleno hasta el borde: su sombra interior dibuja la línea bajo la última
+                     sub-partida solo si queda espacio en blanco claro -->
+                <${FillLine} />
               </div>
             `,
           )}

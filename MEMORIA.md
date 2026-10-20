@@ -704,3 +704,43 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   "€ total"). Con commit y push.
 - 2026-10-20: **CAPEX:** la cifra de la cabecera de cada tarjeta ("€/Ha · %") va
   en la fuente normal, como en OPEX (antes en monoespaciada). Con commit y push.
+- 2026-10-20: **OPEX de Torrimpietra, Sanidad vegetal:** la partida "Plant
+  protection products" se muestra como "Protección vegetal" (`splitLabel` en
+  `OpexTab.js` según la categoría); en Control de malezas el mismo texto del
+  Excel sigue como "Productos fitosanitarios". En el diccionario el par
+  "Protección vegetal" va antes que "Productos fitosanitarios" (gana el último
+  al traducir al español). Con commit y push.
+- 2026-10-20: **Regla de Marc: "/Año" siempre con mayúscula** en las unidades
+  (€/Ha/Año, €/Año, % equity/Año), en el editor y en el informe. Con commit y push.
+- 2026-10-20: **OPEX, orden de tarjetas:** columna izquierda Poda · Nutrición ·
+  Sanidad vegetal · Control de malezas (en Torrimpietra, Mantenimiento de
+  infraestructura va entre Sanidad y Malezas, a la altura de Riego); la derecha conserva el orden anterior con el resto
+  (`LEFT` en `OpexTab.js`, se intercalan en la cuadrícula de 2 columnas; si una
+  columna tiene menos tarjetas se deja un hueco vacío). Con commit y push.
+- 2026-10-20: **OPEX de Torrimpietra:** "Roads, facilities, etc." (Caminos,
+  instalaciones, etc.) pasa de "Farm maintenance" (Mantenimiento de terrenos) a
+  "Infrastructure maintenance"; la categoría "farm" desaparece (8 categorías).
+  Cambiado en `iag.js` y, para el modelo guardado, en `normalizeModel` de
+  `api.js`. Las cifras no cambian (TIR SPV 23,31 %). Derecha fila a fila
+  (`RIGHT_IAG`): Cosecha · Riego (junto a Nutrición) · Control de malezas (junto a
+  Sanidad) · Otros (junto a Mantenimiento de infraestructura); la izquierda queda
+  Poda · Nutrición · Sanidad · Mantenimiento de infraestructura. Con commit y push.
+- 2026-10-20: **OPEX, línea bajo la última partida:** solo se ve cuando la tarjeta
+  tiene espacio en blanco debajo (relleno `flex: 1` con sombra interior de 1 px);
+  en la tarjeta más alta de cada fila (p. ej. Riego) ya no se junta con el borde.
+  Igual en las tarjetas de Supuestos (p. ej. Costes estructurales). Después: la
+  línea solo sale si el hueco es de 20 px o más (componente `FillLine.js`, mide
+  con ResizeObserver); con un hueco pequeño, como en Riego, no se dibuja. No se
+  pudo comprobar del todo en el navegador de la sesión (oculto, no repinta).
+  Unidades "Años" con mayúscula en Supuestos. Con commit y push.
+- 2026-10-20: **Pestaña Precio:** números del eje del gráfico a 10 (Marc probó 12 y
+  lo devolvió a 10) y gráfico más
+  bajo (`H` 280 → 125, barras 90 → 55) para que la pestaña quepa sin
+  desplazarse; a 1440×800 queda justa (800 px). Con commit y push.
+- 2026-10-20: **Regla de Marc: tras "/" la letra siempre en mayúscula** (amplía la
+  de "/Año"): €/Kg, €/Árbol, €/Ha/Año… y en inglés €/Tree, /Year, olives/Tree.
+  Cambiado en editor, informe y diccionario. Pendiente de decidir: "(calle sí/no)".
+  Con commit y push.
+- 2026-10-20: **Gráfico de Precio:** la media lleva la etiqueta "Precio Medio" (8,
+  negrita, color de la línea) 5 px por encima de la línea discontinua, al
+  principio de la línea (izquierda), y se mueve con ella; sale "Media" de la leyenda. Con commit y push.

@@ -108,7 +108,17 @@ export function normalizeModel(m) {
       return { ...it, label, v: Math.round((+it.v || 0) * sup * 100) / 100, total: true };
     }),
   }));
-  return changed ? { ...m, a: { ...m.a, capexGroups } } : m;
+  // Torrimpietra: "Roads, facilities, etc." pasa de "Farm maintenance" a "Infrastructure
+  // maintenance" y la categoría "farm" desaparece
+  let opexItems = m.a.opexItems;
+  const farm = m.a.engine === 'iag' && Array.isArray(opexItems) ? opexItems.find((c) => c.key === 'farm') : null;
+  if (farm && opexItems.some((c) => c.key === 'infra')) {
+    changed = true;
+    opexItems = opexItems
+      .filter((c) => c.key !== 'farm')
+      .map((c) => (c.key === 'infra' ? { ...c, items: [...c.items, ...farm.items] } : c));
+  }
+  return changed ? { ...m, a: { ...m.a, capexGroups, opexItems } } : m;
 }
 
 export async function fetchModels() {

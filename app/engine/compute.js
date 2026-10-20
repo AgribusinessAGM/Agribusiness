@@ -26,7 +26,7 @@ export function kgOlivesHa(a, y) {
   return ((+a.kgTree || 0) * ramp * 10000) / (a.marcoN * a.marcoM);
 }
 
-// €/Ha de una sub-partida en el año y. Las partidas en €/kg de aceituna (perKg,
+// €/Ha de una sub-partida en el año y. Las partidas en €/Kg de aceituna (perKg,
 // solo en el modelo IAG) se recalculan con la producción de ese año.
 export function opexItemYear(it, y, a) {
   if (it.perKg) return (+it.cant || 0) * (+it.coste || 0) * kgOlivesHa(a, y);

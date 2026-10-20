@@ -34,7 +34,7 @@ const TAB_DEFS_IAG = [
 
 function editorKpis(a, r) {
   const p = r.price.slice(1);
-  const avgPrice = { label: 'Precio medio', value: nf(p.length ? p.reduce((x, v) => x + v, 0) / p.length : NaN, 2) + ' €/kg' };
+  const avgPrice = { label: 'Precio medio', value: nf(p.length ? p.reduce((x, v) => x + v, 0) / p.length : NaN, 2) + ' €/Kg' };
   if (a.engine === 'iag') {
     return [
       { label: 'TIR SPV · Orchard 1', value: pct(r.tirL), highlight: true },

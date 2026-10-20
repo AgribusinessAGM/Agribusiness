@@ -2,6 +2,7 @@ import { html } from '../../lib/html.js';
 import { nf } from '../../engine/format.js';
 import { discountPct } from '../../engine/compute.js';
 import { NumberField } from '../NumberField.js';
+import { FillLine } from '../FillLine.js';
 import { useApp } from '../../state/store.js';
 
 // Cada fila edita una clave de los supuestos (model.a[key]).
@@ -18,15 +19,15 @@ const GROUPS = [
     title: 'Producción y precio',
     rows: [
       { key: 'prodPlena', label: 'Productividad plena', unit: 'kg aceite/Ha' },
-      { key: 'precioEVOO', label: 'Precio EVOO (constante)', unit: '€/kg' },
-      { key: 'duracionProyecto', label: 'Duración proyecto', unit: 'años' },
+      { key: 'precioEVOO', label: 'Precio EVOO (constante)', unit: '€/Kg' },
+      { key: 'duracionProyecto', label: 'Duración proyecto', unit: 'Años' },
     ],
   },
   {
     title: 'Costes estructurales',
     rows: [
-      { key: 'alquiler', label: 'Alquiler de la finca', unit: '€/Ha/año' },
-      { key: 'personal', label: 'Personal', unit: '€/Ha/año' },
+      { key: 'alquiler', label: 'Alquiler de la finca', unit: '€/Ha/Año' },
+      { key: 'personal', label: 'Personal', unit: '€/Ha/Año' },
     ],
   },
   {
@@ -42,8 +43,8 @@ const GROUPS = [
     rows: [
       { key: 'financiacion', label: 'Financiación (deuda)', unit: '%' },
       { key: 'interes', label: 'Tasa de interés', unit: '%' },
-      { key: 'plazo', label: 'Plazo préstamo', unit: 'años' },
-      { key: 'carencia', label: 'Años de carencia', unit: 'años' },
+      { key: 'plazo', label: 'Plazo préstamo', unit: 'Años' },
+      { key: 'carencia', label: 'Años de carencia', unit: 'Años' },
     ],
   },
   {
@@ -51,7 +52,7 @@ const GROUPS = [
     rows: [
       { key: 'capexFee', label: 'CAPEX Fee (año 1)', unit: '€/Ha' },
       { key: 'opexFee', label: 'OPEX Fee (anual, plano)', unit: '€/Ha' },
-      { key: 'fondoCost', label: 'Costes del fondo', unit: '% equity/año' },
+      { key: 'fondoCost', label: 'Costes del fondo', unit: '% equity/Año' },
     ],
   },
 ];
@@ -72,14 +73,14 @@ const GROUPS_IAG = [
     rows: [
       { key: 'kgTree', label: 'Kg/Aceituna/Árbol (olivo) · Plena Producción', unit: 'kg' },
       { key: 'oilYield', label: 'Rendimiento graso', unit: '%' },
-      { key: 'precioEVOO', label: 'Precio inicial (EVOO)', unit: '€/kg' },
+      { key: 'precioEVOO', label: 'Precio inicial (EVOO)', unit: '€/Kg' },
     ],
   },
   {
     title: 'Costes estructurales',
     rows: [
-      { key: 'alquiler', label: 'Alquiler', unit: '€/Ha/año' },
-      { key: 'personal', label: 'Costes de personal (equipo de operaciones)', unit: '€/Ha/año' },
+      { key: 'alquiler', label: 'Alquiler', unit: '€/Ha/Año' },
+      { key: 'personal', label: 'Costes de personal (equipo de operaciones)', unit: '€/Ha/Año' },
     ],
   },
   {
@@ -95,8 +96,8 @@ const GROUPS_IAG = [
     rows: [
       { key: 'financiacion', label: 'Financiación', unit: '%' },
       { key: 'interes', label: 'Tipo de interés', unit: '%' },
-      { key: 'plazo', label: 'Plazo', unit: 'años' },
-      { key: 'carencia', label: 'Carencia', unit: 'años' },
+      { key: 'plazo', label: 'Plazo', unit: 'Años' },
+      { key: 'carencia', label: 'Carencia', unit: 'Años' },
     ],
   },
   {
@@ -104,7 +105,7 @@ const GROUPS_IAG = [
     rows: [
       { key: 'capexFee', label: 'CAPEX fee (año 1)', unit: '€/Ha' },
       { key: 'opexFee', label: 'OPEX fee (anual, plano)', unit: '€/Ha' },
-      { key: 'audit', label: 'Auditoría (prorrateada al Orchard 1)', unit: '€/año' },
+      { key: 'audit', label: 'Auditoría (prorrateada al Orchard 1)', unit: '€/Año' },
     ],
   },
 ];
@@ -144,6 +145,8 @@ export function SupuestosTab({ a, r }) {
                 borderRadius: 'var(--radius)',
                 boxShadow: 'var(--shadow)',
                 overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
               }}
             >
               <div
@@ -158,7 +161,7 @@ export function SupuestosTab({ a, r }) {
               >
                 ${g.title}
               </div>
-              <div style=${{ padding: '0 16px' }}>
+              <div style=${{ padding: '0 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
                 ${g.rows.map(
                   (row, ri) => html`
                     <div
@@ -215,6 +218,9 @@ export function SupuestosTab({ a, r }) {
                     </div>
                   </div>
                 `}
+                <!-- relleno hasta el borde: su sombra interior dibuja la línea bajo la última fila
+                     solo si queda espacio en blanco claro -->
+                <${FillLine} />
               </div>
             </div>
           `,

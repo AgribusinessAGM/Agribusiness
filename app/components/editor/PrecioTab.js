@@ -17,7 +17,8 @@ function PriceChart({ price, priceVar }) {
   const avg = p.reduce((x, v) => x + v, 0) / N;
   const sx = (i) => pl + i * ((W - pl - pr) / (N - 1));
 
-  const H = 280;
+  // alturas reducidas para que la pestaña quepa en una pantalla sin desplazarse
+  const H = 125;
   const pt = 16;
   const pb = 10;
   const mn = Math.min(...p, avg) * 0.9;
@@ -25,7 +26,7 @@ function PriceChart({ price, priceVar }) {
   const sy = (v) => H - pb - ((v - mn) / (mx - mn || 1)) * (H - pb - pt);
   const grid = [0, 1, 2, 3, 4].map((k) => mn + ((mx - mn) * k) / 4);
 
-  const H2 = 90;
+  const H2 = 55;
   const pt2 = 6;
   const pb2 = 22;
   const mid = (H2 - pb2 + pt2) / 2;
@@ -52,6 +53,8 @@ function PriceChart({ price, priceVar }) {
           `,
         )}
         <line x1=${pl} y1=${sy(avg)} x2=${W - pr} y2=${sy(avg)} stroke=${c.accent} strokeWidth=${1.5} strokeDasharray="6 4" />
+        <!-- etiqueta de la media, 5 px por encima de su línea (se mueve con ella) -->
+        <text x=${pl + 4} y=${sy(avg) - 5} fill=${c.accent} fontSize=${8} fontWeight=${700} textAnchor="start">Precio Medio</text>
         <polyline
           points=${p.map((v, i) => sx(i) + ',' + sy(v)).join(' ')}
           fill="none"
@@ -196,7 +199,7 @@ export function PrecioTab({ a, r, title }) {
             </thead>
             <tbody>
               <tr>
-                <td style=${stickyLabel('var(--brandL)', 800)}>Precio €/kg EVOO</td>
+                <td style=${stickyLabel('var(--brandL)', 800)}>Precio €/Kg EVOO</td>
                 ${years.map(
                   (y) => html`
                     <td
@@ -242,8 +245,7 @@ export function PrecioTab({ a, r, title }) {
       <div style=${{ ...card, padding: 18, marginTop: 18 }}>
         <div style=${{ fontWeight: 700, fontSize: 14, marginBottom: 2 }}>Ciclo de precios</div>
         <div style=${{ fontSize: 12, color: 'var(--ink2)', marginBottom: 12 }}>
-          <span style=${{ color: c.brand, fontWeight: 700 }}>■</span> Precio €/kg${'  '}
-          <span style=${{ color: c.accent, fontWeight: 700 }}>■</span> Media${'  '}
+          <span style=${{ color: c.brand, fontWeight: 700 }}>■</span> Precio €/Kg${'  '}
           <span style=${{ color: UP, fontWeight: 700 }}>■</span> % Var. (+)${'  '}
           <span style=${{ color: DOWN, fontWeight: 700 }}>■</span> % Var. (-)
         </div>
