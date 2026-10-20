@@ -311,12 +311,14 @@ export function Report({ title }) {
   // Resumen del OPEX en plena producción por bloque (sin la fila "Otros"); el % es sobre el OPEX total
   const opexBlocks = a.opexItems
     .filter((cat) => cat.key !== 'otros' && cat.key !== 'other')
-    .map((cat) => ({ key: cat.key, title: cat.label, ha: cat.items.reduce((s, it) => s + opexItemYear(it, MP, a), 0) }));
+    .map((cat) => ({ key: cat.key, title: cat.label, ha: cat.items.reduce((s, it) => s + opexItemYear(it, MP, a), 0) }))
+    .sort((x, y) => y.ha - x.ha); // de mayor a menor peso
   const opexBlocksHa = r.opexHa; // el total incluye "Otros", aunque no se muestre como bloque
-  const capexRows = a.capexGroups.map((g) => {
-    const ha = grpHa(g);
-    return { key: g.key, title: g.title, perHa: nf(ha), pct: pctR(ha / r.capexEstab, 0), total: nf((ha * sup) / 1000) + ' k€' };
-  });
+  // Partidas del CAPEX de mayor a menor peso (la capitalización del OPEX va siempre al final)
+  const capexRows = a.capexGroups
+    .map((g) => ({ g, ha: grpHa(g) }))
+    .sort((x, y) => y.ha - x.ha)
+    .map(({ g, ha }) => ({ key: g.key, title: g.title, perHa: nf(ha), pct: pctR(ha / r.capexEstab, 0), total: nf((ha * sup) / 1000) + ' k€' }));
 
   // ---- tablas de rentabilidad
   const projectRows = renRows(layers[0], true).map((row) =>
@@ -514,7 +516,7 @@ export function Report({ title }) {
               totalRow=${{ title: 'Inversión total', perHa: nf(r.capexHa), total: nf(r.totalCapex) + ' k€' }}
             />
             <div style=${{ margin: '20px 0 8px', paddingLeft: '0.2cm', fontSize: 13, fontWeight: 700, textTransform: 'uppercase', color: C.green }}>
-              OPEX anual · plena producción
+              OPEX · Plena producción
             </div>
             <${SummaryTable}
               first="Partida"

@@ -574,7 +574,7 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   income"). El informe ya no lo renombra por su cuenta. Con commit y push.
 - 2026-10-20: **Hoja 3 del informe (CAPEX):** sin la foto de la plantación,
   filas de la tabla de partidas más bajas (`SummaryTable` en `Report.js`) y
-  nueva tabla "OPEX anual · plena producción" con los 8 bloques del OPEX sin
+  nueva tabla "OPEX · Plena producción" con los 8 bloques del OPEX sin
   "Otros" (€/Ha, % sobre esos 8, total k€) y fila "OPEX total (sin otros)".
   Sobran unos 160 px hasta el pie. Comprobado en los dos tipos de modelo y en
   ES/EN. La foto `assets/foto-plantacion.jpg` ya no se usa. Con commit y push.
@@ -589,3 +589,7 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   ese total; la cabecera de la tabla OPEX es "Partida"; nuevo título
   "CAPEX · Inversión inicial" sobre la tabla CAPEX. La foto baja a ≈118 px.
   Con commit y push.
+- 2026-10-20: **Hoja 3:** las tablas CAPEX y OPEX se ordenan solas de mayor a
+  menor peso (%) cada vez que cambian las partidas del modelo; la
+  capitalización del OPEX va siempre al final de la tabla CAPEX (su % es sobre
+  otra base). Título de la tabla OPEX: "OPEX · Plena producción". Con commit y push.
