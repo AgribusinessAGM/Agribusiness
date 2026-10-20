@@ -572,3 +572,9 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-20: **"(=) Beneficio Neto" en toda la app** (antes "(=) Resultado
   Neto"; cambiado en `pnlLayers.js` y el diccionario, en inglés sigue "(=) Net
   income"). El informe ya no lo renombra por su cuenta. Con commit y push.
+- 2026-10-20: **Hoja 3 del informe (CAPEX):** sin la foto de la plantación,
+  filas de la tabla de partidas más bajas (`SummaryTable` en `Report.js`) y
+  nueva tabla "OPEX anual · plena producción" con los 8 bloques del OPEX sin
+  "Otros" (€/Ha, % sobre esos 8, total k€) y fila "OPEX total (sin otros)".
+  Sobran unos 160 px hasta el pie. Comprobado en los dos tipos de modelo y en
+  ES/EN. La foto `assets/foto-plantacion.jpg` ya no se usa. Con commit y push.

@@ -3,7 +3,7 @@ import { createPortal, flushSync } from 'react-dom';
 import { html } from '../../lib/html.js';
 import { fmt2, nf } from '../../engine/format.js';
 import { buildPnlLayers } from '../../engine/pnlLayers.js';
-import { discountPct } from '../../engine/compute.js';
+import { MP, discountPct, opexItemYear } from '../../engine/compute.js';
 import { useApp } from '../../state/store.js';
 import { useActiveCompute } from '../../state/useActiveCompute.js';
 import { RentTable } from './RentTable.js';
@@ -93,6 +93,49 @@ function Footer({ page }) {
       </span>
       <span>${'Confidencial · Página ' + String(page).padStart(2, '0')}</span>
     </div>
+  `;
+}
+
+// Tabla de la hoja CAPEX (partidas del CAPEX y bloques del OPEX): €/Ha, % y total
+function SummaryTable({ first, rows, totalRow }) {
+  const pad = (side) => (side === 'l' ? '8px 0 8px 0.2cm' : side === 'r' ? '8px 0.2cm 8px 0' : '8px 0');
+  return html`
+    <table style=${{ width: '100%', borderCollapse: 'collapse' }}>
+      <thead>
+        <tr style=${{ borderBottom: '2px solid ' + C.green }}>
+          ${[
+            [first, 'left', undefined, '8px 0 8px 0.2cm'],
+            ['€/Ha', 'right', 110, '8px 0'],
+            ['%', 'right', 100, '8px 0'],
+            ['Total (k€)', 'right', 110, '8px 0.2cm 8px 0'],
+          ].map(
+            ([label, align, width, padding]) => html`
+              <th key=${label} style=${{ textAlign: align, padding, fontSize: 12, textTransform: 'uppercase', color: C.green, fontWeight: 700, width }}>
+                ${label}
+              </th>
+            `,
+          )}
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(
+          (row) => html`
+            <tr key=${row.key} style=${{ borderBottom: '1px solid ' + C.line2 }}>
+              <td style=${{ padding: pad('l'), fontSize: 13, color: C.text }}>${row.title}</td>
+              <td className="num" style=${{ padding: pad(), textAlign: 'right', fontSize: 13, color: C.text }}>${row.perHa}</td>
+              <td className="num" style=${{ padding: pad(), textAlign: 'right', fontSize: 13, color: '#000' }}>${row.pct}</td>
+              <td className="num" style=${{ padding: pad('r'), textAlign: 'right', fontSize: 14, fontWeight: 600, color: C.green }}>${row.total}</td>
+            </tr>
+          `,
+        )}
+        <tr style=${{ borderTop: '2px solid ' + C.green, background: '#f4f6f2' }}>
+          <td style=${{ padding: '10px 12px 10px 0.2cm', fontWeight: 700, fontSize: 13, color: C.green }}>${totalRow.title}</td>
+          <td className="num" style=${{ padding: '10px 0', textAlign: 'right', fontWeight: 700, fontSize: 13, color: C.green }}>${totalRow.perHa}</td>
+          <td></td>
+          <td className="num" style=${{ padding: '10px 0.2cm 10px 0', textAlign: 'right', fontWeight: 700, fontSize: 14, color: C.green }}>${totalRow.total}</td>
+        </tr>
+      </tbody>
+    </table>
   `;
 }
 
@@ -265,6 +308,11 @@ export function Report({ title }) {
     { k: 'Impuesto de sociedades', v: fmt2(a.is) + ' %' },
   ];
   const grpHa = (g) => g.items.reduce((s, it) => s + (+it.v || 0), 0) * (g.unit === 'ud' ? r.densidad : 1);
+  // Resumen del OPEX en plena producción por bloque (sin "Otros"); el % es sobre el total mostrado
+  const opexBlocks = a.opexItems
+    .filter((cat) => cat.key !== 'otros' && cat.key !== 'other')
+    .map((cat) => ({ key: cat.key, title: cat.label, ha: cat.items.reduce((s, it) => s + opexItemYear(it, MP, a), 0) }));
+  const opexBlocksHa = opexBlocks.reduce((s, b) => s + b.ha, 0);
   const capexRows = a.capexGroups.map((g) => {
     const ha = grpHa(g);
     return { key: g.key, title: g.title, perHa: nf(ha), pct: pctR(ha / r.capexEstab, 0), total: nf((ha * sup) / 1000) + ' k€' };
@@ -448,62 +496,34 @@ export function Report({ title }) {
                 </div>
               </div>
             </div>
-            <table style=${{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style=${{ borderBottom: '2px solid ' + C.green }}>
-                  ${[
-                    ['Partida', 'left', undefined, '10px 0 10px 0.2cm'],
-                    ['€/Ha', 'right', 110, '10px 0'],
-                    ['%', 'right', 100, '10px 0'],
-                    ['Total (k€)', 'right', 110, '10px 0.2cm 10px 0'],
-                  ].map(
-                    ([label, align, width, padding]) => html`
-                      <th
-                        key=${label}
-                        style=${{ textAlign: align, padding, fontSize: 12, textTransform: 'uppercase', color: C.green, fontWeight: 700, width }}
-                      >
-                        ${label}
-                      </th>
-                    `,
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                ${capexRows.map(
-                  (row) => html`
-                    <tr key=${row.key} style=${{ borderBottom: '1px solid ' + C.line2 }}>
-                      <td style=${{ padding: '14px 0 14px 0.2cm', fontSize: 13, color: C.text }}>${row.title}</td>
-                      <td className="num" style=${{ padding: '14px 0', textAlign: 'right', fontSize: 13, color: C.text }}>${row.perHa}</td>
-                      <td className="num" style=${{ padding: '14px 0', textAlign: 'right', fontSize: 13, color: '#000' }}>${row.pct}</td>
-                      <td className="num" style=${{ padding: '14px 0.2cm 14px 0', textAlign: 'right', fontSize: 14, fontWeight: 600, color: C.green }}>${row.total}</td>
-                    </tr>
-                  `,
-                )}
-                <tr style=${{ borderBottom: '1px solid ' + C.line2 }}>
-                  <td style=${{ padding: '14px 0 14px 0.2cm', fontSize: 14, color: C.text }}>
-                    Capitalización OPEX${' '}<span style=${{ color: '#000' }}>(años 1–2)</span>
-                  </td>
-                  <td className="num" style=${{ padding: '14px 0', textAlign: 'right', fontSize: 14, color: C.text }}>${nf(r.capexOpex)}</td>
-                  <td className="num" style=${{ padding: '14px 0', textAlign: 'right', fontSize: 12.5, color: '#000' }}>
-                    ${pctR(r.capexOpex / r.capexHa, 0)}
-                  </td>
-                  <td className="num" style=${{ padding: '14px 0.2cm 14px 0', textAlign: 'right', fontSize: 14, fontWeight: 600, color: C.green }}>
-                    ${nf((r.capexOpex * sup) / 1000) + ' k€'}
-                  </td>
-                </tr>
-                <tr style=${{ borderTop: '2px solid ' + C.green, background: '#f4f6f2' }}>
-                  <td style=${{ padding: '16px 12px 16px 0.2cm', fontWeight: 700, fontSize: 13, color: C.green }}>Inversión total</td>
-                  <td className="num" style=${{ padding: '16px 0', textAlign: 'right', fontWeight: 700, fontSize: 13, color: C.green }}>${nf(r.capexHa)}</td>
-                  <td></td>
-                  <td className="num" style=${{ padding: '16px 0.2cm 16px 0', textAlign: 'right', fontWeight: 700, fontSize: 14, color: C.green }}>
-                    ${nf(r.totalCapex) + ' k€'}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div style=${{ flex: 1, minHeight: 0, padding: '24px 60px' }}>
-            <img src="assets/foto-plantacion.jpg" alt="" style=${{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', opacity: 0.75, borderRadius: 4 }} />
+            <${SummaryTable}
+              first="Partida"
+              rows=${[
+                ...capexRows.map((row) => ({ key: row.key, title: row.title, perHa: row.perHa, pct: row.pct, total: row.total })),
+                {
+                  key: 'capOpex',
+                  title: html`Capitalización OPEX${' '}<span style=${{ color: '#000' }}>(años 1–2)</span>`,
+                  perHa: nf(r.capexOpex),
+                  pct: pctR(r.capexOpex / r.capexHa, 0),
+                  total: nf((r.capexOpex * sup) / 1000) + ' k€',
+                },
+              ]}
+              totalRow=${{ title: 'Inversión total', perHa: nf(r.capexHa), total: nf(r.totalCapex) + ' k€' }}
+            />
+            <div style=${{ margin: '34px 0 8px', paddingLeft: '0.2cm', fontSize: 13, fontWeight: 700, textTransform: 'uppercase', color: C.green }}>
+              OPEX anual · plena producción
+            </div>
+            <${SummaryTable}
+              first="Bloque"
+              rows=${opexBlocks.map((b) => ({
+                key: b.key,
+                title: b.title,
+                perHa: nf(b.ha),
+                pct: pctR(opexBlocksHa ? b.ha / opexBlocksHa : NaN, 0),
+                total: nf((b.ha * sup) / 1000) + ' k€',
+              }))}
+              totalRow=${{ title: 'OPEX total (sin otros)', perHa: nf(opexBlocksHa), total: nf((opexBlocksHa * sup) / 1000) + ' k€' }}
+            />
           </div>
           <${Footer} page=${3} />
         <//>
