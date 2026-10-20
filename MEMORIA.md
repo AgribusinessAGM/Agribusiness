@@ -123,10 +123,15 @@ Navegador ──► index.html → app/main.js   (interfaz React, módulos JS si
     nodo (`${'sobre ' + n + ' Ha'}` en lugar de `sobre ${n} Ha`) para que se
     pueda traducir entero. Los números se formatean según el idioma
     (`setNumLang` en `engine/format.js`: 1.234,5 / 1,234.5).
-  - **Informe PDF** (`app/components/report/`): pantalla `report` que abre
-    "Exportar informe" (Resultados) o el botón PDF del editor. Páginas A4 que se
-    imprimen con el cuadro del navegador ("Guardar como PDF"); las de
-    rentabilidad usan la página con nombre `landscape` de `styles.css`.
+  - **Informe PDF** (`app/components/report/`): se ve dentro de la pestaña
+    Informe del editor (a ella llevan "Exportar informe" de Resultados y el
+    botón PDF de la barra lateral), reducido con `zoom` para caber en el ancho.
+    Páginas A4 que se imprimen con el botón "Imprimir" (`window.print()`: el
+    usuario elige impresora o "Guardar como PDF"); las de rentabilidad usan la
+    página con nombre `landscape` de `styles.css`. Al imprimir (también con
+    Ctrl+P) `Report.js` monta en `beforeprint` una copia de las páginas en
+    `<body>` (`.print-portal`, con `createPortal` de `react-dom`, añadido al
+    import map) y la CSS de impresión oculta `#root`.
 - **API:** PHP 8.0+ sin frameworks ni Composer.
   - `api/index.php` — enrutado y las 14 operaciones.
   - `api/lib/db.php` — conexión PDO, creación automática de la base de datos,
@@ -250,8 +255,8 @@ de idioma Español / English en la barra superior.
 6. **5 · Precio** — ciclo de precios: variación % anual editable (`priceVar`),
    botón Restablecer (vuelve a precio constante) y gráfico. Sin variaciones el
    precio es constante, como en el Excel Iberocrops.
-7. **6 · Informe** — índice de páginas del informe PDF y botón "Abrir informe
-   PDF" (`InformeTab.js`); al volver del informe se queda en esta pestaña.
+7. **6 · Informe** — el informe PDF directamente, con el botón "Imprimir"
+   arriba a la derecha.
 
 Indicadores fijos arriba: TIR Fondo · Final, VAN Fondo (tasa), Equity
 comprometido (calculado automáticamente), Inversión total y Precio medio.
@@ -341,8 +346,8 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - **Exportar a Excel:** el botón solo muestra un aviso; **no genera archivo**
   todavía. (El PDF sí: informe imprimible, ver sección 5.)
 - **Informe PDF:** comprobado en pantalla (cabe todo en cada hoja y la
-  orientación de cada página es la correcta), pero la impresión real a PDF no
-  se ha podido probar desde la sesión de IA.
+  orientación de cada página es la correcta) y Marc probó el botón "Imprimir"
+  el 2026-10-20 con buen resultado.
 - **Idioma:** la API responde siempre en español; sus mensajes de error se
   traducen en pantalla con el diccionario.
 - **Comparación de escenarios:** el escenario guardado vive solo en memoria del
@@ -501,4 +506,11 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   único acceso era el botón pequeño "PDF" de la barra lateral y el de
   Resultados). "6 · Informe" en modelos normales y "7. Informe" en
   Torrimpietra: índice de páginas, TIR agrícola y SPV y botón para abrir el
-  informe. Comprobado en el navegador en español e inglés. Con commit, sin push.
+  informe. Comprobado en el navegador en español e inglés. Con commit y push.
+- 2026-10-20: **El informe se ve dentro de la pestaña Informe** (petición de
+  Marc: ver el PDF directamente y un botón "Imprimir" arriba a la derecha que
+  abra el cuadro de impresión). Desaparecen la pantalla `report` (y
+  `reportFrom`/`closeReport`) y `InformeTab.js`. Comprobado en pantalla: páginas
+  escaladas al ancho y la copia de impresión se monta/desmonta con
+  `beforeprint`/`afterprint`. Marc probó "Imprimir" y sale bien. Con commit,
+  sin push.

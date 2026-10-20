@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from 'react';
+import { createPortal, flushSync } from 'react-dom';
 import { html } from '../../lib/html.js';
 import { fmt2, nf } from '../../engine/format.js';
 import { buildPnlLayers } from '../../engine/pnlLayers.js';
@@ -7,8 +9,9 @@ import { useActiveCompute } from '../../state/useActiveCompute.js';
 import { RentTable } from './RentTable.js';
 
 // Informe PDF del modelo activo (diseño "Informe PDF Torrimpietra" de Claude Design,
-// estilo institucional). Son páginas A4 que se imprimen con el cuadro de impresión
-// del navegador ("Guardar como PDF"); las de rentabilidad van en horizontal.
+// estilo institucional). Se ve en la pestaña Informe del editor. Son páginas A4 que
+// se imprimen con el cuadro de impresión del navegador (impresora o "Guardar como
+// PDF"); las de rentabilidad van en horizontal.
 // Modelo IAG: 7 páginas. Modelo normal: 8 (añade la capa Fondo).
 
 const HEAD_FONT = "Rockwell, 'Rockwell Nova', 'Roboto Slab', serif";
@@ -181,8 +184,35 @@ function LayerBox({ title, sub, tir, accent, tinted }) {
 
 const Arrow = () => html`<div style=${{ textAlign: 'center', color: '#b9c2b0', fontSize: 16, lineHeight: 0.6 }}>↓</div>`;
 
-export function Report() {
-  const { state, closeReport } = useApp();
+export function Report({ title }) {
+  const { state } = useApp();
+  // Al imprimir (botón Imprimir o Ctrl+P) se monta una copia de las páginas
+  // directamente en <body> y la CSS de impresión oculta el resto de la app, que
+  // si no recortaría las páginas dentro del editor.
+  const [printing, setPrinting] = useState(false);
+  useEffect(() => {
+    const before = () => flushSync(() => setPrinting(true));
+    const after = () => setPrinting(false);
+    window.addEventListener('beforeprint', before);
+    window.addEventListener('afterprint', after);
+    return () => {
+      window.removeEventListener('beforeprint', before);
+      window.removeEventListener('afterprint', after);
+    };
+  }, []);
+  // En pantalla las páginas se reducen para caber en el ancho de la pestaña
+  // (la horizontal, 297 mm ≈ 1123 px, es la más ancha). Al imprimir van a tamaño real.
+  const viewRef = useRef(null);
+  const [zoom, setZoom] = useState(1);
+  useEffect(() => {
+    const el = viewRef.current;
+    if (!el) return;
+    const fit = () => setZoom(Math.min(1, (el.clientWidth - 32) / 1123));
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   const { model, a, r } = useActiveCompute();
   const en = state.lang === 'en';
   const T = (es, enText) => (en ? enText : es);
@@ -288,19 +318,7 @@ export function Report() {
     </div>
   `;
 
-  return html`
-    <div className="report-wrap">
-      <div className="report-toolbar no-print">
-        <button onClick=${closeReport} className="report-back">‹ Volver</button>
-        <div style=${{ flex: 1, minWidth: 0 }}>
-          <div style=${{ fontWeight: 800, fontSize: 15 }}>Informe PDF · ${model.name}</div>
-          <div style=${{ fontSize: 12, color: 'var(--ink2)' }}>
-            En el cuadro de impresión elige «Guardar como PDF». Las páginas de rentabilidad salen en horizontal.
-          </div>
-        </div>
-        <button onClick=${() => window.print()} className="lift report-print">Imprimir / Guardar PDF</button>
-      </div>
-
+  const pages = html`
       <div className="report-pages" style=${{ fontFamily: BODY_FONT }}>
         <!-- 1 · Portada -->
         <section className="report-page">
@@ -630,6 +648,21 @@ export function Report() {
           <${Footer} page=${pLegal} />
         <//>
       </div>
+  `;
+
+  return html`
+    <div className="report-wrap" ref=${viewRef}>
+      <div className="report-toolbar">
+        <div style=${{ flex: 1, minWidth: 0 }}>
+          <div style=${{ fontWeight: 800, fontSize: 18 }}>${title}</div>
+          <div style=${{ fontSize: 12, color: 'var(--ink2)' }}>
+            Informe PDF con los resultados del modelo. Las páginas de rentabilidad salen en horizontal.
+          </div>
+        </div>
+        <button onClick=${() => window.print()} className="lift report-print">Imprimir</button>
+      </div>
+      <div style=${{ zoom }}>${pages}</div>
+      ${printing && createPortal(html`<div className="print-portal">${pages}</div>`, document.body)}
     </div>
   `;
 }

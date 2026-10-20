@@ -21,10 +21,9 @@ function initialState() {
   return {
     booting: true,
     lang: savedLang(), // 'es' | 'en' (lo traduce app/i18n/translate.js)
-    screen: 'login', // 'login' | 'dashboard' | 'editor' | 'results' | 'admin' | 'report'
-    reportFrom: 'results', // pantalla a la que vuelve el informe PDF
+    screen: 'login', // 'login' | 'dashboard' | 'editor' | 'results' | 'admin'
     activeId: 1,
-    etab: 'supuestos', // pestaña del editor: 'supuestos' | 'capex' | 'opex' | 'rent' | 'fin' | 'precio'
+    etab: 'supuestos', // pestaña del editor: 'supuestos' | 'capex' | 'opex' | 'rent' | 'fin' | 'precio' | 'informe'
     models: [],
     users: [],
     currentUser: null,
@@ -475,12 +474,8 @@ export function useAppStore() {
   }, [active, flash]);
 
   const exportXlsx = useCallback(() => flash('Exportando a Excel…'), [flash]);
-  // El informe PDF es una pantalla de la app que se imprime (o se guarda como PDF).
-  const exportPdf = useCallback(
-    () => setState((s) => ({ ...s, screen: 'report', reportFrom: s.screen === 'report' ? s.reportFrom : s.screen })),
-    [],
-  );
-  const closeReport = useCallback(() => setState((s) => ({ ...s, screen: s.reportFrom || 'results' })), []);
+  // El informe PDF se ve en la pestaña Informe del editor y se imprime (o se guarda como PDF) desde allí.
+  const exportPdf = useCallback(() => setState((s) => ({ ...s, screen: 'editor', etab: 'informe' })), []);
 
   const openNew = useCallback(
     () => setState((s) => ({ ...s, showNew: true, newName: '', newHa: 100, newTemplate: 'olivo' })),
@@ -566,7 +561,6 @@ export function useAppStore() {
       save,
       exportXlsx,
       exportPdf,
-      closeReport,
       openNew,
       closeNew,
       setNewName,
@@ -621,7 +615,6 @@ export function useAppStore() {
       save,
       exportXlsx,
       exportPdf,
-      closeReport,
       openNew,
       closeNew,
       setNewName,

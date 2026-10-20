@@ -96,29 +96,25 @@ button {
 }
 
 .report-wrap {
-  min-height: 100vh;
   background: #e6e8e3;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   -webkit-font-smoothing: antialiased;
 }
 .report-toolbar {
   position: sticky;
   top: 0;
-  z-index: 30;
+  z-index: 10;
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 12px 22px;
+  padding: 12px 18px;
   background: var(--surface);
   border-bottom: 1px solid var(--line);
+  border-radius: var(--radius) var(--radius) 0 0;
 }
-.report-back {
-  background: none;
-  border: none;
-  color: var(--ink2);
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  padding: 6px 4px;
+.print-portal {
+  display: none;
 }
 .report-print {
   background: var(--brand);
@@ -172,12 +168,12 @@ button {
   #root {
     background: #fff !important;
   }
-  .no-print {
+  /* Solo se imprime la copia del informe montada en <body> (ver Report.js) */
+  body:has(> .print-portal) > #root {
     display: none !important;
   }
-  .report-wrap {
-    min-height: 0;
-    background: none;
+  .print-portal {
+    display: block;
   }
   .report-pages {
     display: block;

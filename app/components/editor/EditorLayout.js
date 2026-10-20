@@ -9,7 +9,7 @@ import { OpexTab } from './OpexTab.js';
 import { RentabilidadTab } from './RentabilidadTab.js';
 import { FinancieraTab } from './FinancieraTab.js';
 import { PrecioTab } from './PrecioTab.js';
-import { InformeTab } from './InformeTab.js';
+import { Report } from '../report/Report.js';
 
 // [clave, título, editable]
 const TAB_DEFS = [
@@ -342,7 +342,7 @@ export function EditorLayout() {
           ${etab === 'rent' && html`<${RentabilidadTab} a=${a} r=${r} />`}
           ${etab === 'fin' && html`<${FinancieraTab} a=${a} r=${r} />`}
           ${etab === 'precio' && html`<${PrecioTab} a=${a} r=${r} title=${isIAG ? '6. Precio' : '5 · Precio'} />`}
-          ${etab === 'informe' && html`<${InformeTab} a=${a} r=${r} title=${isIAG ? '7. Informe' : '6 · Informe'} />`}
+          ${etab === 'informe' && html`<${Report} title=${isIAG ? '7. Informe' : '6 · Informe'} />`}
         </div>
       </div>
     </div>
