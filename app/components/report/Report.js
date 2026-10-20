@@ -308,11 +308,11 @@ export function Report({ title }) {
     { k: 'Impuesto de sociedades', v: fmt2(a.is) + ' %' },
   ];
   const grpHa = (g) => g.items.reduce((s, it) => s + (+it.v || 0), 0) * (g.unit === 'ud' ? r.densidad : 1);
-  // Resumen del OPEX en plena producción por bloque (sin "Otros"); el % es sobre el total mostrado
+  // Resumen del OPEX en plena producción por bloque (sin la fila "Otros"); el % es sobre el OPEX total
   const opexBlocks = a.opexItems
     .filter((cat) => cat.key !== 'otros' && cat.key !== 'other')
     .map((cat) => ({ key: cat.key, title: cat.label, ha: cat.items.reduce((s, it) => s + opexItemYear(it, MP, a), 0) }));
-  const opexBlocksHa = opexBlocks.reduce((s, b) => s + b.ha, 0);
+  const opexBlocksHa = r.opexHa; // el total incluye "Otros", aunque no se muestre como bloque
   const capexRows = a.capexGroups.map((g) => {
     const ha = grpHa(g);
     return { key: g.key, title: g.title, perHa: nf(ha), pct: pctR(ha / r.capexEstab, 0), total: nf((ha * sup) / 1000) + ' k€' };
@@ -496,6 +496,9 @@ export function Report({ title }) {
                 </div>
               </div>
             </div>
+            <div style=${{ margin: '0 0 8px', paddingLeft: '0.2cm', fontSize: 13, fontWeight: 700, textTransform: 'uppercase', color: C.green }}>
+              CAPEX - Inversión inicial
+            </div>
             <${SummaryTable}
               first="Partida"
               rows=${[
@@ -514,7 +517,7 @@ export function Report({ title }) {
               OPEX anual · plena producción
             </div>
             <${SummaryTable}
-              first="Bloque"
+              first="Partida"
               rows=${opexBlocks.map((b) => ({
                 key: b.key,
                 title: b.title,
@@ -522,7 +525,7 @@ export function Report({ title }) {
                 pct: pctR(opexBlocksHa ? b.ha / opexBlocksHa : NaN, 0),
                 total: nf((b.ha * sup) / 1000) + ' k€',
               }))}
-              totalRow=${{ title: 'OPEX total (sin otros)', perHa: nf(opexBlocksHa), total: nf((opexBlocksHa * sup) / 1000) + ' k€' }}
+              totalRow=${{ title: 'OPEX total', perHa: nf(opexBlocksHa), total: nf((opexBlocksHa * sup) / 1000) + ' k€' }}
             />
           </div>
           <div style=${{ flex: 1, minHeight: 0, padding: '20px 60px 24px' }}>
