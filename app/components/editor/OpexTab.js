@@ -30,7 +30,7 @@ const projLabel = (strong) => ({
 
 // Etiquetas que se muestran en dos líneas (el diccionario traduce la versión con salto)
 const TWO_LINES = {
-  'Aplicación foliar (calle sí/no)': 'Aplicación foliar\n(calle sí/no)',
+  'Aplicación foliar (calle sí/no)': 'Aplicación foliar\n(calle Sí/No)',
   'Aplicación foliar (todas hileras)': 'Aplicación foliar\n(todas hileras)',
 };
 // En Sanidad vegetal la partida de productos se llama "Protección vegetal" (en

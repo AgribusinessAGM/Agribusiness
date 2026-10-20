@@ -739,7 +739,7 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   desplazarse; a 1440×800 queda justa (800 px). Con commit y push.
 - 2026-10-20: **Regla de Marc: tras "/" la letra siempre en mayúscula** (amplía la
   de "/Año"): €/Kg, €/Árbol, €/Ha/Año… y en inglés €/Tree, /Year, olives/Tree.
-  Cambiado en editor, informe y diccionario. Pendiente de decidir: "(calle sí/no)".
+  Cambiado en editor, informe y diccionario. "(calle sí/no)" se muestra como "(calle Sí/No)" (con commit y push).
   Con commit y push.
 - 2026-10-20: **Gráfico de Precio:** la media lleva la etiqueta "Precio Medio" (8,
   negrita, color de la línea) 5 px por encima de la línea discontinua, al

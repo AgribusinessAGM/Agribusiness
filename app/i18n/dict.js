@@ -100,7 +100,7 @@ export const PAIRS = [
 ['Suministro (de agua)','Water supply'],['€/Kg/\nAceitunas','€/Kg/\nOlives'],['Riego','Irrigation'],['Canon CCRR + CHG','Water levy CCRR + CHG'],
 ['Consumo de energía','Energy consumption'],['Consumo de agua','Water consumption'],['Mantenimiento y reparaciones','Servicing and repairs'],
 ['Probabilidades de vegetación','Vegetation probabilities'],['Limpieza de riego por goteo','Drip irrigation cleaning'],
-['Sanidad vegetal','Plant health'],['Aplicación foliar\n(calle sí/no)','Foliar application (alternate rows)'],['Aplicación foliar\n(todas hileras)','Foliar application (all rows)'],
+['Sanidad vegetal','Plant health'],['Aplicación foliar\n(calle Sí/No)','Foliar application (alternate rows)'],['Aplicación foliar\n(todas hileras)','Foliar application (all rows)'],
 ['Protección vegetal (productos)','Plant protection products'],['Tratamiento herbicida','Herbicide treatment'],
 ['Fertilizantes NPK','NPK fertilisers'],['Análisis nutricionales','Nutritional analyses'],['Bioestimulantes y correcciones nutricionales','Biostimulants and nutritional corrections'],
 ['Total OPEX','Total OPEX'],
