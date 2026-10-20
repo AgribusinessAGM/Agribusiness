@@ -272,11 +272,8 @@ export function Report({ title }) {
   const fundRows = isIAG ? null : renRows(layers[2], false);
 
   // ---- textos
-  const coverTitle = almond
-    ? T(['Almendro', 'superintensivo', 'en regadío'], ['Irrigated', 'super-high-density', 'almond orchard'])
-    : isIAG
-    ? T(['Olivar', 'en seto', 'en regadío'], ['Irrigated', 'hedgerow', 'olive grove'])
-    : T(['Olivar', 'superintensivo', 'en regadío'], ['Irrigated', 'super-high-density', 'olive grove']);
+  // Título de portada en una sola línea
+  const coverTitle = almond ? T('Almendro SHD en regadío', 'Irrigated SHD almonds') : T('Olivar SHD en regadío', 'Irrigated SHD olives');
   const cropTxt = almond
     ? T('almendro superintensivo en regadío', 'irrigated super-high-density almond orchard')
     : isIAG
@@ -337,8 +334,11 @@ export function Report({ title }) {
               </div>
               <div style=${{ marginTop: 'auto' }}>
                 <div style=${{ fontSize: 14, fontWeight: 600, textTransform: 'uppercase', color: '#d8b57a', marginBottom: 20 }}>Business Plan</div>
-                <h2 data-i18n-skip="1" style=${{ fontFamily: BODY_FONT, fontWeight: 700, fontSize: 62, lineHeight: 1.04, margin: '0 0 10px' }}>
-                  ${coverTitle[0]}<br />${coverTitle[1]}<br />${coverTitle[2]}
+                <h2
+                  data-i18n-skip="1"
+                  style=${{ fontFamily: BODY_FONT, fontWeight: 700, fontSize: 52, lineHeight: 1.04, margin: '0 0 10px', whiteSpace: 'nowrap' }}
+                >
+                  ${coverTitle}
                 </h2>
                 <div style=${{ width: 64, height: 3, background: C.gold, margin: '26px 0 24px' }} />
                 <div style=${{ fontSize: 19, fontWeight: 500, color: 'rgba(255,255,255,.92)' }}>

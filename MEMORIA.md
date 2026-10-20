@@ -512,5 +512,9 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   abra el cuadro de impresión). Desaparecen la pantalla `report` (y
   `reportFrom`/`closeReport`) y `InformeTab.js`. Comprobado en pantalla: páginas
   escaladas al ancho y la copia de impresión se monta/desmonta con
-  `beforeprint`/`afterprint`. Marc probó "Imprimir" y sale bien. Con commit,
-  sin push.
+  `beforeprint`/`afterprint`. Marc probó "Imprimir" y sale bien. Con commit y
+  push.
+- 2026-10-20: **Título de portada del informe en una línea** (Marc): "Olivar
+  SHD en regadío" / "Irrigated SHD olives" (almendro: "Almendro SHD en
+  regadío" / "Irrigated SHD almonds"), igual para Torrimpietra y los modelos
+  normales, a 52 px. Con commit, sin push.
