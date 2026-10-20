@@ -113,7 +113,7 @@ export const PAIRS = [
 ['Beneficio Neto de Explotación','Net operating profit'],['Resultado neto operativo','Net operating profit'],
 ['2 · SPV','2 · SPV'],['con fees de gestión y deuda','with management fees and debt'],['TIR SPV','SPV IRR'],['Auditoría','Audit'],
 ['(=) Margen bruto','(=) Gross margin'],['Otros gastos operativos','Other operating expenses'],['Comisión CAPEX','CAPEX fee'],['Comisión OPEX','OPEX fee'],
-['Comisión de éxito','Success fee'],['Intereses','Interest'],['IS (Impuesto de Sociedades)','CIT (Corporate Income Tax)'],['(=) Resultado Neto','(=) Net income'],
+['Comisión de éxito','Success fee'],['Intereses','Interest'],['IS (Impuesto de Sociedades)','CIT (Corporate Income Tax)'],['(=) Beneficio Neto','(=) Net income'],
 ['Amortización deuda','Debt repayment'],['FCF Apalancado','Levered FCF'],
 ['3 · Fondo','3 · Fund'],['TIR Fondo','Fund IRR'],['resultado final para el inversor','final result for the investor'],['Ingresos del fondo','Fund revenue'],
 ['Comisión Gestión Fondo','Fund management fee'],['Inversión en SPV','Investment in SPV'],['Impuestos','Taxes'],['FCF acumulado','Cumulative FCF'],['Capital','Capital'],

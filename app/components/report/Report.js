@@ -278,8 +278,6 @@ export function Report({ title }) {
   const spvRows = renRows(layers[1], false).map((row) =>
     row.label === 'IS (Impuesto de Sociedades)'
       ? { ...row, label: T('Imp. Sociedades', 'Corp. Income Tax') }
-      : row.label === '(=) Resultado Neto' && !en
-      ? { ...row, label: '(=) Beneficio Neto' }
       : row,
   );
   const fundRows = isIAG ? null : renRows(layers[2], false);

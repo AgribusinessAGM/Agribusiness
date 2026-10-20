@@ -569,3 +569,6 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-20: **Bloque 03 del informe:** las dos hojas (proyecto y SPV), en
   todos los modelos, llevan el antetítulo "Rentabilidad · Modelo financiero" /
   "Profitability · Financial Model". Con commit y push.
+- 2026-10-20: **"(=) Beneficio Neto" en toda la app** (antes "(=) Resultado
+  Neto"; cambiado en `pnlLayers.js` y el diccionario, en inglés sigue "(=) Net
+  income"). El informe ya no lo renombra por su cuenta. Con commit y push.
