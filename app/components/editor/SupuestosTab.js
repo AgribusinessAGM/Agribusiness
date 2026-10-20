@@ -109,8 +109,6 @@ const GROUPS_IAG = [
   },
 ];
 
-const unitStyle = { fontSize: 12, fontFamily: 'var(--font)', fontWeight: 400, color: 'var(--ink2)' };
-
 export function SupuestosTab({ a, r }) {
   const { onField, canEdit } = useApp();
   const groups = a.engine === 'iag' ? GROUPS_IAG : GROUPS;
@@ -135,35 +133,7 @@ export function SupuestosTab({ a, r }) {
       <p style=${{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 22px' }}>
         Ajusta las variables de tu proyecto.
       </p>
-      <div
-        style=${{
-          background: 'var(--surface)',
-          border: '1px dashed var(--line)',
-          borderRadius: 'var(--radius)',
-          padding: 16,
-          marginBottom: 18,
-        }}
-      >
-        <div style=${{ fontWeight: 700, fontSize: 13, color: 'var(--ink2)', marginBottom: 12 }}>
-          Resumen del Proyecto
-        </div>
-        <!-- misma estructura que la banda de la hoja CAPEX del informe: etiqueta y, debajo, cifra con su unidad en la misma línea -->
-        <div style=${{ display: 'flex', justifyContent: 'space-between', gap: 24 }}>
-          ${[
-            ['Marco', html`${nf(a.marcoN, 2)}${' '}<span style=${unitStyle}>m</span>${' × '}${nf(a.marcoM, 2)}${' '}<span style=${unitStyle}>m</span>`],
-            ['Densidad', html`${nf(r.densidad)}${' '}<span style=${unitStyle}>Árboles/Ha</span>`],
-            ['Superficie', html`${nf(a.superficie)}${' '}<span style=${unitStyle}>Ha</span>`],
-            ['Nº árboles', nf(r.arboles)],
-          ].map(
-            ([label, value]) => html`
-              <div key=${label}>
-                <div style=${{ fontSize: 11, color: 'var(--ink2)', textTransform: 'uppercase', fontWeight: 700, marginBottom: 4 }}>${label}</div>
-                <div style=${{ fontFamily: 'var(--num)', fontSize: 17, fontWeight: 600, whiteSpace: 'nowrap' }}>${value}</div>
-              </div>
-            `,
-          )}
-        </div>
-      </div>      <div style=${{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
+      <div style=${{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
         ${groups.map(
           (g) => html`
             <div

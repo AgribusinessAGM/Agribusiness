@@ -671,3 +671,6 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   de 20 px; quedan alineadas con el título y el resumen. Con commit y push.
 - 2026-10-20: **OPEX:** cada sub-partida lleva línea gris debajo (antes encima),
   así la última fila de cada tarjeta también queda cerrada. Con commit y push.
+- 2026-10-20: **Supuestos:** quitada del todo la banda "Resumen del Proyecto"
+  (Marco, Densidad, Superficie, Nº árboles) a petición de Marc, para que la
+  página sea más baja. Con commit y push.
