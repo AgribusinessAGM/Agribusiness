@@ -553,3 +553,10 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   (antes "Standalone returns") y sección 04 "Modelo Financiero SPV" / "SPV
   Financial Model" (antes "SPV — deuda, fees y auditoría sobre 300 Ha"). Los
   modelos normales no cambian. Con commit y push.
+- 2026-10-20: **Hoja 4 del informe (modelos normales):** "Beneficio Neto de
+  Explotación" pasa a "Beneficio Neto" (solo en el informe y en español; en
+  inglés "Net operating profit" ya cabía). Ya no queda ninguna etiqueta que
+  no quepa en las hojas de rentabilidad. Con commit y push.
+- 2026-10-20: **Portada en español:** "Olivar en seto en regadío" (antes
+  "Olivar SHD en regadío"; en inglés sigue "Irrigated SHD olives"). Cabe en
+  una línea (621 de 666 px). Con commit y push.

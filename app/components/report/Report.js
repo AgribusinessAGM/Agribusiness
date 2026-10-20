@@ -271,7 +271,9 @@ export function Report({ title }) {
   });
 
   // ---- tablas de rentabilidad
-  const projectRows = renRows(layers[0], true);
+  const projectRows = renRows(layers[0], true).map((row) =>
+    row.label === 'Beneficio Neto de Explotación' && !en ? { ...row, label: 'Beneficio Neto' } : row,
+  );
   // La fila del IS va abreviada para que quepa en la columna de etiquetas
   const spvRows = renRows(layers[1], false).map((row) =>
     row.label === 'IS (Impuesto de Sociedades)' ? { ...row, label: T('Imp. Sociedades', 'Corp. Income Tax') } : row,
@@ -280,7 +282,7 @@ export function Report({ title }) {
 
   // ---- textos
   // Título de portada en una sola línea
-  const coverTitle = almond ? T('Almendro SHD en regadío', 'Irrigated SHD almonds') : T('Olivar SHD en regadío', 'Irrigated SHD olives');
+  const coverTitle = almond ? T('Almendro SHD en regadío', 'Irrigated SHD almonds') : T('Olivar en seto en regadío', 'Irrigated SHD olives');
   const cropTxt = almond
     ? T('almendro superintensivo en regadío', 'irrigated super-high-density almond orchard')
     : isIAG
