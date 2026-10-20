@@ -1,4 +1,4 @@
-﻿# MEMORIA DEL PROYECTO — Plataforma AGRIBUSINESS
+# MEMORIA DEL PROYECTO — Plataforma AGRIBUSINESS
 
 > Documento vivo. Es la fuente de verdad para continuar el proyecto en
 > cualquier sesión nueva (persona o IA). **Léelo entero antes de tocar nada** y
