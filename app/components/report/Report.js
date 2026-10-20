@@ -276,7 +276,11 @@ export function Report({ title }) {
   );
   // La fila del IS va abreviada para que quepa en la columna de etiquetas
   const spvRows = renRows(layers[1], false).map((row) =>
-    row.label === 'IS (Impuesto de Sociedades)' ? { ...row, label: T('Imp. Sociedades', 'Corp. Income Tax') } : row,
+    row.label === 'IS (Impuesto de Sociedades)'
+      ? { ...row, label: T('Imp. Sociedades', 'Corp. Income Tax') }
+      : row.label === '(=) Resultado Neto' && !en
+      ? { ...row, label: '(=) Beneficio Neto' }
+      : row,
   );
   const fundRows = isIAG ? null : renRows(layers[2], false);
 
@@ -295,9 +299,10 @@ export function Report({ title }) {
   // La hoja "Estructura financiera" está oculta por decisión de Marc (2026-10-20);
   // para recuperarla basta con poner SHOW_FIN a true.
   const pFin = isIAG ? 6 : 7;
-  const sFin = isIAG ? '05' : '06';
+  // Las hojas de rentabilidad (proyecto y SPV) forman un solo bloque, el 03
+  const sFin = isIAG ? '04' : '05';
   const pLegal = SHOW_FIN ? pFin + 1 : pFin;
-  const sLegal = SHOW_FIN ? (isIAG ? '06' : '07') : sFin;
+  const sLegal = SHOW_FIN ? (isIAG ? '05' : '06') : sFin;
 
   const kpiCell = (label, value, sub, opts = {}) => html`
     <div
@@ -509,7 +514,7 @@ export function Report({ title }) {
         <${Page} landscape>
           <${SectionHead}
             num="03"
-            kicker=${isIAG ? T('Rentabilidad · Modelo financiero', 'Profitability · Financial Model') : 'Rentabilidad · Proyecto'}
+            kicker=${T('Rentabilidad · Modelo financiero', 'Profitability · Financial Model')}
             title=${isIAG ? T('Modelo Financiero Agrícola', 'Agricultural Financial Model') : 'Cuenta de resultados y FCF — proyecto agrícola'}
             intro=${T('Explotación del olivar sin apalancar · TIR agrícola ', 'Unlevered olive grove operation · agricultural IRR ') + kpis.tirA}
           />
@@ -520,8 +525,8 @@ export function Report({ title }) {
         <!-- 5 · Rentabilidad del SPV (horizontal) -->
         <${Page} landscape>
           <${SectionHead}
-            num="04"
-            kicker=${isIAG ? 'Rentabilidad · SPV — Orchard 1' : 'Rentabilidad · SPV'}
+            num="03"
+            kicker=${T('Rentabilidad · Modelo financiero', 'Profitability · Financial Model')}
             title=${isIAG ? T('Modelo Financiero SPV', 'SPV Financial Model') : 'Cuenta de resultados y FCF — vehículo SPV'}
             intro=${T('Vehículo con deuda, fees y auditoría · TIR SPV ', 'Vehicle with debt, fees and audit · SPV IRR ') + kpis.tirL}
           />
@@ -535,7 +540,7 @@ export function Report({ title }) {
           <!-- 6 · Rentabilidad del Fondo (horizontal) -->
           <${Page} landscape>
             <${SectionHead}
-              num="05"
+              num="04"
               kicker="Rentabilidad · Fondo"
               title="Flujo del fondo al inversor"
               intro=${T('Equity del inversor ', 'Investor equity ') + nf(r.fondoEquity) + ' k€' + T(' · TIR fondo ', ' · Fund IRR ') + kpis.tirF}

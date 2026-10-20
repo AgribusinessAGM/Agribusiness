@@ -560,3 +560,12 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-20: **Portada en español:** "Olivar en seto en regadío" (antes
   "Olivar SHD en regadío"; en inglés sigue "Irrigated SHD olives"). Cabe en
   una línea (621 de 666 px). Con commit y push.
+- 2026-10-20: **Numeración de secciones del informe:** la hoja del SPV va en
+  el mismo bloque 03 que la del proyecto (Marc). Quedan: Torrimpietra 01–03 y
+  04 Aviso legal; normales 01–03, 04 Fondo y 05 Aviso legal. Con commit y push.
+- 2026-10-20: **Hoja del SPV, en español:** "(=) Resultado Neto" pasa a
+  "(=) Beneficio Neto" (solo en el informe; en inglés sigue "(=) Net
+  income"). Con commit y push.
+- 2026-10-20: **Bloque 03 del informe:** las dos hojas (proyecto y SPV), en
+  todos los modelos, llevan el antetítulo "Rentabilidad · Modelo financiero" /
+  "Profitability · Financial Model". Con commit y push.
