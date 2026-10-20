@@ -48,7 +48,7 @@ function PriceChart({ price, priceVar }) {
           (v, k) => html`
             <g key=${k}>
               <line x1=${pl} y1=${sy(v)} x2=${W - pr} y2=${sy(v)} stroke=${c.line} strokeDasharray=${k ? '2 3' : undefined} />
-              <text x=${pl - 6} y=${sy(v) + 3} fill=${c.ink2} fontSize=${10} textAnchor="end" fontFamily=${c.num}>${nf(v, 2)}</text>
+              <text x=${pl - 6} y=${sy(v) + 3} fill=${c.ink2} fontSize=${8} textAnchor="end" fontFamily=${c.num}>${nf(v, 2)}</text>
             </g>
           `,
         )}

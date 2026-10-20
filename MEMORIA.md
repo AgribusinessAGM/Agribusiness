@@ -733,8 +733,8 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   con ResizeObserver); con un hueco pequeño, como en Riego, no se dibuja. No se
   pudo comprobar del todo en el navegador de la sesión (oculto, no repinta).
   Unidades "Años" con mayúscula en Supuestos. Con commit y push.
-- 2026-10-20: **Pestaña Precio:** números del eje del gráfico a 10 (Marc probó 12 y
-  lo devolvió a 10) y gráfico más
+- 2026-10-20: **Pestaña Precio:** números del eje del gráfico a 8 (Marc probó 12 y 10 y
+  lo dejó en 8) y gráfico más
   bajo (`H` 280 → 125, barras 90 → 55) para que la pestaña quepa sin
   desplazarse; a 1440×800 queda justa (800 px). Con commit y push.
 - 2026-10-20: **Regla de Marc: tras "/" la letra siempre en mayúscula** (amplía la
