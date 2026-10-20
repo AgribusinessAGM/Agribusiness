@@ -74,14 +74,14 @@ export function RentTable({ rows, pad = 60, vAdj = 0, labW: labWProp }) {
                 fontWeight: 800,
               }}
             >
-              Concepto<br /><span style=${{ fontStyle: 'italic', fontWeight: 400, fontSize: 10, textTransform: 'none' }}>(Miles €)</span>
+              Concepto<br /><span style=${{ fontStyle: 'italic', fontWeight: 400, fontSize: 8, textTransform: 'none' }}>(miles €)</span>
             </th>
             ${years.map(
               (y) => html`
                 <th
                   key=${y}
                   className="num"
-                  style=${{ textAlign: 'right', padding: `${thV}px 0.1cm ${thV}px 0`, fontSize: wide ? 6.6 : 8, color: '#8a9182', fontWeight: 700 }}
+                  style=${{ textAlign: 'right', padding: `${thV}px 0.1cm ${thV}px 0`, fontSize: 8, color: '#8a9182', fontWeight: 700 }}
                 >
                   ${y}
                 </th>

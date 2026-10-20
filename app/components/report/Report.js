@@ -566,7 +566,7 @@ export function Report({ title }) {
             intro=${T('Vehículo con deuda, fees y auditoría · TIR SPV ', 'Vehicle with debt, fees and audit · SPV IRR ') + kpis.tirL}
           />
           <!-- filas algo más bajas: el hueco entre la tabla y el pie es igual al que hay entre la entradilla y la tabla -->
-          <${RentTable} rows=${spvRows} pad=${38} vAdj=${-0.78} labW=${labW45} />
+          <${RentTable} rows=${spvRows} pad=${38} vAdj=${-0.56} labW=${labW45} />
           <${Footer} page=${5} />
         <//>
 

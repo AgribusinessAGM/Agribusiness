@@ -181,7 +181,12 @@ export function FinancieraTab({ a, r }) {
           <div style=${kpiValue}>${k(r.cuota)}</div>
         </div>
       </div>
-      <${DeferredTaxTable} r=${r} />
+      <!-- mismo ancho que las columnas de la pestaña OPEX (3 de 4, sin la foto) -->
+      <div style=${{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+        <div style=${{ gridColumn: '1 / 4', minWidth: 0 }}>
+          <${DeferredTaxTable} r=${r} />
+        </div>
+      </div>
       <div style=${{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
         <div style=${tableCard}>
           <div style=${tableHead}>

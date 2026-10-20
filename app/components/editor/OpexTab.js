@@ -107,7 +107,7 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
     <div style=${{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
       <div style=${{ gridColumn: '1 / 4' }}>
         <div style=${{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-          <h2 style=${{ fontSize: 18, fontWeight: 800, margin: 0 }}>2 · OPEX — Costes operativos</h2>
+          <h2 style=${{ fontSize: 18, fontWeight: 800, margin: 0 }}>3. OPEX — Costes operativos</h2>
           <span
             style=${{
               fontSize: 11,

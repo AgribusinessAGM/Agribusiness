@@ -13,22 +13,22 @@ import { Report } from '../report/Report.js';
 
 // [clave, título, editable]
 const TAB_DEFS = [
-  ['supuestos', 'Supuestos', true],
-  ['capex', '1 · CAPEX', true],
-  ['opex', '2 · OPEX', true],
-  ['rent', '3 · Rentabilidad', false],
-  ['fin', '4 · E. Financiera', false],
-  ['precio', '5 · Precio', true],
-  ['informe', '6 · Informe', false],
+  ['supuestos', '1. Supuestos', true],
+  ['capex', '2. CAPEX', true],
+  ['opex', '3. OPEX', true],
+  ['precio', '4. Precio', true],
+  ['rent', '5. Rentabilidad', false],
+  ['fin', '6. E. Financiera', false],
+  ['informe', '7. Informe', false],
 ];
 // Modelo IAG: las hojas de su Excel, más el ciclo de precios
 const TAB_DEFS_IAG = [
-  ['supuestos', 'Supuestos', true],
-  ['capex', '1. CAPEX', true],
-  ['opex', '2. OPEX', true],
-  ['rent', '3. Rentabilidad', false],
-  ['fin', '4. Financiero', false],
-  ['precio', '6. Precio', true],
+  ['supuestos', '1. Supuestos', true],
+  ['capex', '2. CAPEX', true],
+  ['opex', '3. OPEX', true],
+  ['precio', '4. Precio', true],
+  ['rent', '5. Rentabilidad', false],
+  ['fin', '6. Financiero', false],
   ['informe', '7. Informe', false],
 ];
 
@@ -341,8 +341,8 @@ export function EditorLayout() {
           `}
           ${etab === 'rent' && html`<${RentabilidadTab} a=${a} r=${r} />`}
           ${etab === 'fin' && html`<${FinancieraTab} a=${a} r=${r} />`}
-          ${etab === 'precio' && html`<${PrecioTab} a=${a} r=${r} title=${isIAG ? '6. Precio' : '5 · Precio'} />`}
-          ${etab === 'informe' && html`<${Report} title=${isIAG ? '7. Informe' : '6 · Informe'} />`}
+          ${etab === 'precio' && html`<${PrecioTab} a=${a} r=${r} title=${isIAG ? '4. Precio' : '4. Precio'} />`}
+          ${etab === 'informe' && html`<${Report} title=${isIAG ? '7. Informe' : '7. Informe'} />`}
         </div>
       </div>
     </div>

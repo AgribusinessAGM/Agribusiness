@@ -625,3 +625,16 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-20: **"(Miles €)"** de esa cabecera en cursiva, sin negrita, 10 px y
   sin mayúsculas; `labW45` en inglés vuelve a 90 px (5 px hasta el año 1).
   Con commit y push.
+- 2026-10-20: **Cabecera de las tablas de rentabilidad:** "(miles €)" en
+  minúscula y a 8 px; los números de año a 8 px (antes 6,6). Hoja 5 reajustada
+  (`vAdj=-0.56`) para mantener 26 px arriba y abajo; siguen los 5 px hasta el
+  año 1. Con commit y push.
+- 2026-10-20: **Pestañas del editor reordenadas y numeradas** (Marc): 1 Supuestos ·
+  2 CAPEX · 3 OPEX · 4 Precio · 5 Rentabilidad · 6 Financiero ("E. Financiera"
+  en los normales) · 7 Informe, en los dos tipos de modelo (Torrimpietra con
+  "1.", los normales con "1 ·"). Renumerados también los títulos de las
+  pestañas CAPEX, OPEX, Rentabilidad y Precio. Numeración siempre "N." (también
+  en los modelos normales: "6. E. Financiera"). Con commit y push.
+- 2026-10-20: **Pestaña Financiero:** la tabla "IS - Impuesto diferido" ocupa
+  el mismo ancho que las columnas de la pestaña OPEX (3 de 4 columnas; 542 px
+  medidos en ambas). Con commit y push.

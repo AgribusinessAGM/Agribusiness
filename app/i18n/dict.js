@@ -30,9 +30,9 @@ export const PAIRS = [
 // ---- editor: barra lateral y cabecera
 ['‹ Volver a modelos','‹ Back to models'],['Hojas del modelo','Model sheets'],['Guardar cambios','Save changes'],['Ver resultados →','View results →'],
 ['editable','editable'],['solo lectura','read only'],['Solo lectura','Read only'],
-['Supuestos','Assumptions'],['3 · Rentabilidad','3 · Profitability'],['E. Financiera','E. Financial'],['4 · E. Financiera','4 · E. Financial'],
-['3. Rentabilidad','3. Profitability'],['4. Financiero','4. Financials'],['6. Precio','6. Price'],['5 · Precio','5 · Price'],
-['7. Informe','7. Report'],['Bloque','Block'],['Nº árboles','No. of trees'],['Concepto','Concept'],['(Miles €)','(€ thousand)'],['Beneficio Neto','Net income'],['Árboles/Ha','Trees/Ha'],['OPEX · Plena producción','OPEX · Full production'],['OPEX total','Total OPEX'],['CAPEX · Inversión inicial','CAPEX · Initial investment'],['6 · Informe','6 · Report'],['Imprimir','Print'],
+['Supuestos','Assumptions'],['1. Supuestos','1. Assumptions'],['1. Supuestos','1. Assumptions'],['5. Rentabilidad','5. Profitability'],['E. Financiera','E. Financial'],['6. E. Financiera','6. E. Financial'],
+['5. Rentabilidad','5. Profitability'],['6. Financiero','6. Financials'],['4. Precio','4. Price'],['4. Precio','4. Price'],['2. CAPEX','2. CAPEX'],['3. OPEX','3. OPEX'],
+['7. Informe','7. Report'],['Bloque','Block'],['Nº árboles','No. of trees'],['Concepto','Concept'],['(miles €)','(€ thousand)'],['Beneficio Neto','Net income'],['Árboles/Ha','Trees/Ha'],['OPEX · Plena producción','OPEX · Full production'],['OPEX total','Total OPEX'],['CAPEX · Inversión inicial','CAPEX · Initial investment'],['7. Informe','7. Report'],['Imprimir','Print'],
 ['Informe PDF con los resultados del modelo. Las páginas de rentabilidad salen en horizontal.','PDF report with the model results. The profitability pages are printed in landscape.'],
 ['TIR Fondo · final','Fund IRR · final'],['TIR SPV · Orchard 1','SPV IRR · Orchard 1'],['Inversión total','Total investment'],['Equity comprometido','Committed equity'],
 ['VAN Fondo (8%)','Fund NPV (8%)'],['VAN Fondo (8%) k€','Fund NPV (8%) k€'],['Precio medio','Average price'],
@@ -56,7 +56,7 @@ export const PAIRS = [
 ['CAPEX fee (año 1)','CAPEX fee (year 1)'],['OPEX fee (anual, plano)','OPEX fee (annual, flat)'],['Fees y costes del SPV','SPV fees and costs'],
 ['Auditoría (prorrateada al Orchard 1)','Audit (prorated to Orchard 1)'],['k€/año','k€/year'],['€/año','€/year'],
 // ---- CAPEX
-['1 · CAPEX — Inversión inicial','1 · CAPEX — Initial investment'],['coste unitario editable','editable unit cost'],
+['2. CAPEX — Inversión inicial','2. CAPEX — Initial investment'],['coste unitario editable','editable unit cost'],
 ['Coste de establecimiento por hectárea, con el mismo detalle que la hoja Excel. Las partidas de plantación se introducen en €/árbol y se multiplican por la densidad (','Establishment cost per hectare, with the same detail as the Excel sheet. Planting items are entered in €/tree and multiplied by the density ('],
 ['); el resto en €/Ha.','); the rest in €/Ha.'],
 ['Marco de plantación','Planting layout'],['Marco (n × m)','Layout (n × m)'],['# Plantas','# Plants'],
@@ -78,7 +78,7 @@ export const PAIRS = [
 ['Plantación manual (todo incluido)','Manual planting (all inc.)'],['Sistema de riego (todo incluido)','Irrigation system (all inc.)'],
 ['Proyecto de riego','Irrigation project'],['Due Diligence (15.000 € / 300 ha)','Due Diligence (15.000 € / 300 ha)'],
 // ---- OPEX
-['2 · OPEX — Costes operativos','2 · OPEX — Operating costs'],['Cantidad y coste editables','Editable quantity and cost'],
+['3. OPEX — Costes operativos','3. OPEX — Operating costs'],['Cantidad y coste editables','Editable quantity and cost'],
 ['Misma estructura que la hoja OPEX del Excel: 9 categorías con sus sub-partidas. Cada una tiene','Same structure as the OPEX sheet of the Excel: 9 categories with their sub-items. Each one has'],
 ['Cantidad','Quantity'],['y','and'],
 ['editables; el perfil anual (rampa e inflación) se conserva y la línea escala con lo que edites. €/Ha pleno = año de referencia.','editable; the annual profile (ramp-up and inflation) is kept and the line scales with what you edit. €/Ha full = reference year.'],
@@ -105,7 +105,7 @@ export const PAIRS = [
 ['Fertilizantes NPK','NPK fertilisers'],['Análisis nutricionales','Nutritional analyses'],['Bioestimulantes y correcciones nutricionales','Biostimulants and nutritional corrections'],
 ['Total OPEX','Total OPEX'],
 // ---- rentabilidad
-['3 · Rentabilidad — por capas','3 · Profitability — by layer'],['Concepto','Concept'],
+['5. Rentabilidad — por capas','5. Profitability — by layer'],['Concepto','Concept'],
 ['Análisis de la rentabilidad del proyecto: Proyecto agrícola · Estructura SPV · Estructura Fondo, cada uno con su TIR. Cifras en miles € (\'000).','Project profitability analysis: Agricultural project · SPV structure · Fund structure, each with its IRR. Figures in thousand € (\'000).'],
 ['1 · Proyecto agrícola','1 · Agricultural project'],['sin apalancar · sin fees','unlevered · no fees'],['TIR Agrícola','Agricultural IRR'],
 ['Ingresos','Revenue'],['Capitalización del OPEX','OPEX capitalisation'],['Gastos de personal','Staff costs'],['% sobre ventas','% of sales'],
@@ -118,7 +118,7 @@ export const PAIRS = [
 ['3 · Fondo','3 · Fund'],['TIR Fondo','Fund IRR'],['resultado final para el inversor','final result for the investor'],['Ingresos del fondo','Fund revenue'],
 ['Comisión Gestión Fondo','Fund management fee'],['Inversión en SPV','Investment in SPV'],['Impuestos','Taxes'],['FCF acumulado','Cumulative FCF'],['Capital','Capital'],
 ['Amortización (reversión)','Depreciation (add-back)'],
-['4 · Rentabilidad individual – Orchard 1','4 · Standalone returns – Orchard 1'],['SPV – Orchard 1','SPV – Orchard 1'],
+['4. Rentabilidad individual – Orchard 1','4 · Standalone returns – Orchard 1'],['SPV – Orchard 1','SPV – Orchard 1'],
 ['deuda, fees y auditoría aplicados a','debt, fees and audit applied to'],
 ['Orchard 1 en solitario, como la sección 4 de «3. Profitability» del Excel. La capa SPV aplica deuda, fees y auditoría a sus','Orchard 1 on its own, as in section 4 of «3. Profitability» of the Excel. The SPV layer applies debt, fees and audit to its'],
 ['Ha. Cifras en k€ · 35 años.','Ha. Figures in k€ · 35 years.'],
