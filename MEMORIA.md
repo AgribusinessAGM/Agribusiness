@@ -598,3 +598,9 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-20: **Hoja 3, banda verde:** 5 px menos de relleno arriba y abajo
   (13 px) y orden Marco · Densidad · Superficie (nuevo) · Nº árboles.
   Con commit y push.
+- 2026-10-20: **Hoja 3, tablas CAPEX y OPEX:** todo el texto (cabeceras,
+  partidas, cifras y fila de total) a 13 px, el tamaño de la columna %.
+  Los títulos "CAPEX · Inversión inicial" y "OPEX · Plena producción" van
+  en la primera celda de la cabecera de cada tabla (en lugar de "Partida" y
+  de un título aparte), con lo que la foto crece a ≈197 px. La densidad de la banda verde
+  se expresa en "Árboles/Ha" ("Trees/Ha"). Con commit y push.

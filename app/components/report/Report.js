@@ -110,7 +110,7 @@ function SummaryTable({ first, rows, totalRow }) {
             ['Total (k€)', 'right', 110, '8px 0.2cm 8px 0'],
           ].map(
             ([label, align, width, padding]) => html`
-              <th key=${label} style=${{ textAlign: align, padding, fontSize: 12, textTransform: 'uppercase', color: C.green, fontWeight: 700, width }}>
+              <th key=${label} style=${{ textAlign: align, padding, fontSize: 13, textTransform: 'uppercase', color: C.green, fontWeight: 700, width }}>
                 ${label}
               </th>
             `,
@@ -124,7 +124,7 @@ function SummaryTable({ first, rows, totalRow }) {
               <td style=${{ padding: pad('l'), fontSize: 13, color: C.text }}>${row.title}</td>
               <td className="num" style=${{ padding: pad(), textAlign: 'right', fontSize: 13, color: C.text }}>${row.perHa}</td>
               <td className="num" style=${{ padding: pad(), textAlign: 'right', fontSize: 13, color: '#000' }}>${row.pct}</td>
-              <td className="num" style=${{ padding: pad('r'), textAlign: 'right', fontSize: 12, fontWeight: 600, color: C.green }}>${row.total}</td>
+              <td className="num" style=${{ padding: pad('r'), textAlign: 'right', fontSize: 13, fontWeight: 600, color: C.green }}>${row.total}</td>
             </tr>
           `,
         )}
@@ -132,7 +132,7 @@ function SummaryTable({ first, rows, totalRow }) {
           <td style=${{ padding: '10px 12px 10px 0.2cm', fontWeight: 700, fontSize: 13, color: C.green }}>${totalRow.title}</td>
           <td className="num" style=${{ padding: '10px 0', textAlign: 'right', fontWeight: 700, fontSize: 13, color: C.green }}>${totalRow.perHa}</td>
           <td></td>
-          <td className="num" style=${{ padding: '10px 0.2cm 10px 0', textAlign: 'right', fontWeight: 700, fontSize: 12, color: C.green }}>${totalRow.total}</td>
+          <td className="num" style=${{ padding: '10px 0.2cm 10px 0', textAlign: 'right', fontWeight: 700, fontSize: 13, color: C.green }}>${totalRow.total}</td>
         </tr>
       </tbody>
     </table>
@@ -490,7 +490,7 @@ export function Report({ title }) {
               <div>
                 <div style=${{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: C.sub, marginBottom: 6 }}>Densidad</div>
                 <div className="num" style=${{ fontSize: 20, fontWeight: 600, color: C.green }}>
-                  ${nf(r.densidad)}${' '}<span style=${{ fontSize: 12, color: '#7b8473' }}>Árboles</span>
+                  ${nf(r.densidad)}${' '}<span style=${{ fontSize: 12, color: '#7b8473' }}>Árboles/Ha</span>
                 </div>
               </div>
               <div>
@@ -504,11 +504,8 @@ export function Report({ title }) {
                 <div className="num" style=${{ fontSize: 20, fontWeight: 600, color: C.green }}>${nf(r.arboles)}</div>
               </div>
             </div>
-            <div style=${{ margin: '0 0 8px', paddingLeft: '0.2cm', fontSize: 13, fontWeight: 700, textTransform: 'uppercase', color: C.green }}>
-              CAPEX · Inversión inicial
-            </div>
             <${SummaryTable}
-              first="Partida"
+              first="CAPEX · Inversión inicial"
               rows=${[
                 ...capexRows.map((row) => ({ key: row.key, title: row.title, perHa: row.perHa, pct: row.pct, total: row.total })),
                 {
@@ -521,11 +518,9 @@ export function Report({ title }) {
               ]}
               totalRow=${{ title: 'Inversión total', perHa: nf(r.capexHa), total: nf(r.totalCapex) + ' k€' }}
             />
-            <div style=${{ margin: '20px 0 8px', paddingLeft: '0.2cm', fontSize: 13, fontWeight: 700, textTransform: 'uppercase', color: C.green }}>
-              OPEX · Plena producción
-            </div>
+            <div style=${{ height: 20 }} />
             <${SummaryTable}
-              first="Partida"
+              first="OPEX · Plena producción"
               rows=${opexBlocks.map((b) => ({
                 key: b.key,
                 title: b.title,

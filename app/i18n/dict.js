@@ -32,7 +32,7 @@ export const PAIRS = [
 ['editable','editable'],['solo lectura','read only'],['Solo lectura','Read only'],
 ['Supuestos','Assumptions'],['3 · Rentabilidad','3 · Profitability'],['E. Financiera','E. Financial'],['4 · E. Financiera','4 · E. Financial'],
 ['3. Rentabilidad','3. Profitability'],['4. Financiero','4. Financials'],['6. Precio','6. Price'],['5 · Precio','5 · Price'],
-['7. Informe','7. Report'],['Bloque','Block'],['Nº árboles','No. of trees'],['OPEX · Plena producción','OPEX · Full production'],['OPEX total','Total OPEX'],['CAPEX · Inversión inicial','CAPEX · Initial investment'],['6 · Informe','6 · Report'],['Imprimir','Print'],
+['7. Informe','7. Report'],['Bloque','Block'],['Nº árboles','No. of trees'],['Árboles/Ha','Trees/Ha'],['OPEX · Plena producción','OPEX · Full production'],['OPEX total','Total OPEX'],['CAPEX · Inversión inicial','CAPEX · Initial investment'],['6 · Informe','6 · Report'],['Imprimir','Print'],
 ['Informe PDF con los resultados del modelo. Las páginas de rentabilidad salen en horizontal.','PDF report with the model results. The profitability pages are printed in landscape.'],
 ['TIR Fondo · final','Fund IRR · final'],['TIR SPV · Orchard 1','SPV IRR · Orchard 1'],['Inversión total','Total investment'],['Equity comprometido','Committed equity'],
 ['VAN Fondo (8%)','Fund NPV (8%)'],['VAN Fondo (8%) k€','Fund NPV (8%) k€'],['Precio medio','Average price'],
