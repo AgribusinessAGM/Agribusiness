@@ -2,7 +2,7 @@ import { html } from '../lib/html.js';
 import { useApp } from '../state/store.js';
 
 export function TopBar() {
-  const { state, gotoDash, gotoAdmin, logout } = useApp();
+  const { state, gotoDash, gotoAdmin, logout, setLang } = useApp();
   const isAdmin = state.currentUser?.role === 'admin';
   const initials = (state.currentUser?.name || '?')
     .split(' ')
@@ -57,6 +57,26 @@ export function TopBar() {
       </nav>
       <div style=${{ flex: 1 }} />
       <div style=${{ width: 1, height: 26, background: 'var(--line)' }} />
+      <select
+        data-i18n-skip="1"
+        value=${state.lang}
+        onChange=${(e) => setLang(e.target.value)}
+        aria-label="Language"
+        style=${{
+          border: '1px solid var(--line)',
+          borderRadius: 999,
+          background: 'var(--surface)',
+          color: 'var(--ink)',
+          fontSize: 12,
+          fontWeight: 600,
+          padding: '7px 12px',
+          cursor: 'pointer',
+          fontFamily: 'inherit',
+        }}
+      >
+        <option value="es">Español (ESP)</option>
+        <option value="en">English (EN)</option>
+      </select>
       <div style=${{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <div
           title=${state.currentUser?.name}

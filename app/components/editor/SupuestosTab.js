@@ -1,5 +1,6 @@
 import { html } from '../../lib/html.js';
 import { nf } from '../../engine/format.js';
+import { discountPct } from '../../engine/compute.js';
 import { NumberField } from '../NumberField.js';
 import { useApp } from '../../state/store.js';
 
@@ -24,8 +25,8 @@ const GROUPS = [
   {
     title: 'Costes estructurales',
     rows: [
-      { key: 'alquiler', label: 'Alquiler de la finca', unit: '€/Ha·año' },
-      { key: 'personal', label: 'Personal', unit: '€/Ha·año' },
+      { key: 'alquiler', label: 'Alquiler de la finca', unit: '€/Ha/año' },
+      { key: 'personal', label: 'Personal', unit: '€/Ha/año' },
     ],
   },
   {
@@ -33,6 +34,7 @@ const GROUPS = [
     rows: [
       { key: 'inflacion', label: 'Inflación anual (costes)', unit: '%' },
       { key: 'is', label: 'Impuesto Sociedades', unit: '%' },
+      { key: 'descuento', label: 'Tasa de descuento (VAN)', unit: '%' },
     ],
   },
   {
@@ -54,8 +56,62 @@ const GROUPS = [
   },
 ];
 
+// Modelo IAG: los supuestos de su Excel (producción por árbol y rendimiento graso
+// en lugar de productividad por Ha, tasa de descuento propia y auditoría del SPV).
+const GROUPS_IAG = [
+  {
+    title: 'Parcela y plantación',
+    rows: [
+      { key: 'superficie', label: 'Superficie de la parcela', unit: 'Ha' },
+      { key: 'marcoN', label: 'Marco de plantación (n)', unit: 'm' },
+      { key: 'marcoM', label: 'Marco de plantación (m)', unit: 'm' },
+    ],
+  },
+  {
+    title: 'Producción y precio',
+    rows: [
+      { key: 'kgTree', label: 'Kg/árbol (olivo) · producción plena', unit: 'kg' },
+      { key: 'oilYield', label: 'Rendimiento graso', unit: '%' },
+      { key: 'precioEVOO', label: 'Precio inicial (EVOO)', unit: '€/kg' },
+    ],
+  },
+  {
+    title: 'Costes estructurales',
+    rows: [
+      { key: 'alquiler', label: 'Alquiler', unit: '€/Ha/año' },
+      { key: 'personal', label: 'Costes de personal (equipo de operaciones)', unit: '€/Ha/año' },
+    ],
+  },
+  {
+    title: 'Supuestos macro',
+    rows: [
+      { key: 'inflacion', label: 'Inflación', unit: '%' },
+      { key: 'is', label: 'Impuesto de sociedades', unit: '%' },
+      { key: 'descuento', label: 'Tasa de descuento (VAN)', unit: '%' },
+    ],
+  },
+  {
+    title: 'Estructura financiera',
+    rows: [
+      { key: 'financiacion', label: 'Financiación', unit: '%' },
+      { key: 'interes', label: 'Tipo de interés', unit: '%' },
+      { key: 'plazo', label: 'Plazo', unit: 'años' },
+      { key: 'carencia', label: 'Carencia', unit: 'años' },
+    ],
+  },
+  {
+    title: 'Fees y costes del SPV',
+    rows: [
+      { key: 'capexFee', label: 'CAPEX fee (año 1)', unit: '€/Ha' },
+      { key: 'opexFee', label: 'OPEX fee (anual, plano)', unit: '€/Ha' },
+      { key: 'audit', label: 'Auditoría (prorrateada al Orchard 1)', unit: '€/año' },
+    ],
+  },
+];
+
 export function SupuestosTab({ a, r }) {
   const { onField, canEdit } = useApp();
+  const groups = a.engine === 'iag' ? GROUPS_IAG : GROUPS;
   return html`
     <div>
       <div style=${{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
@@ -78,7 +134,7 @@ export function SupuestosTab({ a, r }) {
         Ajusta las variables de tu proyecto. Los valores en gris se calculan automáticamente y no se pueden editar.
       </p>
       <div style=${{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
-        ${GROUPS.map(
+        ${groups.map(
           (g) => html`
             <div
               key=${g.title}
@@ -121,7 +177,7 @@ export function SupuestosTab({ a, r }) {
                       <div style=${{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <${NumberField}
                           id=${'sup:' + row.key}
-                          value=${a[row.key]}
+                          value=${row.key === 'descuento' ? discountPct(a) : a[row.key]}
                           onChangeRaw=${(raw) => onField(row.key, raw)}
                         />
                         <span style=${{ fontSize: 12, color: 'var(--ink2)', width: 74 }}>${row.unit}</span>

@@ -1,8 +1,10 @@
-import { nfAcc, pct } from './format.js';
+import { nf, nfAcc, pct } from './format.js';
 
-// Arma las tres capas de P&L (Proyecto agrícola · SPV · Fondo) a partir del
-// resultado de compute(): cada capa tiene título, TIR y filas con sus celdas ya
-// formateadas y con su estilo.
+// Arma las capas de P&L a partir del resultado de compute(): Proyecto agrícola ·
+// SPV · Fondo (modelo normal) o Orchard 1 · SPV (modelo IAG). Cada capa tiene
+// título, TIR y filas con sus celdas ya formateadas y con su estilo. Cada fila
+// guarda también su tipo (kind: 'n' normal, 's' subtotal, 'p' porcentaje,
+// 'h' cabecera) y sus valores (vals, años 1..n) para el informe PDF.
 
 function cellStyle(strong) {
   return {
@@ -51,17 +53,21 @@ export function buildPnlHeader(nc) {
   return header;
 }
 
-export function buildPnlLayers(r) {
+export function buildPnlLayers(r, a) {
   const nc = r.ingresos.length - 1;
 
   function mkRow(label, arr, opts) {
     const cells = [];
+    const vals = [];
     for (let y = 1; y <= nc; y++) {
       const v = arr[y];
+      vals.push(v);
       cells.push({ v: v == null || isNaN(v) ? '—' : nfAcc(v), style: cellStyle(opts?.strong) });
     }
     return {
       label,
+      kind: opts?.strong ? 's' : 'n',
+      vals,
       cells,
       rowBg: opts?.strong ? 'var(--brandL)' : undefined,
       labelStyle: labelStyleFor(opts?.strong),
@@ -70,9 +76,11 @@ export function buildPnlLayers(r) {
 
   function mkPct(label, numArr, ingresos) {
     const cells = [];
+    const vals = [];
     for (let y = 1; y <= nc; y++) {
       const rev = ingresos[y];
       const v = rev > 0 && numArr[y] != null && !isNaN(numArr[y]) ? numArr[y] / rev : null;
+      vals.push(v);
       cells.push({
         v: v == null ? '-' : (v * 100).toFixed(0) + '%',
         style: {
@@ -86,7 +94,7 @@ export function buildPnlLayers(r) {
         },
       });
     }
-    return { label, cells, labelStyle: pctLabelStyle };
+    return { label, kind: 'p', vals, cells, labelStyle: pctLabelStyle };
   }
 
   function mkHead(label) {
@@ -94,6 +102,8 @@ export function buildPnlLayers(r) {
     for (let y = 1; y <= nc; y++) cells.push({ v: '', style: { borderTop: '1px solid var(--line)' } });
     return {
       label,
+      kind: 'h',
+      vals: [],
       cells,
       rowBg: 'var(--brandL)',
       labelStyle: {
@@ -110,6 +120,70 @@ export function buildPnlLayers(r) {
 
   const netOp = [];
   for (let y = 0; y <= nc; y++) netOp[y] = (r.ebit[y] || 0) + (r.tax[y] || 0);
+
+  if (r.engine === 'iag') {
+    const ha = nf(a.superficie) + ' Ha';
+    return [
+      {
+        title: '4 · Rentabilidad individual – Orchard 1',
+        sub: 'EBITDA → FCF · ' + ha,
+        tirLabel: 'TIR',
+        tir: pct(r.tirA),
+        rows: [
+          mkRow('Ingresos', r.ingresos),
+          mkRow('OPEX', negArr(r.opex)),
+          mkRow('Alquiler', negArr(r.rent)),
+          mkRow('Capitalización del OPEX', r.opexCapRow),
+          mkRow('Gastos de personal', negArr(r.pers)),
+          mkRow('EBITDA', r.ebitda, { strong: true }),
+          mkPct('% sobre ventas', r.ebitda, r.ingresos),
+          mkRow('Amortización', negArr(r.amort)),
+          mkRow('EBIT', r.ebit, { strong: true }),
+          mkRow('Impuesto de Sociedades', r.tax),
+          mkRow('Beneficio neto', r.netOp, { strong: true }),
+          mkPct('% sobre ventas', r.netOp, r.ingresos),
+          mkRow('CAPEX', r.capexRow),
+          mkRow('Amortización', r.amort),
+          mkRow('FCF', r.fcfU, { strong: true }),
+          mkRow('FCF acumulado', r.fcfAcum),
+        ],
+      },
+      {
+        title: 'SPV – Orchard 1',
+        sub: 'deuda, fees y auditoría aplicados a ' + ha,
+        tirLabel: 'TIR SPV',
+        tir: pct(r.tirL),
+        rows: [
+          mkRow('Ingresos', r.ingresos),
+          mkRow('OPEX', negArr(r.opex)),
+          mkRow('Alquiler', negArr(r.rent)),
+          mkRow('Auditoría', negArr(r.audit)),
+          mkRow('Capitalización del OPEX', r.opexCapRow),
+          mkRow('(=) Margen bruto', r.margenBrutoS, { strong: true }),
+          mkPct('% sobre ventas', r.margenBrutoS, r.ingresos),
+          mkRow('Gastos de personal', negArr(r.pers)),
+          mkRow('(=) EBITDA', r.ebitdaS, { strong: true }),
+          mkPct('% sobre ventas', r.ebitdaS, r.ingresos),
+          mkRow('Comisión CAPEX', negArr(r.capexFeeRow)),
+          mkRow('Comisión OPEX', negArr(r.opexFeeRow)),
+          mkRow('Amortización', negArr(r.amort)),
+          mkRow('(=) EBIT', r.ebitS, { strong: true }),
+          mkPct('% sobre ventas', r.ebitS, r.ingresos),
+          mkRow('Intereses', negArr(r.interest)),
+          mkRow('(=) EBT', r.ebtSd, { strong: true }),
+          mkRow('IS (Impuesto de Sociedades)', r.taxS),
+          mkRow('(=) Resultado Neto', r.netoS, { strong: true }),
+          mkPct('% sobre ventas', r.netoS, r.ingresos),
+          mkRow('CAPEX', r.capexRow),
+          mkRow('Amortización', r.amort),
+          mkRow('(=) FCF', r.fcfSin, { strong: true }),
+          mkRow('Financiación', r.financ),
+          mkRow('Amortización deuda', negArr(r.principal)),
+          mkRow('FCF Apalancado', r.fcfL, { strong: true }),
+        ],
+      },
+    ];
+  }
 
   return [
     {

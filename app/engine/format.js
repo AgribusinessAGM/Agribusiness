@@ -1,13 +1,30 @@
+// Formato de números según el idioma de la interfaz: en español "1.234,5" y en
+// inglés "1,234.5". El idioma lo fija el store con setNumLang() antes de pintar.
+let lang = 'es';
+
+export function setNumLang(l) {
+  lang = l === 'en' ? 'en' : 'es';
+}
+
+const loc = () => (lang === 'en' ? 'en-US' : 'es-ES');
+const decSep = () => (lang === 'en' ? '.' : ',');
+
 export function parseNum(str) {
-  const c = String(str).replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
+  const t = String(str).replace(/\s/g, '');
+  const c = lang === 'en' ? t.replace(/,/g, '') : t.replace(/\./g, '').replace(',', '.');
   const v = parseFloat(c);
   return isNaN(v) ? 0 : v;
 }
 
+// Quita los separadores de miles de un número ya formateado (al empezar a editarlo).
+export function stripGrouping(str) {
+  return String(str).replace(lang === 'en' ? /,/g : /\./g, '');
+}
+
 export function fmt2(n) {
   if (n == null || isNaN(n)) return '';
-  return Number(n).toLocaleString('es-ES', {
-    useGrouping: true,
+  return Number(n).toLocaleString(loc(), {
+    useGrouping: 'always',
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   });
@@ -15,8 +32,8 @@ export function fmt2(n) {
 
 export function nf(n, d = 0) {
   if (n == null || !isFinite(n)) return '—';
-  return Number(n).toLocaleString('es-ES', {
-    useGrouping: true,
+  return Number(n).toLocaleString(loc(), {
+    useGrouping: 'always',
     minimumFractionDigits: d,
     maximumFractionDigits: d,
   });
@@ -24,7 +41,12 @@ export function nf(n, d = 0) {
 
 export function pct(n, d = 2) {
   if (n == null || !isFinite(n)) return '—';
-  return (n * 100).toFixed(d).replace('.', ',') + '%';
+  return (n * 100).toFixed(d).replace('.', decSep()) + '%';
+}
+
+// Diferencia en puntos porcentuales con signo (comparación de escenarios).
+export function pp(d) {
+  return (d * 100 >= 0 ? '+' : '') + (d * 100).toFixed(1).replace('.', decSep()) + ' pp';
 }
 
 export function k(n) {

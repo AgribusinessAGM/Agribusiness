@@ -109,6 +109,9 @@ export function Login() {
           <div style=${{ textAlign: 'center', marginTop: 8, fontSize: 12, color: 'var(--ink2)' }}>
             Demo: usa m.ferrer@iberocrops.com con la contraseña agromillora2026
           </div>
+          <div style=${{ textAlign: 'center', marginTop: 18, fontSize: 15, fontWeight: 700, color: 'var(--brand)' }}>
+            Hola Marc!
+          </div>
         </div>
       </div>
       <div

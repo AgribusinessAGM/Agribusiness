@@ -29,3 +29,9 @@ server/data.db
 
 # Configuración local de la API PHP (contraseñas): no se sube a git
 api/config.php
+
+# Paquetes exportados de Claude Design (zips de ~30 MB y su contenido, con los
+# Excel de los clientes): se quedan solo en local
+*.zip
+new-design/
+project/design-nuevo/

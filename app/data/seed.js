@@ -21,6 +21,7 @@ export function baseA(ov) {
       capexFee: 1000,
       opexFee: 355,
       fondoCost: 1.5,
+      descuento: 8,
       duracionProyecto: 35,
       capexGroups: buildCapex(),
       opexItems: buildOpex(),

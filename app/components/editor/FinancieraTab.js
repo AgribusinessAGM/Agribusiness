@@ -1,7 +1,121 @@
 import { html } from '../../lib/html.js';
-import { k, nf } from '../../engine/format.js';
+import { k, nf, nfAcc } from '../../engine/format.js';
 
-export function FinancieraTab({ r }) {
+// Impuesto de sociedades del SPV visto como activo por impuesto diferido
+// ('E. Financial' filas 10-14 del Excel IAG; en el resto de modelos es el mismo
+// arrastre de pérdidas que ya calculaba el motor).
+function DeferredTaxTable({ r }) {
+  const horizon = r.isDev.length - 1;
+  const years = Array.from({ length: horizon }, (_, i) => i + 1);
+  const rows = [
+    { label: 'IS - Impuesto diferido', head: true },
+    { label: 'Impuesto devengado', arr: r.isDev },
+    { label: 'Valor del activo por impuesto diferido (AID)', arr: r.aidVal },
+    { label: 'AID aplicado', arr: r.aidApl },
+    { label: 'Restante', arr: r.aidRest },
+    { label: 'IS a pagar', arr: r.isPay, strong: true },
+  ];
+  const labelTd = (strong, head) => ({
+    textAlign: 'left',
+    padding: '8px 14px',
+    position: 'sticky',
+    left: 0,
+    background: strong || head ? 'var(--brandL)' : 'var(--surface)',
+    fontWeight: head || strong ? 800 : 500,
+    borderTop: strong || head ? undefined : '1px solid var(--line)',
+    whiteSpace: 'nowrap',
+  });
+  const numTd = (strong, head) => ({
+    textAlign: 'right',
+    padding: '8px 12px',
+    fontFamily: 'var(--num)',
+    whiteSpace: 'nowrap',
+    borderTop: strong ? undefined : '1px solid var(--line)',
+    fontWeight: strong ? 700 : undefined,
+    ...(head ? { padding: 0 } : {}),
+  });
+  return html`
+    <div
+      style=${{
+        background: 'var(--surface)',
+        border: '1px solid var(--line)',
+        borderRadius: 'var(--radius)',
+        boxShadow: 'var(--shadow)',
+        overflow: 'hidden',
+        marginBottom: 22,
+      }}
+    >
+      <div
+        style=${{
+          padding: '11px 16px',
+          background: 'var(--brandL)',
+          color: 'var(--brandD)',
+          display: 'flex',
+          alignItems: 'baseline',
+          gap: 10,
+        }}
+      >
+        <span style=${{ fontWeight: 800, fontSize: 14 }}>IS - Impuesto diferido</span>
+        <span style=${{ fontSize: 12, opacity: 0.75 }}>SPV · k€ · pérdidas compensadas con el IS futuro</span>
+      </div>
+      <div style=${{ overflow: 'auto' }}>
+        <table style=${{ borderCollapse: 'collapse', width: '100%', minWidth: 840, fontSize: 13 }}>
+          <thead>
+            <tr>
+              <th
+                style=${{
+                  textAlign: 'left',
+                  padding: '9px 14px',
+                  position: 'sticky',
+                  left: 0,
+                  background: 'var(--surface)',
+                  color: 'var(--ink2)',
+                  fontSize: 11,
+                  borderBottom: '1px solid var(--line)',
+                }}
+              >
+                Concepto
+              </th>
+              ${years.map(
+                (y) => html`
+                  <th
+                    key=${y}
+                    style=${{
+                      textAlign: 'right',
+                      padding: '9px 12px',
+                      color: 'var(--ink2)',
+                      fontFamily: 'var(--num)',
+                      fontSize: 11,
+                      whiteSpace: 'nowrap',
+                      borderBottom: '1px solid var(--line)',
+                    }}
+                  >
+                    ${'Año ' + y}
+                  </th>
+                `,
+              )}
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(
+              (row) => html`
+                <tr key=${row.label} style=${{ background: row.strong || row.head ? 'var(--brandL)' : undefined }}>
+                  <td style=${labelTd(row.strong, row.head)}>${row.label}</td>
+                  ${years.map(
+                    (y) => html`<td key=${y} style=${numTd(row.strong, row.head)}>${row.head ? '' : nfAcc(row.arr[y])}</td>`,
+                  )}
+                </tr>
+              `,
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+export function FinancieraTab({ a, r }) {
+  const isIAG = a.engine === 'iag';
   const horizon = r.interest.length - 1;
   const amortRows = [];
   let saldoA = r.deuda;
@@ -24,7 +138,7 @@ export function FinancieraTab({ r }) {
       year: y,
       dep: nf(r.amort[y]),
       acum: nf(acumD),
-      pend: nf(Math.max(0, r.totalCapex - acumD)),
+      pend: nf(Math.max(0, (r.depBase || r.totalCapex) - acumD)),
     });
   }
 
@@ -67,10 +181,11 @@ export function FinancieraTab({ r }) {
           <div style=${kpiValue}>${k(r.cuota)}</div>
         </div>
       </div>
+      <${DeferredTaxTable} r=${r} />
       <div style=${{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
         <div style=${tableCard}>
           <div style=${tableHead}>
-            <span>Cuadro de amortización · ${horizon} años</span>
+            <span>${`Cuadro de amortización · ${horizon} años`}</span>
             <span style=${{ fontSize: 11, fontWeight: 500, color: 'var(--ink2)' }}>Total intereses ${k(r.totalIntereses)}</span>
           </div>
           <div style=${{ maxHeight: 520, overflow: 'auto' }}>
@@ -102,7 +217,7 @@ export function FinancieraTab({ r }) {
         </div>
         <div style=${tableCard}>
           <div style=${tableHead}>
-            <span>Cuadro de depreciación · ${horizon} años</span>
+            <span>${isIAG ? 'Amortización · olivo 10 % · riego 5 % · OPEX cap. 10 %' : `Cuadro de depreciación · ${horizon} años`}</span>
             <span style=${{ fontSize: 11, fontWeight: 500, color: 'var(--ink2)' }}>Base ${k(r.totalCapex)}</span>
           </div>
           <div style=${{ maxHeight: 520, overflow: 'auto' }}>

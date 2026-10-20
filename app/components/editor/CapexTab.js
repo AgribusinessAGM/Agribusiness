@@ -67,6 +67,7 @@ export function CapexTab({ a, r }) {
               </div>
               <div style=${{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <${NumberField} id="sup:marcoN" value=${a.marcoN} width=${72} onChangeRaw=${(raw) => onField('marcoN', raw)} />
+                <span style=${{ fontSize: 12, color: 'var(--ink2)' }}>m</span>
                 <span style=${{ color: 'var(--ink2)' }}>×</span>
                 <${NumberField} id="sup:marcoM" value=${a.marcoM} width=${72} onChangeRaw=${(raw) => onField('marcoM', raw)} />
                 <span style=${{ fontSize: 12, color: 'var(--ink2)' }}>m</span>
@@ -84,7 +85,7 @@ export function CapexTab({ a, r }) {
                 # Plantas
               </div>
               <div style=${{ fontFamily: 'var(--num)', fontSize: 20, fontWeight: 600 }}>${nf(r.arboles)}</div>
-              <div style=${{ fontSize: 11, color: 'var(--ink2)' }}>sobre ${nf(a.superficie)} Ha</div>
+              <div style=${{ fontSize: 11, color: 'var(--ink2)' }}>${'sobre ' + nf(a.superficie) + ' Ha'}</div>
             </div>
           </div>
         </div>

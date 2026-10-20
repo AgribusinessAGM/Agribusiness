@@ -58,9 +58,12 @@ La raíz del repositorio es la app:
 - `index.html` — página de entrada (carga `app/main.js`)
 - `app/` — **código de la interfaz** (React en JavaScript, sin compilar)
   - `components/` — pantallas y piezas de la interfaz
-  - `engine/` — motor de cálculo (`compute.js`, réplica del Excel)
+  - `engine/` — motor de cálculo (`compute.js`, réplica del Excel; y
+    `computeIAG.js`, el del modelo Torrimpietra)
   - `state/store.js` — estado de la app y acciones
-  - `data/` — estructura base de CAPEX y OPEX
+  - `data/` — estructura base de CAPEX y OPEX (`iag.js`: modelo Torrimpietra)
+  - `i18n/` — traducción español / inglés (`dict.js` es el diccionario)
+  - `components/report/` — informe PDF (se imprime desde el navegador)
   - `styles.css` — estilos globales
 - `assets/` — imágenes y `vendor/` (React, React DOM y htm, copiados aquí
   para no depender de internet)
@@ -88,6 +91,10 @@ Los componentes usan React con plantillas `html` en lugar de JSX (librería
 html`<button onClick=${guardar} style=${{ color: 'red' }}>Guardar</button>`
 html`<${NumberField} id="sup:superficie" value=${a.superficie} />`
 ```
+
+Los textos se escriben en español. Si añades uno nuevo, añade también su
+traducción al inglés en `app/i18n/dict.js` (el selector de idioma de la barra
+superior la usa para traducir la pantalla).
 
 Si algo no se ve, abre la consola del navegador (F12): ahí aparecen los
 errores con el archivo y la línea.

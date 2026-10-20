@@ -1,5 +1,6 @@
 import { html } from '../lib/html.js';
-import { k, nf, pct } from '../engine/format.js';
+import { fmt2, k, nf, pct, pp } from '../engine/format.js';
+import { discountPct } from '../engine/compute.js';
 import { useApp } from '../state/store.js';
 import { useActiveCompute } from '../state/useActiveCompute.js';
 import { BarsChart } from './charts/BarsChart.js';
@@ -8,15 +9,27 @@ import { FcfChart } from './charts/FcfChart.js';
 export function Results() {
   const { state, gotoEditor, saveScenario, clearScenario, exportPdf } = useApp();
   const { model, a, r } = useActiveCompute();
+  // El modelo IAG no tiene capa Fondo: se compara por TIR SPV, TIR agrícola y VAN por ha.
+  const isIAG = a.engine === 'iag';
+  const vanFLabel = 'VAN Fondo (' + fmt2(discountPct(a)) + '%)';
 
-  const kpiCards = [
-    { label: 'TIR Fondo', value: pct(r.tirF), sub: 'resultado final inversor' },
-    { label: 'TIR SPV', value: pct(r.tirL), sub: 'con fees y deuda' },
-    { label: 'TIR Agrícola', value: pct(r.tirA), sub: 'proyecto sin deuda' },
-    { label: 'VAN Fondo (8%)', value: k(r.vanF), sub: 'flujos del fondo' },
-    { label: 'Inversión total', value: nf(r.totalCapex / 1000, 2) + ' M€', sub: nf(a.superficie) + ' Ha' },
-    { label: 'Payback', value: r.payback != null ? 'Año ' + r.payback : '>35a', sub: 'FCF acumulado > 0' },
-  ];
+  const kpiCards = isIAG
+    ? [
+        { label: 'TIR SPV', value: pct(r.tirL), sub: 'Orchard 1 · deuda y fees' },
+        { label: 'TIR Agrícola', value: pct(r.tirA), sub: 'Orchard 1 · sin apalancar' },
+        { label: 'VAN por ha (' + nf(discountPct(a), 1) + '%)', value: nf(r.vanHa) + ' €', sub: 'FCF del proyecto' },
+        { label: 'Inversión total', value: nf(r.totalCapex / 1000, 2) + ' M€', sub: nf(a.superficie) + ' Ha' },
+        { label: 'Payback', value: r.payback != null ? 'Año ' + r.payback : '>35a', sub: 'FCF acumulado ≥ 0' },
+        { label: 'Importe del préstamo', value: k(r.deuda), sub: nf(a.financiacion) + '% de la inversión' },
+      ]
+    : [
+        { label: 'TIR Fondo', value: pct(r.tirF), sub: 'resultado final inversor' },
+        { label: 'TIR SPV', value: pct(r.tirL), sub: 'con fees y deuda' },
+        { label: 'TIR Agrícola', value: pct(r.tirA), sub: 'proyecto sin deuda' },
+        { label: vanFLabel, value: k(r.vanF), sub: 'flujos del fondo' },
+        { label: 'Inversión total', value: nf(r.totalCapex / 1000, 2) + ' M€', sub: nf(a.superficie) + ' Ha' },
+        { label: 'Payback', value: r.payback != null ? 'Año ' + r.payback : '>35a', sub: 'FCF acumulado > 0' },
+      ];
 
   let compareRows = [];
   if (state.scenario) {
@@ -24,17 +37,21 @@ export function Results() {
     const dl = (now, base, pctpts) => {
       const d = now - base;
       const col = d >= 0 ? 'var(--brand)' : '#c0392b';
-      const val = pctpts
-        ? (d * 100 >= 0 ? '+' : '') + (d * 100).toFixed(1).replace('.', ',') + ' pp'
-        : (d >= 0 ? '+' : '') + nf(d);
+      const val = pctpts ? pp(d) : (d >= 0 ? '+' : '') + nf(d);
       return { delta: val, deltaColor: col };
     };
-    compareRows = [
-      { label: 'TIR Fondo', base: pct(b.tirF), now: pct(r.tirF), ...dl(r.tirF ?? NaN, b.tirF ?? NaN, true) },
-      { label: 'TIR SPV', base: pct(b.tirL), now: pct(r.tirL), ...dl(r.tirL ?? NaN, b.tirL ?? NaN, true) },
-      { label: 'TIR Agrícola', base: pct(b.tirA), now: pct(r.tirA), ...dl(r.tirA ?? NaN, b.tirA ?? NaN, true) },
-      { label: 'VAN Fondo (8%) k€', base: nf(b.van), now: nf(r.vanF), ...dl(r.vanF, b.van) },
-    ];
+    compareRows = isIAG
+      ? [
+          { label: 'TIR SPV', base: pct(b.tirL), now: pct(r.tirL), ...dl(r.tirL ?? NaN, b.tirL ?? NaN, true) },
+          { label: 'TIR Agrícola', base: pct(b.tirA), now: pct(r.tirA), ...dl(r.tirA ?? NaN, b.tirA ?? NaN, true) },
+          { label: 'VAN por ha (€)', base: nf(b.van), now: nf(r.vanHa), ...dl(r.vanHa, b.van) },
+        ]
+      : [
+          { label: 'TIR Fondo', base: pct(b.tirF), now: pct(r.tirF), ...dl(r.tirF ?? NaN, b.tirF ?? NaN, true) },
+          { label: 'TIR SPV', base: pct(b.tirL), now: pct(r.tirL), ...dl(r.tirL ?? NaN, b.tirL ?? NaN, true) },
+          { label: 'TIR Agrícola', base: pct(b.tirA), now: pct(r.tirA), ...dl(r.tirA ?? NaN, b.tirA ?? NaN, true) },
+          { label: vanFLabel + ' k€', base: nf(b.van), now: nf(r.vanF), ...dl(r.vanF, b.van) },
+        ];
   }
 
   const card = { background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow)', padding: 18 };
@@ -62,7 +79,8 @@ export function Results() {
         </div>
         <div style=${{ display: 'flex', gap: 10 }}>
           <button
-            onClick=${() => saveScenario({ tirA: r.tirA, tirL: r.tirL, tirF: r.tirF, van: r.vanF, ebitda: r.ebitda[8] })}
+            onClick=${() =>
+              saveScenario({ tirA: r.tirA, tirL: r.tirL, tirF: r.tirF, van: isIAG ? r.vanHa : r.vanF, ebitda: r.ebitda[8] })}
             style=${{ background: 'none', border: '1px solid var(--line)', borderRadius: 'var(--radius)', padding: '10px 15px', fontWeight: 600, cursor: 'pointer', fontSize: 13, color: 'var(--ink)' }}
           >
             Guardar escenario actual

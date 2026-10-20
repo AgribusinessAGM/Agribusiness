@@ -1,5 +1,6 @@
 import { html } from '../../lib/html.js';
-import { nf, pct, k } from '../../engine/format.js';
+import { fmt2, nf, pct, k } from '../../engine/format.js';
+import { discountPct } from '../../engine/compute.js';
 import { useApp } from '../../state/store.js';
 import { useActiveCompute } from '../../state/useActiveCompute.js';
 import { SupuestosTab } from './SupuestosTab.js';
@@ -7,6 +8,7 @@ import { CapexTab } from './CapexTab.js';
 import { OpexTab } from './OpexTab.js';
 import { RentabilidadTab } from './RentabilidadTab.js';
 import { FinancieraTab } from './FinancieraTab.js';
+import { PrecioTab } from './PrecioTab.js';
 
 // [clave, título, editable]
 const TAB_DEFS = [
@@ -15,7 +17,38 @@ const TAB_DEFS = [
   ['opex', '2 · OPEX', true],
   ['rent', '3 · Rentabilidad', false],
   ['fin', '4 · E. Financiera', false],
+  ['precio', '5 · Precio', true],
 ];
+// Modelo IAG: las hojas de su Excel, más el ciclo de precios
+const TAB_DEFS_IAG = [
+  ['supuestos', 'Supuestos', true],
+  ['capex', '1. CAPEX', true],
+  ['opex', '2. OPEX', true],
+  ['rent', '3. Rentabilidad', false],
+  ['fin', '4. Financiero', false],
+  ['precio', '6. Precio', true],
+];
+
+function editorKpis(a, r) {
+  const p = r.price.slice(1);
+  const avgPrice = { label: 'Precio medio', value: nf(p.length ? p.reduce((x, v) => x + v, 0) / p.length : NaN, 2) + ' €/kg' };
+  if (a.engine === 'iag') {
+    return [
+      { label: 'TIR SPV · Orchard 1', value: pct(r.tirL), highlight: true },
+      { label: 'TIR Agrícola', value: pct(r.tirA) },
+      { label: 'VAN por ha (' + nf(discountPct(a), 1) + '%)', value: nf(r.vanHa) + ' €' },
+      { label: 'Inversión total', value: nf(r.totalCapex / 1000, 2) + ' M€' },
+      avgPrice,
+    ];
+  }
+  return [
+    { label: 'TIR Fondo · final', value: pct(r.tirF), highlight: true },
+    { label: 'VAN Fondo (' + fmt2(discountPct(a)) + '%)', value: k(r.vanF) },
+    { label: 'Equity comprometido', value: k(r.fondoEquity) },
+    { label: 'Inversión total', value: nf(r.totalCapex / 1000, 2) + ' M€' },
+    avgPrice,
+  ];
+}
 
 function TabWithPhoto({ photo, alt, objectPosition = 'center', children }) {
   return html`
@@ -69,6 +102,10 @@ function KpiBox({ label, value, highlight }) {
 export function EditorLayout() {
   const { state, gotoDash, setEtab, gotoResults, save, exportXlsx, exportPdf, canEdit } = useApp();
   const { model, a, r } = useActiveCompute();
+  const isIAG = a.engine === 'iag';
+  const tabDefs = isIAG ? TAB_DEFS_IAG : TAB_DEFS;
+  // Si el modelo no tiene la pestaña abierta (p. ej. Precio en un modelo normal), se muestra Supuestos.
+  const etab = tabDefs.some(([key]) => key === state.etab) ? state.etab : 'supuestos';
 
   return html`
     <div style=${{ display: 'flex', flex: 1, minHeight: 0 }}>
@@ -112,8 +149,8 @@ export function EditorLayout() {
         >
           Hojas del modelo
         </div>
-        ${TAB_DEFS.map(([key, label, editable]) => {
-          const on = state.etab === key;
+        ${tabDefs.map(([key, label, editable]) => {
+          const on = etab === key;
           return html`
             <button
               key=${key}
@@ -262,16 +299,15 @@ export function EditorLayout() {
               Ver resultados →
             </button>
           </div>
-          <div style=${{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginTop: 14 }}>
-            <${KpiBox} label="TIR Fondo · final" value=${pct(r.tirF)} highlight />
-            <${KpiBox} label="VAN Fondo (8%)" value=${k(r.vanF)} />
-            <${KpiBox} label="Equity comprometido" value=${k(r.fondoEquity)} />
-            <${KpiBox} label="Inversión total" value=${nf(r.totalCapex / 1000, 2) + ' M€'} />
+          <div style=${{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))', gap: 12, marginTop: 14 }}>
+            ${editorKpis(a, r).map(
+              (kp) => html`<${KpiBox} key=${kp.label} label=${kp.label} value=${kp.value} highlight=${kp.highlight} />`,
+            )}
           </div>
         </div>
 
         <div style=${{ flex: 1, overflow: 'auto', padding: 26 }}>
-          ${state.etab === 'supuestos' &&
+          ${etab === 'supuestos' &&
           html`
             <${TabWithPhoto}
               photo=${model.crop === 'almendro' ? 'assets/supuestos-almendro-detalle.webp' : 'assets/olivar-detalle.webp'}
@@ -280,7 +316,7 @@ export function EditorLayout() {
               <${SupuestosTab} a=${a} r=${r} />
             <//>
           `}
-          ${state.etab === 'capex' &&
+          ${etab === 'capex' &&
           html`
             <${TabWithPhoto}
               photo=${model.crop === 'almendro' ? 'assets/capex-almendro-detalle.webp' : 'assets/capex-detalle.webp'}
@@ -290,7 +326,7 @@ export function EditorLayout() {
               <${CapexTab} a=${a} r=${r} />
             <//>
           `}
-          ${state.etab === 'opex' &&
+          ${etab === 'opex' &&
           html`
             <${OpexTab}
               a=${a}
@@ -300,8 +336,9 @@ export function EditorLayout() {
               photoObjectPosition=${model.crop === 'almendro' ? '22% center' : 'center'}
             />
           `}
-          ${state.etab === 'rent' && html`<${RentabilidadTab} r=${r} />`}
-          ${state.etab === 'fin' && html`<${FinancieraTab} r=${r} />`}
+          ${etab === 'rent' && html`<${RentabilidadTab} a=${a} r=${r} />`}
+          ${etab === 'fin' && html`<${FinancieraTab} a=${a} r=${r} />`}
+          ${etab === 'precio' && html`<${PrecioTab} a=${a} r=${r} title=${isIAG ? '6. Precio' : '5 · Precio'} />`}
         </div>
       </div>
     </div>

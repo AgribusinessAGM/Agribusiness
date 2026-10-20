@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { html } from './lib/html.js';
 import { AppProvider, useApp } from './state/store.js';
+import { setLanguage } from './i18n/translate.js';
+import { Report } from './components/report/Report.js';
 import { Login } from './components/Login.js';
 import { SetPassword } from './components/SetPassword.js';
 import { TopBar } from './components/TopBar.js';
@@ -20,10 +22,13 @@ function AppShell() {
   const model = active();
   const [routeToken, setRouteToken] = useState(getTokenFromUrl);
 
+  // Traduce el texto de la página al idioma elegido (y lo que se pinte después).
+  useEffect(() => setLanguage(state.lang), [state.lang]);
+
   // El tema por cultivo solo aplica dentro de la vista de un modelo concreto
   // (editor/resultados) — el dashboard y la administración muestran varios
   // modelos a la vez, así que se quedan siempre en el verde por defecto.
-  const isModelScreen = state.screen === 'editor' || state.screen === 'results';
+  const isModelScreen = state.screen === 'editor' || state.screen === 'results' || state.screen === 'report';
   const cropOverride =
     isModelScreen && model?.crop === 'almendro'
       ? {
@@ -57,6 +62,8 @@ function AppShell() {
     <div style=${{ ...cropOverride, background: 'var(--bg)', color: 'var(--ink)', minHeight: '100vh' }}>
       ${state.screen === 'login'
         ? html`<${Login} />`
+        : state.screen === 'report' && model
+        ? html`<${Report} />`
         : html`
             <div style=${{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
               <${TopBar} />

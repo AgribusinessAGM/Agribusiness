@@ -1,16 +1,22 @@
 import { html } from '../../lib/html.js';
+import { nf } from '../../engine/format.js';
 import { buildPnlHeader, buildPnlLayers } from '../../engine/pnlLayers.js';
 
-export function RentabilidadTab({ r }) {
+export function RentabilidadTab({ a, r }) {
   const horizon = r.ingresos.length - 1;
   const pnlHeader = buildPnlHeader(horizon);
-  const pnlLayers = buildPnlLayers(r);
+  const pnlLayers = buildPnlLayers(r, a);
+  const isIAG = a.engine === 'iag';
 
   return html`
     <div>
       <h2 style=${{ fontSize: 18, fontWeight: 800, margin: '0 0 6px' }}>3 · Rentabilidad — por capas</h2>
       <p style=${{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 18px' }}>
-        Análisis de la rentabilidad del proyecto: Proyecto agrícola · Estructura SPV · Estructura Fondo, cada uno con su TIR. Cifras en miles € ('000).
+        ${isIAG
+          ? 'Orchard 1 en solitario, como la sección 4 de «3. Profitability» del Excel. La capa SPV aplica deuda, fees y auditoría a sus ' +
+            nf(a.superficie) +
+            ' Ha. Cifras en k€ · 35 años.'
+          : "Análisis de la rentabilidad del proyecto: Proyecto agrícola · Estructura SPV · Estructura Fondo, cada uno con su TIR. Cifras en miles € ('000)."}
       </p>
       <div style=${{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         ${pnlLayers.map(

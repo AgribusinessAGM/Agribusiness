@@ -1,5 +1,5 @@
 import { html } from '../../lib/html.js';
-import { MP, opexItemScale, opexYear } from '../../engine/compute.js';
+import { MP, opexItemYear } from '../../engine/compute.js';
 import { nf, pctShare } from '../../engine/format.js';
 import { NumberField } from '../NumberField.js';
 import { useApp } from '../../state/store.js';
@@ -33,9 +33,8 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
   const opexDetail = a.opexItems.map((cat) => {
     let catPlena = 0;
     const items = cat.items.map((it) => {
-      const scale = opexItemScale(it);
-      const plena = opexYear(it.sched, MP) * scale;
-      const year1 = opexYear(it.sched, 1) * scale;
+      const plena = opexItemYear(it, MP, a);
+      const year1 = opexItemYear(it, 1, a);
       catPlena += plena;
       return { ...it, catKey: cat.key, plenaFmt: nf(plena, 0), year1Fmt: nf(year1, 0) };
     });
@@ -70,8 +69,12 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
     });
 
   // Orden visual pedido: Malezas/Sanidad · Nutrición/Terrenos · Poda/Riego · Cosecha/Otros.
+  // El modelo IAG tiene sus propias categorías (las de su Excel): se muestran tal cual.
   const CARD_ORDER = ['malezas', 'sanidad', 'nutricion', 'terrenos', 'poda', 'riego', 'cosecha', 'otros'];
-  const orderedCards = CARD_ORDER.map((key) => opexCards.find((g) => g.key === key)).filter((g) => g != null);
+  const orderedCards =
+    a.engine === 'iag'
+      ? opexDetail
+      : CARD_ORDER.map((key) => opexCards.find((g) => g.key === key)).filter((g) => g != null);
 
   const projHa = +state.projHa || 0;
   const inflFp = (y) => Math.pow(1 + a.inflacion / 100, y - 1);
@@ -81,7 +84,7 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
   const opexProjRows = a.opexItems.map((cat) => {
     const cells = years.map((y) => {
       let perHaY = 0;
-      for (const it of cat.items) perHaY += opexYear(it.sched, y) * opexItemScale(it);
+      for (const it of cat.items) perHaY += opexItemYear(it, y, a);
       const v = perHaY * inflFp(y) * projHa;
       return { v: v > 0 ? nf(v) : '·', style: projCell(false) };
     });
@@ -89,7 +92,7 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
   });
   const opexTotalCells = years.map((y) => {
     let tot = 0;
-    for (const cat of a.opexItems) for (const it of cat.items) tot += opexYear(it.sched, y) * opexItemScale(it);
+    for (const cat of a.opexItems) for (const it of cat.items) tot += opexItemYear(it, y, a);
     return { v: nf(tot * inflFp(y) * projHa), style: projCell(true) };
   });
 
@@ -240,7 +243,7 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
     <div>
       <div style=${{ display: 'flex', alignItems: 'flex-end', gap: 12, margin: '26px 0 8px', flexWrap: 'wrap' }}>
         <div>
-          <h3 style=${{ fontSize: 15, fontWeight: 800, margin: 0 }}>Proyección OPEX a ${horizon} años</h3>
+          <h3 style=${{ fontSize: 15, fontWeight: 800, margin: 0 }}>${'Proyección OPEX a ' + horizon + ' años'}</h3>
           <div style=${{ fontSize: 11, color: 'var(--ink2)', marginTop: 3 }}>€/Ha por año · con inflación</div>
         </div>
         <div

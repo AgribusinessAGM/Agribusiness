@@ -1,18 +1,30 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { html } from '../lib/html.js';
 import { blankA } from '../data/seed.js';
-import { fmt2, parseNum } from '../engine/format.js';
+import { PRICE_VAR_IAG } from '../data/iag.js';
+import { fmt2, parseNum, setNumLang, stripGrouping } from '../engine/format.js';
+import { tr } from '../i18n/translate.js';
 import * as api from '../api.js';
 
 // Estado global de la app y todas las acciones que lo cambian. Los componentes
 // lo leen con useApp().
 
+function savedLang() {
+  try {
+    return localStorage.getItem('om_lang') === 'en' ? 'en' : 'es';
+  } catch {
+    return 'es';
+  }
+}
+
 function initialState() {
   return {
     booting: true,
-    screen: 'login', // 'login' | 'dashboard' | 'editor' | 'results' | 'admin'
+    lang: savedLang(), // 'es' | 'en' (lo traduce app/i18n/translate.js)
+    screen: 'login', // 'login' | 'dashboard' | 'editor' | 'results' | 'admin' | 'report'
+    reportFrom: 'results', // pantalla a la que vuelve el informe PDF
     activeId: 1,
-    etab: 'supuestos', // pestaña del editor: 'supuestos' | 'capex' | 'opex' | 'rent' | 'fin'
+    etab: 'supuestos', // pestaña del editor: 'supuestos' | 'capex' | 'opex' | 'rent' | 'fin' | 'precio'
     models: [],
     users: [],
     currentUser: null,
@@ -47,6 +59,7 @@ function initialState() {
 }
 
 function inpId(ds) {
+  if (ds.pidx != null) return 'pv:' + ds.pidx;
   if (ds.opfld) return 'op:' + ds.opfld + ':' + ds.catkey + '.' + ds.itkey;
   if (ds.gkey) return 'cap:' + ds.gkey + '.' + ds.ikey;
   return 'sup:' + ds.key;
@@ -57,6 +70,18 @@ const PERM_ORDER = { none: 'view', view: 'edit', edit: 'none' };
 export function useAppStore() {
   const [state, setState] = useState(initialState);
   const toastTimer = useRef(undefined);
+  // Los formateadores de números leen el idioma de aquí, antes de pintar.
+  setNumLang(state.lang);
+
+  const setLang = useCallback((l) => {
+    const v = l === 'en' ? 'en' : 'es';
+    try {
+      localStorage.setItem('om_lang', v);
+    } catch {
+      // sin almacenamiento local: el idioma dura lo que la pestaña
+    }
+    setState((s) => ({ ...s, lang: v, editKey: null, editRaw: '' }));
+  }, []);
 
   const active = useCallback(
     () => state.models.find((m) => m.id === state.activeId) || state.models[0],
@@ -170,7 +195,7 @@ export function useAppStore() {
   const setEtab = useCallback((key) => setState((s) => ({ ...s, etab: key })), []);
 
   const onNumFocus = useCallback((id, currentDisplay) => {
-    const raw = String(currentDisplay).replace(/\./g, '');
+    const raw = stripGrouping(currentDisplay);
     setState((s) => ({ ...s, editKey: id, editRaw: raw === '0' ? '' : raw }));
   }, []);
   const onNumBlur = useCallback(() => {
@@ -241,6 +266,44 @@ export function useAppStore() {
     },
     [],
   );
+
+  // Variación % del precio del año idx+1 (pestaña Precio, modelo IAG)
+  const onPriceVar = useCallback((idx, raw) => {
+    const v = parseNum(raw) / 100;
+    setState((s) => {
+      if (!isActiveEditable(s)) return s;
+      return {
+        ...s,
+        editKey: inpId({ pidx: idx }),
+        editRaw: raw,
+        models: s.models.map((m) => {
+          if (m.id !== s.activeId) return m;
+          // Sin huecos: los años anteriores sin variación quedan a 0
+          const old = m.a.priceVar || [];
+          const pv = Array.from({ length: Math.max(old.length, idx + 1) }, (_, i) => +old[i] || 0);
+          pv[idx] = v;
+          return { ...m, a: { ...m.a, priceVar: pv } };
+        }),
+      };
+    });
+  }, []);
+
+  const resetPriceVar = useCallback(() => {
+    setState((s) => {
+      if (!isActiveEditable(s)) return s;
+      return {
+        ...s,
+        editKey: null,
+        // IAG vuelve al ciclo de su Excel; el resto, a precio constante
+        models: s.models.map((m) =>
+          m.id === s.activeId
+            ? { ...m, a: { ...m.a, priceVar: m.a.engine === 'iag' ? PRICE_VAR_IAG.slice() : [] } }
+            : m,
+        ),
+      };
+    });
+    flash('Variaciones de precio restauradas');
+  }, []);
 
   const onProjHaField = useCallback((raw) => {
     const v = parseNum(raw);
@@ -357,7 +420,7 @@ export function useAppStore() {
     (userId) => {
       const target = state.users.find((u) => u.id === userId);
       if (!target) return;
-      if (!window.confirm(`¿Eliminar a ${target.name}? Perderá el acceso a todos los modelos.`)) return;
+      if (!window.confirm(tr(`¿Eliminar a ${target.name}? Perderá el acceso a todos los modelos.`))) return;
       setState((s) => ({ ...s, users: s.users.filter((u) => u.id !== userId) }));
       api.deleteUser(userId).catch(() => {
         flash('No se pudo eliminar la persona');
@@ -412,7 +475,12 @@ export function useAppStore() {
   }, [active, flash]);
 
   const exportXlsx = useCallback(() => flash('Exportando a Excel…'), [flash]);
-  const exportPdf = useCallback(() => flash('Generando informe PDF…'), [flash]);
+  // El informe PDF es una pantalla de la app que se imprime (o se guarda como PDF).
+  const exportPdf = useCallback(
+    () => setState((s) => ({ ...s, screen: 'report', reportFrom: s.screen === 'report' ? s.reportFrom : s.screen })),
+    [],
+  );
+  const closeReport = useCallback(() => setState((s) => ({ ...s, screen: s.reportFrom || 'results' })), []);
 
   const openNew = useCallback(
     () => setState((s) => ({ ...s, showNew: true, newName: '', newHa: 100, newTemplate: 'olivo' })),
@@ -457,6 +525,7 @@ export function useAppStore() {
     () => ({
       state,
       active,
+      setLang,
       canEdit,
       edVal,
       setLoginEmail,
@@ -476,6 +545,8 @@ export function useAppStore() {
       onCapexField,
       onOpexField,
       onProjHaField,
+      onPriceVar,
+      resetPriceVar,
       cyclePerm,
       openInvite,
       closeInvite,
@@ -495,6 +566,7 @@ export function useAppStore() {
       save,
       exportXlsx,
       exportPdf,
+      closeReport,
       openNew,
       closeNew,
       setNewName,
@@ -508,6 +580,7 @@ export function useAppStore() {
     [
       state,
       active,
+      setLang,
       canEdit,
       edVal,
       setLoginEmail,
@@ -527,6 +600,8 @@ export function useAppStore() {
       onCapexField,
       onOpexField,
       onProjHaField,
+      onPriceVar,
+      resetPriceVar,
       cyclePerm,
       openInvite,
       closeInvite,
@@ -546,6 +621,7 @@ export function useAppStore() {
       save,
       exportXlsx,
       exportPdf,
+      closeReport,
       openNew,
       closeNew,
       setNewName,

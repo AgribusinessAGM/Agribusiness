@@ -83,6 +83,115 @@ button {
   background: var(--brandL);
 }
 
+/* ---------- Informe PDF (components/report) ----------
+   Páginas A4: en pantalla, apiladas sobre fondo gris; al imprimir, una por hoja
+   (las de rentabilidad en horizontal gracias a la página con nombre "landscape"). */
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+@page landscape {
+  size: A4 landscape;
+  margin: 0;
+}
+
+.report-wrap {
+  min-height: 100vh;
+  background: #e6e8e3;
+  -webkit-font-smoothing: antialiased;
+}
+.report-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 22px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.report-back {
+  background: none;
+  border: none;
+  color: var(--ink2);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 4px;
+}
+.report-print {
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 13px;
+}
+.report-pages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  padding: 28px 16px 60px;
+  color: #1c261a;
+}
+.report-page {
+  width: 210mm;
+  height: 297mm;
+  flex: none;
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.16);
+  page: portrait;
+}
+.report-page.landscape {
+  width: 297mm;
+  height: 210mm;
+  page: landscape;
+}
+.report-page .num {
+  font-family: Arial, Helvetica, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+@page portrait {
+  size: A4 portrait;
+  margin: 0;
+}
+
+@media print {
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  html,
+  body,
+  #root {
+    background: #fff !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .report-wrap {
+    min-height: 0;
+    background: none;
+  }
+  .report-pages {
+    display: block;
+    padding: 0;
+  }
+  .report-page {
+    box-shadow: none;
+    break-after: page;
+  }
+  .report-page:last-child {
+    break-after: auto;
+  }
+}
+
 @keyframes toastIn {
   from {
     opacity: 0;

@@ -57,12 +57,16 @@ solo a sus modelos.
 | Código de la interfaz | `app/` (JavaScript sin compilar; React en `assets/vendor/`) |
 | Producción prevista | Plesk (dominio propio de Marc), aún sin desplegar |
 | Diseño original | `project/Plataforma Modelos.dc.html` (prototipo de Claude Design) |
+| Diseño nuevo (2026-10-19) | `project/design-nuevo/` — paquete de Claude Design (zip y su contenido): `Plataforma Modelos.dc.html`, `Informe PDF*.dc.html`, `RentTable.dc.html`, `i18n-dict.js`, Excels en `uploads/` |
 | Transcripciones del diseño | `chats/chat1.md` … `chat5.md` |
 
-**Estado de la rama `php` a 2026-10-19:** publicada en GitHub (por orden de
-Marc) y con seguimiento de `origin/php`; último commit subido `6a69a9a`. Los
-commits posteriores pueden estar solo en local hasta el siguiente push
-(comprobar con `git status -sb`).
+**Estado de la rama `php`:** publicada en GitHub (por orden de Marc) y con
+seguimiento de `origin/php`. Lo que está subido y lo que solo está en local se
+comprueba con `git status -sb` (aquí no se apuntan hashes: cada apunte sería un
+commit nuevo pendiente de subir).
+
+Claude Design: desde la sesión de IA no se puede leer un proyecto de Claude
+Design. Marc exporta el paquete ("handoff" en zip) y lo deja en `project/`.
 
 ### Entorno del equipo de Marc (Windows 11)
 
@@ -107,6 +111,22 @@ Navegador ──► index.html → app/main.js   (interfaz React, módulos JS si
   - `app/components/` pantallas; `app/engine/` motor de cálculo;
     `app/state/store.js` estado y acciones; `app/data/` plantillas de
     CAPEX/OPEX; `app/styles.css` estilos globales.
+  - **Idioma ES/EN** (`app/i18n/`): selector en la barra superior, se guarda en
+    `localStorage` (`om_lang`). Igual que en el diseño, los componentes se
+    escriben en español y `translate.js` reescribe el texto del DOM con el
+    diccionario `dict.js` (pares `[español, inglés]` y patrones como "Año N");
+    un `MutationObserver` traduce lo que React vaya pintando. Hacia el inglés
+    también sustituye frases conocidas dentro de un texto; hacia el español solo
+    textos completos (las partidas en inglés del Excel IAG), para no estropear
+    los textos de la app. `data-i18n-skip` excluye un elemento. **Al añadir un
+    texto visible nuevo, añadir su par al diccionario**, y escribirlo en un solo
+    nodo (`${'sobre ' + n + ' Ha'}` en lugar de `sobre ${n} Ha`) para que se
+    pueda traducir entero. Los números se formatean según el idioma
+    (`setNumLang` en `engine/format.js`: 1.234,5 / 1,234.5).
+  - **Informe PDF** (`app/components/report/`): pantalla `report` que abre
+    "Exportar informe" (Resultados) o el botón PDF del editor. Páginas A4 que se
+    imprimen con el cuadro del navegador ("Guardar como PDF"); las de
+    rentabilidad usan la página con nombre `landscape` de `styles.css`.
 - **API:** PHP 8.0+ sin frameworks ni Composer.
   - `api/index.php` — enrutado y las 14 operaciones.
   - `api/lib/db.php` — conexión PDO, creación automática de la base de datos,
@@ -114,7 +134,11 @@ Navegador ──► index.html → app/main.js   (interfaz React, módulos JS si
   - `api/lib/mailer.php` — correo de invitación por SMTP con STARTTLS (cliente
     propio).
   - `api/data/schema.sql` — esquema. `api/data/seed-models.json` — los 3
-    modelos de ejemplo.
+    modelos de ejemplo. `api/data/seed-iag.json` — el modelo Torrimpietra
+    (generado con `baseIAG()` de `app/data/iag.js`; si se cambia uno, cambiar
+    el otro). `ensure_iag_model()` lo crea también en bases de datos ya
+    existentes si no hay ningún modelo con `"engine":"iag"`, con acceso de
+    edición para los administradores.
   - `api/.htaccess` en `lib/` y `data/` bloquea el acceso web a esas carpetas.
 - **Rutas relativas:** la app funciona en cualquier carpeta (subcarpeta en
   XAMPP o raíz en Plesk). La API se llama como `api/index.php/login`
@@ -188,13 +212,16 @@ muestra la pantalla "Crear contraseña".
 | a.costa@alentejofarms.pt | usuario | — / — / editar |
 
 Modelos de ejemplo: 1 "Iberocrops · Olivar Andalucía" (olivo, 250 ha), 2 "Finca
-La Dehesa" (almendro, 120 ha), 3 "Projeto Alentejo" (olivo, 400 ha).
+La Dehesa" (almendro, 120 ha), 3 "Projeto Alentejo" (olivo, 400 ha) y 4
+"Torrimpietra" (IAG · Lazio, olivo, 300 ha; solo lo ven los administradores
+hasta que se le dé acceso a alguien).
 
 ## 5. La aplicación (funcionalidad)
 
 Pantallas: **Login** → **Modelos** (dashboard con tarjetas) → **Editor** (5
-pestañas) → **Resultados** (gráficos y comparación de escenario) → **Usuarios y
-permisos** (solo admin).
+pestañas; 6 en el modelo IAG) → **Resultados** (gráficos y comparación de
+escenario) → **Informe PDF** → **Usuarios y permisos** (solo admin). Selector
+de idioma Español / English en la barra superior.
 
 ### Pestañas del editor
 
@@ -217,10 +244,52 @@ permisos** (solo admin).
    **Fondo**. Subtítulo exacto: "Análisis de la rentabilidad del proyecto:
    Proyecto agrícola · Estructura SPV · Estructura Fondo, cada uno con su TIR.
    Cifras en miles € ('000)."
-5. **4 · E. Financiera** — estructura financiera y deuda.
+5. **4 · E. Financiera** — estructura financiera y deuda, con la tabla "IS -
+   Impuesto diferido" (el arrastre de pérdidas del SPV visto como activo por
+   impuesto diferido; no cambia ninguna cifra).
+6. **5 · Precio** — ciclo de precios: variación % anual editable (`priceVar`),
+   botón Restablecer (vuelve a precio constante) y gráfico. Sin variaciones el
+   precio es constante, como en el Excel Iberocrops.
 
-Indicadores fijos arriba: TIR Fondo · Final, VAN Fondo (8%), Equity
-comprometido (calculado automáticamente) e Inversión total.
+Indicadores fijos arriba: TIR Fondo · Final, VAN Fondo (tasa), Equity
+comprometido (calculado automáticamente), Inversión total y Precio medio.
+
+**Torrimpietra es la referencia (decisión de Marc, 2026-10-20):** los modelos
+normales conservan su motor y su capa Fondo, pero tienen todo lo nuevo de
+Torrimpietra: pestaña Precio con ciclo de precios, tabla de impuesto diferido y
+**tasa de descuento del VAN editable** en Supuestos macro (`descuento`; los
+modelos guardados sin ella usan el 8 %, `discountPct()` en `compute.js`). Con
+los valores por defecto las cifras son idénticas a las de antes (comprobado
+contra el motor anterior en los 3 modelos de ejemplo).
+
+### Modelo Torrimpietra (motor IAG, `a.engine === 'iag'`)
+
+- Fuente: Excel IAG del 15/10/2026 (`project/design-nuevo/…/uploads/
+  excel-1792399489264-v9nw.xlsx`), solo el Orchard 1 (300 ha). Datos en
+  `app/data/iag.js` (etiquetas en inglés, como el Excel) y motor en
+  `app/engine/computeIAG.js` (`compute()` elige el motor).
+- Verificado contra el diseño/Excel: TIR agrícola 22,28 %, TIR SPV 23,31 %,
+  VAN/ha 59.728 € (al 6 %), payback año 7, inversión 5.045,5 k€.
+- Diferencias con el motor normal: producción = kg/árbol × rendimiento graso
+  con rampa 0·0·50·75·100 %; **ciclo de precios** (variación % anual editable,
+  `priceVar`); partidas de OPEX en €/kg de aceituna (`perKg`); amortización
+  olivo 10 % · riego 5 % · OPEX capitalizada 10 % con el reparto del Excel
+  (Orchard 2 en `cons`); IS del SPV con activo por impuesto diferido; tasa de
+  descuento propia; **sin capa Fondo** (la TIR de referencia es la del SPV).
+- Pestañas: Supuestos · 1. CAPEX · 2. OPEX · 3. Rentabilidad (Orchard 1 + SPV)
+  · 4. Financiero (con la tabla "IS - Impuesto diferido") · **6. Precio**
+  (tabla del ciclo, botón Restablecer y gráfico precio/media/variación).
+
+### Informe PDF
+
+7 páginas (IAG) u 8 (normal, con la página del Fondo): portada, resumen
+ejecutivo, CAPEX, rentabilidad del proyecto y del SPV (y del Fondo) en
+horizontal, estructura financiera y aviso legal. Estilo del diseño "Informe PDF
+Torrimpietra" (el más reciente) para todos los modelos; tablas a 35 años. En la
+tabla del SPV normal se omiten "Otros", "Otros gastos operativos" y "Comisión de
+éxito" cuando son cero (si no, no cabe en la hoja). Imágenes:
+`assets/agromillora-logo-white.png`, `foto-olivar.jpg`, `foto-plantacion.jpg`
+(reducidas a 1600 px).
 
 ### Motor de cálculo (`app/engine/compute.js`)
 
@@ -265,8 +334,13 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 
 ## 6. Pendiente / limitaciones conocidas
 
-- **Exportar a Excel y PDF:** los botones solo muestran un aviso; **no generan
-  archivo** todavía.
+- **Exportar a Excel:** el botón solo muestra un aviso; **no genera archivo**
+  todavía. (El PDF sí: informe imprimible, ver sección 5.)
+- **Informe PDF:** comprobado en pantalla (cabe todo en cada hoja y la
+  orientación de cada página es la correcta), pero la impresión real a PDF no
+  se ha podido probar desde la sesión de IA.
+- **Idioma:** la API responde siempre en español; sus mensajes de error se
+  traducen en pantalla con el diccionario.
 - **Comparación de escenarios:** el escenario guardado vive solo en memoria del
   navegador; no se guarda en la base de datos.
 - **Correo real:** el cliente SMTP de PHP no se ha probado contra Microsoft 365
@@ -387,3 +461,35 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   desde una pestaña de la terminal de la app con inicio de sesión en el
   navegador (Git Credential Manager). Después se subió también `6a69a9a`
   (memoria). Rama local y remota sincronizadas.
+- 2026-10-19: Mensaje "Hola Marc!" (verde de marca, negrita) debajo del texto
+  de demo en la pantalla de login (`app/components/Login.js`). Comprobado en
+  el navegador. Sin commit.
+- 2026-10-19: **Diseño nuevo de Claude Design implementado** (paquete en
+  `project/design-nuevo/`; Marc pidió todo, informes PDF incluidos):
+  selector de idioma ES/EN con traducción de toda la interfaz y formato de
+  números por idioma; modelo **Torrimpietra** con motor IAG propio, pestaña
+  "6. Precio", tabla de impuesto diferido e indicadores propios (editor,
+  dashboard, resultados); la API lo añade a la base de datos existente;
+  **informe PDF** imprimible (7/8 páginas A4, mixtas). Comprobado en el
+  navegador: cifras de Torrimpietra iguales al Excel, Iberocrops sin cambios
+  (TIR Fondo 10,94 %), todas las pantallas y ventanas en inglés y en español,
+  edición y restablecimiento del ciclo de precios, guardado y recarga desde la
+  base de datos, y que cada página del informe cabe en su hoja. Sin commit.
+- 2026-10-20: **Torrimpietra como referencia para todos los modelos** (Marc
+  eligió "solo las novedades" y mantener la capa Fondo): los modelos normales
+  ganan la pestaña "5 · Precio" (ciclo de precios), la tabla de impuesto
+  diferido en E. Financiera, la tasa de descuento editable (por defecto 8 %) y
+  el indicador Precio medio; el informe usa esa tasa y marca "con ciclo" si hay
+  variaciones. Comprobado: con los valores por defecto, Iberocrops, La Dehesa y
+  Alentejo dan exactamente lo mismo que el motor anterior; cambiar la tasa o una
+  variación de precio recalcula y Restablecer vuelve atrás; textos en inglés.
+  Sin commit.
+- 2026-10-20: **Repaso del diseño nuevo elemento a elemento** contra la app
+  (pantalla principal e informes). Estaba todo salvo la unidad "€/Ha/año" de
+  Supuestos (corregida). No se incorporan, a propósito: el mapa de
+  sensibilidad (en el diseño está oculto con `display:none`, Marc lo ocultó en
+  el chat 5) y el selector "Estilo" Corporativo/Moderno/Cálido (herramienta de
+  comparación del diseño; la app nunca lo tuvo). Excel sigue sin exportar
+  (también en el diseño es solo un aviso). Corregido además: al editar una
+  variación de precio en un modelo normal el gráfico de la pestaña Precio se
+  quedaba sin barras mientras se escribía (huecos en `priceVar`).

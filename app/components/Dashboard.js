@@ -20,6 +20,8 @@ function ModelCard({ m }) {
   const { openModel, openResults } = useApp();
   const r = compute(m.a);
   const cropLabel = m.crop === 'almendro' ? 'Almendro SHD' : 'Olivo SHD';
+  // El modelo IAG no tiene capa Fondo: su TIR de referencia es la del SPV.
+  const isIAG = m.a.engine === 'iag';
   return html`
     <div
       className="lift"
@@ -87,10 +89,10 @@ function ModelCard({ m }) {
                 fontWeight: 600,
               }}
             >
-              TIR Fondo
+              ${isIAG ? 'TIR SPV' : 'TIR Fondo'}
             </div>
             <div style=${{ fontFamily: 'var(--num)', fontSize: 22, fontWeight: 600, color: 'var(--ink)' }}>
-              ${pct(r.tirF)}
+              ${pct(isIAG ? r.tirL : r.tirF)}
             </div>
           </div>
           <div>

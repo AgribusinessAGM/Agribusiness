@@ -1,5 +1,6 @@
 /** @typedef {import('../types.js').Assumptions} Assumptions */
 /** @typedef {import('../types.js').OpexItem} OpexItem */
+import { computeIAG } from './computeIAG.js';
 
 export const MP = 6; // año de referencia para el "€/Ha pleno" mostrado
 export const HZ = 35; // horizonte de cálculo de las TIR (como el Excel)
@@ -17,6 +18,19 @@ export function opexYear(sched, y) {
 export function opexItemScale(it) {
   const base = +it.base || 0;
   return base > 0 ? ((+it.cant || 0) * (+it.coste || 0)) / base : 1;
+}
+
+// kg de aceituna por Ha en el año y (modelo IAG): rampa 0 · 0 · 50% · 75% · 100%.
+export function kgOlivesHa(a, y) {
+  const ramp = y <= 2 ? 0 : y === 3 ? 0.5 : y === 4 ? 0.75 : 1;
+  return ((+a.kgTree || 0) * ramp * 10000) / (a.marcoN * a.marcoM);
+}
+
+// €/Ha de una sub-partida en el año y. Las partidas en €/kg de aceituna (perKg,
+// solo en el modelo IAG) se recalculan con la producción de ese año.
+export function opexItemYear(it, y, a) {
+  if (it.perKg) return (+it.cant || 0) * (+it.coste || 0) * kgOlivesHa(a, y);
+  return opexYear(it.sched, y) * opexItemScale(it);
 }
 
 // Busca cambios de signo del VAN en una malla y devuelve la raíz más cercana al 10% (guess de Excel).
@@ -51,10 +65,23 @@ export function irr(cfs) {
   return best;
 }
 
+// Tasa de descuento del VAN, en %. Los modelos guardados antes de que fuera
+// editable no la tienen: usan el 8 % del Excel Iberocrops.
+export function discountPct(a) {
+  return a.descuento == null || a.descuento === '' ? 8 : +a.descuento || 0;
+}
+
+// Cada modelo usa el motor de su Excel: el de Iberocrops (por defecto) o el de
+// IAG (a.engine === 'iag', modelo Torrimpietra).
+/** @param {Assumptions} a */
+export function compute(a) {
+  return a.engine === 'iag' ? computeIAG(a) : computeStd(a);
+}
+
 // Réplica del motor de "3. Rentabilidad" del Excel Iberocrops. Años 1..35; el CAPEX se paga en el año 1.
 // Devuelve las series por año (índice 0 vacío, años 1..horizonte), las TIR, el VAN y los totales.
 /** @param {Assumptions} a */
-export function compute(a) {
+function computeStd(a) {
   const horizon = Math.max(1, Math.round(+a.duracionProyecto) || HZ);
   const sup = a.superficie;
   const densidad = 10000 / (a.marcoN * a.marcoM);
@@ -99,13 +126,17 @@ export function compute(a) {
   for (let y = 1; y <= horizon; y++)
     dep[y] = y >= 3 && y <= 12 ? depBase * 0.0393405 : y >= 13 && y <= 22 ? depBase * 0.0112316 : 0;
 
-  // Ingresos a precio constante (sin inflación); alquiler, personal y auditoría con inflación
+  // Ingresos con el ciclo de precios (variación % anual de la pestaña Precio; sin
+  // variaciones el precio es constante, como en el Excel). Alquiler, personal y
+  // auditoría con inflación.
   const ingresos = [0];
   const rent = [0];
   const pers = [0];
   const audit = [0];
+  const price = [0];
   for (let y = 1; y <= horizon; y++) {
-    ingresos[y] = (sup * a.prodPlena * pr(y) * a.precioEVOO) / 1000;
+    price[y] = y === 1 ? +a.precioEVOO || 0 : price[y - 1] * (1 + ((a.priceVar || [])[y - 1] || 0));
+    ingresos[y] = (sup * a.prodPlena * pr(y) * price[y]) / 1000;
     rent[y] = ((+a.alquiler || 0) * sup * inflF(y)) / 1000;
     pers[y] = ((+a.personal || 0) * sup * inflF(y)) / 1000;
     audit[y] = 10.2 * (sup / 250) * inflF(y); // auditoría + otros del SPV
@@ -164,6 +195,11 @@ export function compute(a) {
   const fcfSin = [0];
   const financ = [0];
   const fcfL = [0];
+  const isDev = [0];
+  const aidVal = [0];
+  const aidApl = [0];
+  const aidRest = [0];
+  const isPay = [0];
   let carry = 0;
 
   // Capa 3 · Fondo
@@ -199,13 +235,22 @@ export function compute(a) {
     // IS del SPV: arrastre de pérdidas sobre el EBT (EBIT - intereses), como el Excel.
     const ebtY = ebitS[y] - interest[y];
     let taxable;
+    // Lo mismo visto como activo por impuesto diferido (tabla "IS - Impuesto
+    // diferido" de la pestaña Financiera): AID = pérdidas pendientes × tipo del IS.
+    isDev[y] = ebtY * isr;
     if (ebtY > 0) {
+      aidVal[y] = -carry * isr;
+      aidApl[y] = Math.min(ebtY, carry) * isr;
       taxable = Math.max(0, ebtY - carry);
       carry = Math.max(0, carry - ebtY);
     } else {
       carry += -ebtY;
+      aidVal[y] = -carry * isr;
+      aidApl[y] = 0;
       taxable = 0;
     }
+    aidRest[y] = -carry * isr;
+    isPay[y] = taxable * isr;
     taxS[y] = -taxable * isr;
     ebtSd[y] = ebtY; // EBT tras intereses (presentación)
     netoS[y] = ebtSd[y] + taxS[y];
@@ -235,8 +280,9 @@ export function compute(a) {
   const tirA = irr(fcfU.slice(1));
   const tirL = irr(fcfL.slice(1));
   const tirF = irr(fcfF.slice(1));
-  const van = fcfU.slice(1).reduce((s, c, i) => s + c / Math.pow(1.08, i), 0);
-  const vanF = fcfF.slice(1).reduce((s, c, i) => s + c / Math.pow(1.08, i), 0);
+  const dr = discountPct(a) / 100;
+  const van = fcfU.slice(1).reduce((s, c, i) => s + c / Math.pow(1 + dr, i), 0);
+  const vanF = fcfF.slice(1).reduce((s, c, i) => s + c / Math.pow(1 + dr, i), 0);
   let payback = null;
   let wentNeg = false;
   for (let y = 1; y <= horizon; y++) {
@@ -264,6 +310,7 @@ export function compute(a) {
     deuda,
     equity,
     cuota,
+    price,
     ingresos,
     opex,
     rent,
@@ -293,6 +340,11 @@ export function compute(a) {
     interest,
     principal,
     fcfL,
+    isDev,
+    aidVal,
+    aidApl,
+    aidRest,
+    isPay,
     fondoEquity,
     fundRev,
     spvInv,

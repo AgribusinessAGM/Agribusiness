@@ -46,16 +46,38 @@ function db(): PDO
 function ensure_schema(PDO $pdo): void
 {
     $exists = $pdo->query("SHOW TABLES LIKE 'models'")->fetchColumn();
-    if ($exists) return;
-
-    $sql = preg_replace('/^--.*$/m', '', file_get_contents(__DIR__ . '/../data/schema.sql'));
-    foreach (array_filter(array_map('trim', explode(';', $sql))) as $statement) {
-        $pdo->exec($statement);
+    if (!$exists) {
+        $sql = preg_replace('/^--.*$/m', '', file_get_contents(__DIR__ . '/../data/schema.sql'));
+        foreach (array_filter(array_map('trim', explode(';', $sql))) as $statement) {
+            $pdo->exec($statement);
+        }
+        // Los modelos van primero: los permisos de los usuarios de ejemplo apuntan a ellos.
+        seed_models($pdo);
+        $adminId = seed_users($pdo);
+        if ($adminId) $pdo->prepare('UPDATE models SET created_by = ?')->execute([$adminId]);
     }
-    // Los modelos van primero: los permisos de los usuarios de ejemplo apuntan a ellos.
-    seed_models($pdo);
-    $adminId = seed_users($pdo);
-    if ($adminId) $pdo->prepare('UPDATE models SET created_by = ?')->execute([$adminId]);
+    ensure_iag_model($pdo);
+}
+
+// Modelo Torrimpietra (motor IAG). Se añadió después de los modelos de ejemplo,
+// así que también se crea en bases de datos que ya existían: solo si todavía no
+// hay ningún modelo IAG, y con acceso de edición para los administradores.
+function ensure_iag_model(PDO $pdo): void
+{
+    $hasIag = $pdo->query("SELECT COUNT(*) FROM models WHERE assumptions LIKE '%\"engine\":\"iag\"%'")->fetchColumn();
+    if ((int) $hasIag > 0) return;
+
+    $m = json_decode(file_get_contents(__DIR__ . '/../data/seed-iag.json'));
+    $adminId = $pdo->query("SELECT id FROM users WHERE role = 'admin' ORDER BY id LIMIT 1")->fetchColumn();
+    $pdo->prepare(
+        'INSERT INTO models (name, crop, region, status, created_by, updated_at, assumptions) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    )->execute([$m->name, $m->crop, $m->region, $m->status, $adminId ?: null, now_utc(), json_out($m->a)]);
+    $modelId = (int) $pdo->lastInsertId();
+
+    $insertAccess = $pdo->prepare('INSERT INTO access (user_id, model_id, level) VALUES (?, ?, ?)');
+    foreach ($pdo->query("SELECT id FROM users WHERE role = 'admin'")->fetchAll(PDO::FETCH_COLUMN) as $id) {
+        $insertAccess->execute([(int) $id, $modelId, 'edit']);
+    }
 }
 
 // Usuarios de ejemplo, con una contraseña conocida para poder probar el login.
