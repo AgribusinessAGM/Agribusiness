@@ -92,16 +92,16 @@ function Footer({ page }) {
   `;
 }
 
-// Cabecera de sección: número, antetítulo, título y entradilla
-function SectionHead({ num, kicker, title, intro, titleFont = HEAD_FONT, introSize = 12 }) {
+// Cabecera de sección: número, antetítulo, título y entradilla (igual en todas las hojas)
+function SectionHead({ num, kicker, title, intro }) {
   return html`
     <div style=${{ padding: '56px 60px 0', flex: 'none' }}>
       <div style=${{ display: 'flex', alignItems: 'baseline', gap: 14, marginBottom: 4 }}>
         <span className="num" style=${{ fontFamily: HEAD_FONT, fontSize: 14, fontWeight: 600, color: C.gold }}>${num}</span>
         <span style=${{ fontFamily: HEAD_FONT, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', color: C.muted }}>${kicker}</span>
       </div>
-      <h3 style=${{ fontFamily: titleFont, fontWeight: 700, fontSize: 32, margin: intro ? '0 0 4px' : 0, color: C.text }}>${title}</h3>
-      ${intro && html`<p style=${{ margin: 0, fontSize: introSize, color: C.sub }}>${intro}</p>`}
+      <h3 style=${{ fontFamily: HEAD_FONT, fontWeight: 700, fontSize: 32, margin: intro ? '0 0 4px' : 0, color: C.text }}>${title}</h3>
+      ${intro && html`<p style=${{ margin: 0, fontSize: 12, color: C.sub }}>${intro}</p>`}
     </div>
   `;
 }
@@ -399,8 +399,6 @@ export function Report({ title }) {
             num="02"
             kicker="Inversión inicial · CAPEX"
             title="Estructura de la inversión"
-            titleFont=${BODY_FONT}
-            introSize=${13.5}
             intro=${almond
               ? 'Coste de establecimiento por hectárea y capitalización del OPEX de los dos primeros años.'
               : 'Coste de establecimiento del olivar por hectárea y capitalización del OPEX de los dos primeros años.'}
@@ -464,7 +462,7 @@ export function Report({ title }) {
                       <td style=${{ padding: '14px 0 14px 0.2cm', fontSize: 13, color: C.text }}>${row.title}</td>
                       <td className="num" style=${{ padding: '14px 0', textAlign: 'right', fontSize: 13, color: C.text }}>${row.perHa}</td>
                       <td className="num" style=${{ padding: '14px 0', textAlign: 'right', fontSize: 13, color: '#000' }}>${row.pct}</td>
-                      <td className="num" style=${{ padding: '14px 0.2cm 14px 0', textAlign: 'right', fontSize: 13, fontWeight: 600, color: C.green }}>${row.total}</td>
+                      <td className="num" style=${{ padding: '14px 0.2cm 14px 0', textAlign: 'right', fontSize: 14, fontWeight: 600, color: C.green }}>${row.total}</td>
                     </tr>
                   `,
                 )}
@@ -484,7 +482,7 @@ export function Report({ title }) {
                   <td style=${{ padding: '16px 12px 16px 0.2cm', fontWeight: 700, fontSize: 13, color: C.green }}>Inversión total</td>
                   <td className="num" style=${{ padding: '16px 0', textAlign: 'right', fontWeight: 700, fontSize: 13, color: C.green }}>${nf(r.capexHa)}</td>
                   <td></td>
-                  <td className="num" style=${{ padding: '16px 0.2cm 16px 0', textAlign: 'right', fontWeight: 700, fontSize: 13, color: C.green }}>
+                  <td className="num" style=${{ padding: '16px 0.2cm 16px 0', textAlign: 'right', fontWeight: 700, fontSize: 14, color: C.green }}>
                     ${nf(r.totalCapex) + ' k€'}
                   </td>
                 </tr>
@@ -556,8 +554,6 @@ export function Report({ title }) {
             num=${sFin}
             kicker="Estructura financiera"
             title=${isIAG ? 'Del cultivo al SPV' : 'Del cultivo al fondo'}
-            titleFont=${BODY_FONT}
-            introSize=${13.5}
             intro=${isIAG
               ? 'Rentabilidad del proyecto agrícola y del SPV del Orchard 1, y condiciones del préstamo.'
               : 'Rentabilidad en las tres capas del vehículo de inversión y condiciones del préstamo.'}
@@ -624,7 +620,7 @@ export function Report({ title }) {
 
         <!-- Aviso legal -->
         <${Page}>
-          <${SectionHead} num=${sLegal} kicker="Aviso legal" title="Confidencialidad y limitación de responsabilidad" titleFont=${BODY_FONT} />
+          <${SectionHead} num=${sLegal} kicker="Aviso legal" title="Confidencialidad y limitación de responsabilidad" />
           <div style=${{ padding: '30px 60px 0', flex: 1, fontSize: 12, lineHeight: 1.7, color: C.sub, textAlign: 'justify' }}>
             <p style=${{ margin: '0 0 14px' }}>
               La presente presentación (en adelante, la «Presentación») ha sido elaborada a partir de fuentes oficiales, información y datos de publicaciones especializadas del sector agrícola, así como de información elaborada por el equipo de Agromillora Catalana, S.A.U. (en adelante, «Agromillora»), con fines exclusivamente informativos para el desarrollo de proyectos agrícolas. Agromillora no ha verificado la veracidad, suficiencia o exactitud de la información publicada por fuentes oficiales y, por tanto, no asume responsabilidad alguna derivada de su uso.

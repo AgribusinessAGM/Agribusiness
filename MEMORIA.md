@@ -517,4 +517,11 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-20: **Título de portada del informe en una línea** (Marc): "Olivar
   SHD en regadío" / "Irrigated SHD olives" (almendro: "Almendro SHD en
   regadío" / "Irrigated SHD almonds"), igual para Torrimpietra y los modelos
-  normales, a 52 px. Con commit, sin push.
+  normales, a 52 px. Con commit y push.
+- 2026-10-20: **Página CAPEX del informe:** toda la columna "Total (k€)" a
+  14 px, como la fila de capitalización del OPEX (Marc). Con commit y push.
+- 2026-10-20: **Cabeceras de hoja del informe iguales** (Marc): todas como la
+  del resumen ejecutivo — título en Rockwell 32 px y entradilla a 12 px
+  (`SectionHead` ya no admite otra fuente ni tamaño; antes CAPEX, Estructura
+  financiera y Aviso legal iban en Arial). El título del aviso legal ocupa dos
+  líneas; nada se sale de la hoja. Con commit y push.
