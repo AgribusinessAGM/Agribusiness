@@ -578,3 +578,5 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   "Otros" (€/Ha, % sobre esos 8, total k€) y fila "OPEX total (sin otros)".
   Sobran unos 160 px hasta el pie. Comprobado en los dos tipos de modelo y en
   ES/EN. La foto `assets/foto-plantacion.jpg` ya no se usa. Con commit y push.
+- 2026-10-20: **Hojas 2 y 3 del informe:** 20 px entre la entradilla y el
+  primer bloque (antes 30 y 32). Con commit y push.

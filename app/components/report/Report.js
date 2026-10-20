@@ -432,7 +432,7 @@ export function Report({ title }) {
         <!-- 2 · Resumen ejecutivo -->
         <${Page}>
           <${SectionHead} num="01" kicker="Resumen ejecutivo" title="Escenario central" intro=${intro1} />
-          <div style=${{ padding: '30px 60px 0', flex: 'none' }}>
+          <div style=${{ padding: '20px 60px 0', flex: 'none' }}>
             <div style=${{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', border: '1px solid ' + C.line, borderRadius: 8, overflow: 'hidden' }}>
               ${kpiCell('VAN proyecto', kpis.van, vanSub, { top: true })}
               ${kpiCell('TIR agrícola', kpis.tirA, 'Proyecto desapalancado', { top: true, big: true })}
@@ -464,7 +464,7 @@ export function Report({ title }) {
               ? 'Coste de establecimiento por hectárea y capitalización del OPEX de los dos primeros años.'
               : 'Coste de establecimiento del olivar por hectárea y capitalización del OPEX de los dos primeros años.'}
           />
-          <div style=${{ padding: '32px 60px 0', flex: 'none' }}>
+          <div style=${{ padding: '20px 60px 0', flex: 'none' }}>
             <div
               style=${{
                 marginBottom: 26,
