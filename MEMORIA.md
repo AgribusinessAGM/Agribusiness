@@ -744,3 +744,17 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-20: **Gráfico de Precio:** la media lleva la etiqueta "Precio Medio" (8,
   negrita, color de la línea) 5 px por encima de la línea discontinua, al
   principio de la línea (izquierda), y se mueve con ella; sale "Media" de la leyenda. Con commit y push.
+- 2026-10-20: **Gráfico de Precio:** los números del eje arrancan en el margen
+  izquierdo de la tarjeta (alineados con el título "Ciclo de precios") y el
+  gráfico empieza justo después (margen interior 30).
+- 2026-10-20: **OPEX:** el texto de entrada pasa a ser una breve descripción del OPEX
+  (costes operativos anuales) y aclara que los importes son datos base por Ha sin inflación.
+- 2026-10-20: **Gráfico de Precio:** eje vertical desde 0 con marcas cada 0,5 €/Kg.
+- 2026-10-20: **TEMPORAL:** botón "Edición de texto" (app/devTextEdit.js, cargado en index.html)
+  para editar textos en pantalla y copiar la lista ANTES/DESPUÉS. Quitarlo cuando Marc lo diga.
+- 2026-10-20: **Textos (edición en pantalla):** Kg/Aceituna/Árbol sin "(olivo)"; CAPEX/OPEX Fee;
+  "Activo por Impuesto Diferido (AID)"; columna "Amorti."; bloque IS como "Impuesto de Sociedades
+  (en miles €)" sin subtítulo; capa IAG "4 · Rentabilidad agrícola" sin subtítulo; pestaña
+  "5. Rentabilidad" con texto IAG provisional "PDTE.".
+- 2026-10-20: **OPEX:** texto de entrada empieza por "Costes operativos anuales…"; "Bioestimulantes y nutrición".
+- 2026-10-20: **OPEX:** "Aplicación foliar (todas las hileras)".

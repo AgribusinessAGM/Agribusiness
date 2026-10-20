@@ -8,9 +8,9 @@ function DeferredTaxTable({ r }) {
   const horizon = r.isDev.length - 1;
   const years = Array.from({ length: horizon }, (_, i) => i + 1);
   const rows = [
-    { label: 'IS - Impuesto diferido', head: true },
+    { label: 'Impuesto de Sociedades', head: true },
     { label: 'Impuesto devengado', arr: r.isDev },
-    { label: 'Valor del activo por impuesto diferido (AID)', arr: r.aidVal },
+    { label: 'Activo por Impuesto Diferido (AID)', arr: r.aidVal },
     { label: 'AID aplicado', arr: r.aidApl },
     { label: 'Restante', arr: r.aidRest },
     { label: 'IS a pagar', arr: r.isPay, strong: true },
@@ -55,8 +55,7 @@ function DeferredTaxTable({ r }) {
           gap: 10,
         }}
       >
-        <span style=${{ fontWeight: 800, fontSize: 14 }}>IS - Impuesto diferido</span>
-        <span style=${{ fontSize: 12, opacity: 0.75 }}>SPV · k€ · pérdidas compensadas con el IS futuro</span>
+        <span style=${{ fontWeight: 800, fontSize: 14 }}>Impuesto de Sociedades (en miles €)</span>
       </div>
       <div style=${{ overflow: 'auto' }}>
         <table style=${{ borderCollapse: 'collapse', width: '100%', minWidth: 840, fontSize: 13 }}>
@@ -197,7 +196,7 @@ export function FinancieraTab({ a, r }) {
                   <th style=${thLeft}>Año</th>
                   <th style=${thStyle}>Cuota</th>
                   <th style=${thStyle}>Interés</th>
-                  <th style=${thStyle}>Amort.</th>
+                  <th style=${thStyle}>Amorti.</th>
                   <th style=${thStyle}>Pendiente</th>
                 </tr>
               </thead>

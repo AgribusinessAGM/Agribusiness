@@ -12,7 +12,8 @@ function PriceChart({ price, priceVar }) {
   const p = price.slice(1);
   const N = p.length;
   const W = 1000;
-  const pl = 44;
+  // números del eje pegados al margen izquierdo de la tarjeta (mismo que el título)
+  const pl = 30;
   const pr = 16;
   const avg = p.reduce((x, v) => x + v, 0) / N;
   const sx = (i) => pl + i * ((W - pl - pr) / (N - 1));
@@ -21,10 +22,12 @@ function PriceChart({ price, priceVar }) {
   const H = 125;
   const pt = 16;
   const pb = 10;
-  const mn = Math.min(...p, avg) * 0.9;
-  const mx = Math.max(...p, avg) * 1.05;
+  // eje desde 0 con marcas cada 0,5
+  const STEP = 0.5;
+  const mn = 0;
+  const mx = Math.ceil((Math.max(...p, avg) * 1.02) / STEP) * STEP;
   const sy = (v) => H - pb - ((v - mn) / (mx - mn || 1)) * (H - pb - pt);
-  const grid = [0, 1, 2, 3, 4].map((k) => mn + ((mx - mn) * k) / 4);
+  const grid = Array.from({ length: Math.round(mx / STEP) + 1 }, (_, k) => k * STEP);
 
   const H2 = 55;
   const pt2 = 6;
@@ -48,7 +51,7 @@ function PriceChart({ price, priceVar }) {
           (v, k) => html`
             <g key=${k}>
               <line x1=${pl} y1=${sy(v)} x2=${W - pr} y2=${sy(v)} stroke=${c.line} strokeDasharray=${k ? '2 3' : undefined} />
-              <text x=${pl - 6} y=${sy(v) + 3} fill=${c.ink2} fontSize=${8} textAnchor="end" fontFamily=${c.num}>${nf(v, 2)}</text>
+              <text x=${0} y=${sy(v) + 3} fill=${c.ink2} fontSize=${8} textAnchor="start" fontFamily=${c.num}>${nf(v, 1)}</text>
             </g>
           `,
         )}

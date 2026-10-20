@@ -10,12 +10,10 @@ export function RentabilidadTab({ a, r }) {
 
   return html`
     <div>
-      <h2 style=${{ fontSize: 18, fontWeight: 800, margin: '0 0 6px' }}>5. Rentabilidad — por capas</h2>
+      <h2 style=${{ fontSize: 18, fontWeight: 800, margin: '0 0 6px' }}>5. Rentabilidad</h2>
       <p style=${{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 18px' }}>
         ${isIAG
-          ? 'Orchard 1 en solitario, como la sección 4 de «3. Profitability» del Excel. La capa SPV aplica deuda, fees y auditoría a sus ' +
-            nf(a.superficie) +
-            ' Ha. Cifras en k€ · 35 años.'
+          ? 'PDTE.'
           : "Análisis de la rentabilidad del proyecto: Proyecto agrícola · Estructura SPV · Estructura Fondo, cada uno con su TIR. Cifras en miles € ('000)."}
       </p>
       <div style=${{ display: 'flex', flexDirection: 'column', gap: 20 }}>

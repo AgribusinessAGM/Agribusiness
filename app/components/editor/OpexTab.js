@@ -31,7 +31,7 @@ const projLabel = (strong) => ({
 // Etiquetas que se muestran en dos líneas (el diccionario traduce la versión con salto)
 const TWO_LINES = {
   'Aplicación foliar (calle sí/no)': 'Aplicación foliar\n(calle Sí/No)',
-  'Aplicación foliar (todas hileras)': 'Aplicación foliar\n(todas hileras)',
+  'Aplicación foliar (todas hileras)': 'Aplicación foliar\n(todas las hileras)',
 };
 // En Sanidad vegetal la partida de productos se llama "Protección vegetal" (en
 // Control de malezas el mismo texto del Excel sigue como "Productos fitosanitarios")
@@ -159,7 +159,7 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
           </span>
         </div>
         <p style=${{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 20px' }}>
-          Misma estructura que la hoja OPEX del Excel: 9 categorías con sus sub-partidas. Cada una tiene <strong>Cantidad</strong> y <strong>Coste unitario</strong> editables; el perfil anual (rampa e inflación) se conserva y la línea escala con lo que edites. €/Ha pleno = año de referencia.
+          Costes operativos anuales de la explotación necesarios para mantener la plantación y producir. Los importes de esta pestaña son los datos base por hectárea, sin inflación.
         </p>
         <div style=${{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           ${orderedCards.map((g, gi) =>

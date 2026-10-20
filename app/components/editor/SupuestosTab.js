@@ -71,7 +71,7 @@ const GROUPS_IAG = [
   {
     title: 'Producción y precio',
     rows: [
-      { key: 'kgTree', label: 'Kg/Aceituna/Árbol (olivo) · Plena Producción', unit: 'kg' },
+      { key: 'kgTree', label: 'Kg/Aceituna/Árbol · Plena Producción', unit: 'kg' },
       { key: 'oilYield', label: 'Rendimiento graso', unit: '%' },
       { key: 'precioEVOO', label: 'Precio inicial (EVOO)', unit: '€/Kg' },
     ],
@@ -103,8 +103,8 @@ const GROUPS_IAG = [
   {
     title: 'Fees y costes del SPV',
     rows: [
-      { key: 'capexFee', label: 'CAPEX fee (año 1)', unit: '€/Ha' },
-      { key: 'opexFee', label: 'OPEX fee (anual, plano)', unit: '€/Ha' },
+      { key: 'capexFee', label: 'CAPEX Fee (año 1)', unit: '€/Ha' },
+      { key: 'opexFee', label: 'OPEX Fee (anual, plano)', unit: '€/Ha' },
       { key: 'audit', label: 'Auditoría (prorrateada al Orchard 1)', unit: '€/Año' },
     ],
   },

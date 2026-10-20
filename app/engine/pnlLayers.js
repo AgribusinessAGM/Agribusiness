@@ -125,8 +125,8 @@ export function buildPnlLayers(r, a) {
     const ha = nf(a.superficie) + ' Ha';
     return [
       {
-        title: '4 · Rentabilidad individual – Orchard 1',
-        sub: 'EBITDA → FCF · ' + ha,
+        title: '4 · Rentabilidad agrícola',
+        sub: '',
         tirLabel: 'TIR',
         tir: pct(r.tirA),
         rows: [
