@@ -12,7 +12,7 @@ export function CapexTab({ a, r }) {
   const capexDetail = a.capexGroups.map((g) => {
     const items = g.items.map((it) => {
       const ha = capexItemHa(it, g, r.densidad, +a.superficie || 0);
-      return { ...it, ha: nf(ha, 0), unitLabel: it.total ? '€ total' : CAP_UNIT[g.unit] };
+      return { ...it, ha: nf(ha, 0), unitLabel: it.total ? '€/Total' : CAP_UNIT[g.unit] };
     });
     const subtotal = g.items.reduce((s, it) => s + capexItemHa(it, g, r.densidad, +a.superficie || 0), 0);
     return {
@@ -64,7 +64,7 @@ export function CapexTab({ a, r }) {
           <div style=${{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }}>
             <div style=${{ padding: '14px 18px', borderRight: '1px solid var(--line)' }}>
               <div style=${smallHead}>
-                Marco (n × m)
+                Marco de plantación
               </div>
               <div style=${{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <${NumberField} id="sup:marcoN" value=${a.marcoN} width=${72} onChangeRaw=${(raw) => onField('marcoN', raw)} />
@@ -105,7 +105,7 @@ export function CapexTab({ a, r }) {
                 }}
               >
                 <div style=${{ fontWeight: 700, fontSize: 13.5 }}>${g.title}</div>
-                <div style=${{ fontFamily: 'var(--num)', fontSize: 13, fontWeight: 700 }}>
+                <div style=${{ fontSize: 13, fontWeight: 700 }}>
                   ${g.subtotalFmt} · ${g.pct}
                 </div>
               </div>

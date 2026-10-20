@@ -692,3 +692,15 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   que `baseIAG` ya no coincide byte a byte con `seed-iag.json`. Con commit y push.
 - 2026-10-20: **Est. Financiera:** la entradilla queda en "Préstamo francés sobre
   la deuda, con años de carencia." (sin la segunda frase). Con commit y push.
+- 2026-10-20: **CAPEX:** la etiqueta "Marco (n × m)" de la tarjeta "Marco de
+  plantación" pasa a "Marco de plantación". Con commit y push.
+- 2026-10-20: **OPEX:** la cabecera "Sub-partida" de las tarjetas pasa a"
+  "Partida". Con commit y push.
+- 2026-10-20: **OPEX:** "Aplicación foliar (calle sí/no)" se muestra en dos
+  líneas ("Aplicación foliar" / "(calle sí/no)"): `TWO_LINES` en `OpexTab.js`
+  y el par del diccionario con el salto (EN sigue "Foliar application
+  (alternate rows)"). Igual "Aplicación foliar" / "(todas hileras)". Con commit y push.
+- 2026-10-20: **CAPEX:** la unidad de la Due Diligence es "€/Total" (antes
+  "€ total"). Con commit y push.
+- 2026-10-20: **CAPEX:** la cifra de la cabecera de cada tarjeta ("€/Ha · %") va
+  en la fuente normal, como en OPEX (antes en monoespaciada). Con commit y push.

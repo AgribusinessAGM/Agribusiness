@@ -27,6 +27,13 @@ const projLabel = (strong) => ({
   zIndex: 1,
 });
 
+// Etiquetas que se muestran en dos líneas (el diccionario traduce la versión con salto)
+const TWO_LINES = {
+  'Aplicación foliar (calle sí/no)': 'Aplicación foliar\n(calle sí/no)',
+  'Aplicación foliar (todas hileras)': 'Aplicación foliar\n(todas hileras)',
+};
+const splitLabel = (label) => TWO_LINES[label] || label;
+
 export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' }) {
   const { state, onOpexField, onProjHaField, canEdit } = useApp();
 
@@ -155,7 +162,7 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
                     borderBottom: '1px solid var(--line)',
                   }}
                 >
-                  <div>Sub-partida</div>
+                  <div>Partida</div>
                   <div style=${{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                     <div style=${{ width: 84, textAlign: 'right' }}>Cantidad</div>
                     <div style=${{ width: 84, textAlign: 'right' }}>Coste unitario</div>
@@ -177,7 +184,7 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
                         borderBottom: '1px solid var(--line)',
                       }}
                     >
-                      <div style=${{ fontSize: 13.5, whiteSpace: 'pre-line' }}>${it.label}</div>
+                      <div style=${{ fontSize: 13.5, whiteSpace: 'pre-line' }}>${splitLabel(it.label)}</div>
                       <div style=${{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                         <${NumberField}
                           id=${'op:cant:' + it.catKey + '.' + it.key}
