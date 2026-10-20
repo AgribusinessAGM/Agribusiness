@@ -124,7 +124,7 @@ function SummaryTable({ first, rows, totalRow }) {
               <td style=${{ padding: pad('l'), fontSize: 13, color: C.text }}>${row.title}</td>
               <td className="num" style=${{ padding: pad(), textAlign: 'right', fontSize: 13, color: C.text }}>${row.perHa}</td>
               <td className="num" style=${{ padding: pad(), textAlign: 'right', fontSize: 13, color: '#000' }}>${row.pct}</td>
-              <td className="num" style=${{ padding: pad('r'), textAlign: 'right', fontSize: 14, fontWeight: 600, color: C.green }}>${row.total}</td>
+              <td className="num" style=${{ padding: pad('r'), textAlign: 'right', fontSize: 12, fontWeight: 600, color: C.green }}>${row.total}</td>
             </tr>
           `,
         )}
@@ -132,7 +132,7 @@ function SummaryTable({ first, rows, totalRow }) {
           <td style=${{ padding: '10px 12px 10px 0.2cm', fontWeight: 700, fontSize: 13, color: C.green }}>${totalRow.title}</td>
           <td className="num" style=${{ padding: '10px 0', textAlign: 'right', fontWeight: 700, fontSize: 13, color: C.green }}>${totalRow.perHa}</td>
           <td></td>
-          <td className="num" style=${{ padding: '10px 0.2cm 10px 0', textAlign: 'right', fontWeight: 700, fontSize: 14, color: C.green }}>${totalRow.total}</td>
+          <td className="num" style=${{ padding: '10px 0.2cm 10px 0', textAlign: 'right', fontWeight: 700, fontSize: 12, color: C.green }}>${totalRow.total}</td>
         </tr>
       </tbody>
     </table>

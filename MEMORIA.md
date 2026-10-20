@@ -593,3 +593,5 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   menor peso (%) cada vez que cambian las partidas del modelo; la
   capitalización del OPEX va siempre al final de la tabla CAPEX (su % es sobre
   otra base). Título de la tabla OPEX: "OPEX · Plena producción". Con commit y push.
+- 2026-10-20: **Hoja 3:** la columna "Total (k€)" de las tablas CAPEX y OPEX
+  baja a 12 px (antes 14; las dos tablas comparten `SummaryTable`). Con commit y push.
