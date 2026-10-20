@@ -604,3 +604,11 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   en la primera celda de la cabecera de cada tabla (en lugar de "Partida" y
   de un título aparte), con lo que la foto crece a ≈197 px. La densidad de la banda verde
   se expresa en "Árboles/Ha" ("Trees/Ha"). Con commit y push.
+- 2026-10-20: **Etiquetas de las hojas de rentabilidad:** "Capitalización del
+  OPEX" pasa a "Capitalización OPEX" en toda la app (`pnlLayers.js`); en el
+  informe, hoja 4: "Impuesto de Sociedades" → "Imp. Sociedades" (EN "Corp.
+  Income Tax") y "Beneficio neto" de Torrimpietra → "Beneficio Neto"; hoja
+  5: sin los prefijos "(=) " ("Beneficio Neto" → EN "Net income"). Con commit y push.
+- 2026-10-20: **Tablas de rentabilidad (hojas 4, 5 y la del Fondo):** cada
+  columna de año y su cabecera con 0,1 cm de margen derecho (`RentTable`);
+  ninguna cifra se corta. Con commit y push.

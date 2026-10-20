@@ -322,13 +322,18 @@ export function Report({ title }) {
 
   // ---- tablas de rentabilidad
   const projectRows = renRows(layers[0], true).map((row) =>
-    row.label === 'Beneficio Neto de Explotación' && !en ? { ...row, label: 'Beneficio Neto' } : row,
+    (row.label === 'Beneficio Neto de Explotación' || row.label === 'Beneficio neto') && !en
+      ? { ...row, label: 'Beneficio Neto' }
+      : row.label === 'Impuesto de Sociedades'
+      ? { ...row, label: T('Imp. Sociedades', 'Corp. Income Tax') }
+      : row,
   );
-  // La fila del IS va abreviada para que quepa en la columna de etiquetas
+  // La fila del IS va abreviada para que quepa en la columna de etiquetas y,
+  // en esta hoja, las etiquetas van sin el prefijo "(=) "
   const spvRows = renRows(layers[1], false).map((row) =>
     row.label === 'IS (Impuesto de Sociedades)'
       ? { ...row, label: T('Imp. Sociedades', 'Corp. Income Tax') }
-      : row,
+      : { ...row, label: row.label.replace(/^\(=\) /, '') },
   );
   const fundRows = isIAG ? null : renRows(layers[2], false);
 

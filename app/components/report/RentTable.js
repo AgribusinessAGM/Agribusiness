@@ -21,8 +21,7 @@ function rowStyles(kind, wide, vAdj) {
   const v = { f: 7, p: 3, s: 5, n: 4 }[kind] + (wide ? 2.5 : 0) + vAdj;
   const numFs = wide ? 6.6 : kind === 'p' ? 8 : 8.5;
   const lblFs = kind === 'p' ? 9.5 : wide ? 9 : kind === 'f' ? 10.5 : 10;
-  const numPadH = wide ? 0 : 1;
-  const base = { lbl: { textAlign: 'left', padding: `${v}px 8px`, fontSize: lblFs, whiteSpace: 'nowrap' }, num: { textAlign: 'right', padding: `${v}px ${numPadH}px`, fontSize: numFs } };
+  const base = { lbl: { textAlign: 'left', padding: `${v}px 8px`, fontSize: lblFs, whiteSpace: 'nowrap' }, num: { textAlign: 'right', padding: `${v}px 0.1cm ${v}px 0`, fontSize: numFs } };
   if (kind === 'f')
     return {
       tr: { background: T.finalBg, color: '#fff' },
@@ -78,7 +77,7 @@ export function RentTable({ rows, pad = 60, vAdj = 0 }) {
                 <th
                   key=${y}
                   className="num"
-                  style=${{ textAlign: 'right', padding: `${thV}px 0`, fontSize: wide ? 6.6 : 8, color: '#8a9182', fontWeight: 700 }}
+                  style=${{ textAlign: 'right', padding: `${thV}px 0.1cm ${thV}px 0`, fontSize: wide ? 6.6 : 8, color: '#8a9182', fontWeight: 700 }}
                 >
                   ${y}
                 </th>
