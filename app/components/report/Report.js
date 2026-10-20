@@ -520,7 +520,8 @@ export function Report({ title }) {
             title=${isIAG ? T('SPV — deuda, fees y auditoría sobre ', 'SPV — debt, fees and audit over ') + supTxt : 'Cuenta de resultados y FCF — vehículo SPV'}
             intro=${T('Vehículo con deuda, fees y auditoría · TIR SPV ', 'Vehicle with debt, fees and audit · SPV IRR ') + kpis.tirL}
           />
-          <${RentTable} rows=${spvRows} />
+          <!-- filas algo más bajas: el hueco entre la tabla y el pie es igual al que hay entre la entradilla y la tabla -->
+          <${RentTable} rows=${spvRows} vAdj=${-1.05} />
           <${Footer} page=${5} />
         <//>
 

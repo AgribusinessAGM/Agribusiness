@@ -16,9 +16,9 @@ const T = {
   green: '#1e4423',
 };
 
-function rowStyles(kind, wide) {
+function rowStyles(kind, wide, vAdj) {
   // [padding vertical, tamaño etiqueta, tamaño número] según el tipo de fila
-  const v = { f: 7, p: 3, s: 5, n: 4 }[kind] + (wide ? 2.5 : 0);
+  const v = { f: 7, p: 3, s: 5, n: 4 }[kind] + (wide ? 2.5 : 0) + vAdj;
   const numFs = wide ? 6.6 : kind === 'p' ? 8 : 8.5;
   const lblFs = kind === 'p' ? 9.5 : wide ? 9 : kind === 'f' ? 10.5 : 10;
   const numPadH = wide ? 0 : 1;
@@ -48,7 +48,8 @@ function rowStyles(kind, wide) {
   };
 }
 
-export function RentTable({ rows, pad = 60 }) {
+// vAdj: px que se suman (o restan) al relleno vertical de cada fila del cuerpo
+export function RentTable({ rows, pad = 60, vAdj = 0 }) {
   const n = rows[0]?.cells.length || 25;
   const wide = n > 25;
   const labW = wide ? 115 : 172;
@@ -87,7 +88,7 @@ export function RentTable({ rows, pad = 60 }) {
         </thead>
         <tbody>
           ${rows.map((row, ri) => {
-            const st = rowStyles(row.kind, wide);
+            const st = rowStyles(row.kind, wide, vAdj);
             return html`
               <tr key=${ri} style=${st.tr}>
                 <td style=${st.lbl}>${row.label}</td>

@@ -536,3 +536,7 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   14 px; en Torrimpietra la hoja 03 se titula "Standalone returns" con el
   antetítulo "Rentabilidad · Modelo financiero" / "Profitability · Financial
   Model". Comprobado en ES y EN; nada se sale de la hoja. Con commit y push.
+- 2026-10-20: **Hoja 5 del informe (SPV):** filas algo más bajas
+  (`RentTable vAdj=-1.05`) para que el hueco entre la tabla y la línea del pie
+  sea igual al que hay entre la entradilla y la tabla (≈26 px en ambos, en los
+  dos tipos de modelo). Con commit y push.
