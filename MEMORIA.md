@@ -617,3 +617,8 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   la etiqueta más larga y las cifras del año 1 queden 5 px; medido en los dos
   modelos y los dos idiomas. Si cambian las etiquetas hay que reajustarlo. En
   inglés, la hoja 4 dice ahora "Net income" (como "Beneficio Neto"). Con commit y push.
+- 2026-10-20: **Cabecera de las tablas de rentabilidad:** "Concepto · k€" pasa a
+  "Concepto" / "(Miles €)" en dos líneas (EN "Concept" / "(€ thousand)"),
+  sin relleno vertical para que la fila no crezca. Reajustados `labW45` (94,1 /
+  91,65 px) y la hoja 5 (`vAdj=-0.78`): siguen los 5 px hasta el año 1 y los
+  26 px arriba y abajo de la tabla del SPV. Con commit y push.

@@ -64,14 +64,17 @@ export function RentTable({ rows, pad = 60, vAdj = 0, labW: labWProp }) {
               style=${{
                 textAlign: 'left',
                 width: labW,
-                padding: `${thV}px 8px`,
+                // dos líneas sin relleno vertical: la fila de cabecera mide lo mismo que con una
+                padding: '0 0 0 8px',
+                lineHeight: 1.1,
+                whiteSpace: 'nowrap',
                 fontSize: 10,
                 textTransform: 'uppercase',
                 color: '#8a9182',
                 fontWeight: 800,
               }}
             >
-              Concepto · k€
+              Concepto<br />(Miles €)
             </th>
             ${years.map(
               (y) => html`
