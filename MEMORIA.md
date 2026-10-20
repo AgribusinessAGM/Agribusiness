@@ -250,6 +250,8 @@ de idioma Español / English en la barra superior.
 6. **5 · Precio** — ciclo de precios: variación % anual editable (`priceVar`),
    botón Restablecer (vuelve a precio constante) y gráfico. Sin variaciones el
    precio es constante, como en el Excel Iberocrops.
+7. **6 · Informe** — índice de páginas del informe PDF y botón "Abrir informe
+   PDF" (`InformeTab.js`); al volver del informe se queda en esta pestaña.
 
 Indicadores fijos arriba: TIR Fondo · Final, VAN Fondo (tasa), Equity
 comprometido (calculado automáticamente), Inversión total y Precio medio.
@@ -278,7 +280,9 @@ contra el motor anterior en los 3 modelos de ejemplo).
   descuento propia; **sin capa Fondo** (la TIR de referencia es la del SPV).
 - Pestañas: Supuestos · 1. CAPEX · 2. OPEX · 3. Rentabilidad (Orchard 1 + SPV)
   · 4. Financiero (con la tabla "IS - Impuesto diferido") · **6. Precio**
-  (tabla del ciclo, botón Restablecer y gráfico precio/media/variación).
+  (tabla del ciclo, botón Restablecer y gráfico precio/media/variación) ·
+  **7. Informe** (como el "6 · Informe" de los modelos normales; es 7 porque
+  el diseño numera Precio como 6).
 
 ### Informe PDF
 
@@ -493,3 +497,8 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   (también en el diseño es solo un aviso). Corregido además: al editar una
   variación de precio en un modelo normal el gráfico de la pestaña Precio se
   quedaba sin barras mientras se escribía (huecos en `priceVar`).
+- 2026-10-20: **Pestaña Informe en el editor** (Marc no encontraba el PDF; el
+  único acceso era el botón pequeño "PDF" de la barra lateral y el de
+  Resultados). "6 · Informe" en modelos normales y "7. Informe" en
+  Torrimpietra: índice de páginas, TIR agrícola y SPV y botón para abrir el
+  informe. Comprobado en el navegador en español e inglés. Con commit, sin push.
