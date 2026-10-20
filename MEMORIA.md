@@ -580,3 +580,7 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   ES/EN. La foto `assets/foto-plantacion.jpg` ya no se usa. Con commit y push.
 - 2026-10-20: **Hojas 2 y 3 del informe:** 20 px entre la entradilla y el
   primer bloque (antes 30 y 32). Con commit y push.
+- 2026-10-20: **Hoja 3:** 20 px entre la banda de densidad, la tabla CAPEX y
+  el bloque OPEX; vuelve la foto `foto-plantacion.jpg` en el hueco que queda
+  (20 px por arriba, 24 px hasta el pie como el resto de fotos; ≈141 px de
+  alto). Con commit y push.

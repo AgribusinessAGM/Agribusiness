@@ -467,7 +467,7 @@ export function Report({ title }) {
           <div style=${{ padding: '20px 60px 0', flex: 'none' }}>
             <div
               style=${{
-                marginBottom: 26,
+                marginBottom: 20,
                 padding: '18px 22px',
                 background: '#eaf1e8',
                 borderRadius: 8,
@@ -510,7 +510,7 @@ export function Report({ title }) {
               ]}
               totalRow=${{ title: 'Inversión total', perHa: nf(r.capexHa), total: nf(r.totalCapex) + ' k€' }}
             />
-            <div style=${{ margin: '34px 0 8px', paddingLeft: '0.2cm', fontSize: 13, fontWeight: 700, textTransform: 'uppercase', color: C.green }}>
+            <div style=${{ margin: '20px 0 8px', paddingLeft: '0.2cm', fontSize: 13, fontWeight: 700, textTransform: 'uppercase', color: C.green }}>
               OPEX anual · plena producción
             </div>
             <${SummaryTable}
@@ -524,6 +524,9 @@ export function Report({ title }) {
               }))}
               totalRow=${{ title: 'OPEX total (sin otros)', perHa: nf(opexBlocksHa), total: nf((opexBlocksHa * sup) / 1000) + ' k€' }}
             />
+          </div>
+          <div style=${{ flex: 1, minHeight: 0, padding: '20px 60px 24px' }}>
+            <img src="assets/foto-plantacion.jpg" alt="" style=${{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', opacity: 0.75, borderRadius: 4 }} />
           </div>
           <${Footer} page=${3} />
         <//>
