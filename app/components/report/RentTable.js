@@ -21,7 +21,7 @@ function rowStyles(kind, wide, vAdj) {
   const v = { f: 7, p: 3, s: 5, n: 4 }[kind] + (wide ? 2.5 : 0) + vAdj;
   const numFs = wide ? 6.6 : kind === 'p' ? 8 : 8.5;
   const lblFs = kind === 'p' ? 9.5 : wide ? 9 : kind === 'f' ? 10.5 : 10;
-  const base = { lbl: { textAlign: 'left', padding: `${v}px 8px`, fontSize: lblFs, whiteSpace: 'nowrap' }, num: { textAlign: 'right', padding: `${v}px 0.1cm ${v}px 0`, fontSize: numFs } };
+  const base = { lbl: { textAlign: 'left', padding: `${v}px 0 ${v}px 8px`, fontSize: lblFs, whiteSpace: 'nowrap' }, num: { textAlign: 'right', padding: `${v}px 0.1cm ${v}px 0`, fontSize: numFs } };
   if (kind === 'f')
     return {
       tr: { background: T.finalBg, color: '#fff' },
@@ -48,10 +48,11 @@ function rowStyles(kind, wide, vAdj) {
 }
 
 // vAdj: px que se suman (o restan) al relleno vertical de cada fila del cuerpo
-export function RentTable({ rows, pad = 60, vAdj = 0 }) {
+// labW: ancho de la columna de etiquetas (por defecto, según el número de años)
+export function RentTable({ rows, pad = 60, vAdj = 0, labW: labWProp }) {
   const n = rows[0]?.cells.length || 25;
   const wide = n > 25;
-  const labW = wide ? 115 : 172;
+  const labW = labWProp || (wide ? 115 : 172);
   const thV = wide ? 5 : 7;
   const years = Array.from({ length: n }, (_, i) => i + 1);
   return html`

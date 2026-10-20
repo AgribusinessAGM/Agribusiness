@@ -612,3 +612,8 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-20: **Tablas de rentabilidad (hojas 4, 5 y la del Fondo):** cada
   columna de año y su cabecera con 0,1 cm de margen derecho (`RentTable`);
   ninguna cifra se corta. Con commit y push.
+- 2026-10-20: **Hojas 4 y 5:** columna de etiquetas más estrecha (`labW45` en
+  `Report.js`: 94,1 px en español y 90 px en inglés, antes 115) para que entre
+  la etiqueta más larga y las cifras del año 1 queden 5 px; medido en los dos
+  modelos y los dos idiomas. Si cambian las etiquetas hay que reajustarlo. En
+  inglés, la hoja 4 dice ahora "Net income" (como "Beneficio Neto"). Con commit y push.

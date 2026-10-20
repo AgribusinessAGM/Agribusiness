@@ -321,9 +321,12 @@ export function Report({ title }) {
     .map(({ g, ha }) => ({ key: g.key, title: g.title, perHa: nf(ha), pct: pctR(ha / r.capexEstab, 0), total: nf((ha * sup) / 1000) + ' k€' }));
 
   // ---- tablas de rentabilidad
+  // Columna de etiquetas de las hojas 4 y 5 ajustada a la etiqueta más larga de cada idioma:
+  // deja unos 5 px hasta las cifras del año 1
+  const labW45 = T(94.1, 90);
   const projectRows = renRows(layers[0], true).map((row) =>
-    (row.label === 'Beneficio Neto de Explotación' || row.label === 'Beneficio neto') && !en
-      ? { ...row, label: 'Beneficio Neto' }
+    row.label === 'Beneficio Neto de Explotación' || row.label === 'Beneficio neto'
+      ? { ...row, label: T('Beneficio Neto', 'Net income') }
       : row.label === 'Impuesto de Sociedades'
       ? { ...row, label: T('Imp. Sociedades', 'Corp. Income Tax') }
       : row,
@@ -550,7 +553,7 @@ export function Report({ title }) {
             title=${isIAG ? T('Modelo Financiero Agrícola', 'Agricultural Financial Model') : 'Cuenta de resultados y FCF — proyecto agrícola'}
             intro=${T('Explotación del olivar sin apalancar · TIR agrícola ', 'Unlevered olive grove operation · agricultural IRR ') + kpis.tirA}
           />
-          <${RentTable} rows=${projectRows} pad=${38} />
+          <${RentTable} rows=${projectRows} pad=${38} labW=${labW45} />
           <${Footer} page=${4} />
         <//>
 
@@ -563,7 +566,7 @@ export function Report({ title }) {
             intro=${T('Vehículo con deuda, fees y auditoría · TIR SPV ', 'Vehicle with debt, fees and audit · SPV IRR ') + kpis.tirL}
           />
           <!-- filas algo más bajas: el hueco entre la tabla y el pie es igual al que hay entre la entradilla y la tabla -->
-          <${RentTable} rows=${spvRows} pad=${38} vAdj=${-1.05} />
+          <${RentTable} rows=${spvRows} pad=${38} vAdj=${-1.05} labW=${labW45} />
           <${Footer} page=${5} />
         <//>
 
