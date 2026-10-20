@@ -470,7 +470,7 @@ export function Report({ title }) {
             <div
               style=${{
                 marginBottom: 20,
-                padding: '18px 22px',
+                padding: '13px 22px',
                 background: '#eaf1e8',
                 borderRadius: 8,
                 display: 'flex',
@@ -479,16 +479,6 @@ export function Report({ title }) {
               }}
             >
               <div>
-                <div style=${{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: C.sub, marginBottom: 6 }}>Densidad</div>
-                <div className="num" style=${{ fontSize: 20, fontWeight: 600, color: C.green }}>
-                  ${nf(r.densidad)}${' '}<span style=${{ fontSize: 12, color: '#7b8473' }}>Árboles</span>
-                </div>
-              </div>
-              <div>
-                <div style=${{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: C.sub, marginBottom: 6 }}>Árboles totales</div>
-                <div className="num" style=${{ fontSize: 20, fontWeight: 600, color: C.green }}>${nf(r.arboles)}</div>
-              </div>
-              <div>
                 <div style=${{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: C.sub, marginBottom: 6 }}>Marco</div>
                 <div className="num" style=${{ fontSize: 20, fontWeight: 600, color: C.green }}>
                   ${nf(a.marcoN, 2)}${' '}<span style=${{ fontSize: 12, color: '#7b8473' }}>m</span>${' × '}${nf(a.marcoM, 2)}${' '}<span
@@ -496,6 +486,22 @@ export function Report({ title }) {
                     >m</span
                   >
                 </div>
+              </div>
+              <div>
+                <div style=${{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: C.sub, marginBottom: 6 }}>Densidad</div>
+                <div className="num" style=${{ fontSize: 20, fontWeight: 600, color: C.green }}>
+                  ${nf(r.densidad)}${' '}<span style=${{ fontSize: 12, color: '#7b8473' }}>Árboles</span>
+                </div>
+              </div>
+              <div>
+                <div style=${{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: C.sub, marginBottom: 6 }}>Superficie</div>
+                <div className="num" style=${{ fontSize: 20, fontWeight: 600, color: C.green }}>
+                  ${nf(sup)}${' '}<span style=${{ fontSize: 12, color: '#7b8473' }}>Ha</span>
+                </div>
+              </div>
+              <div>
+                <div style=${{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: C.sub, marginBottom: 6 }}>Nº árboles</div>
+                <div className="num" style=${{ fontSize: 20, fontWeight: 600, color: C.green }}>${nf(r.arboles)}</div>
               </div>
             </div>
             <div style=${{ margin: '0 0 8px', paddingLeft: '0.2cm', fontSize: 13, fontWeight: 700, textTransform: 'uppercase', color: C.green }}>
