@@ -186,8 +186,9 @@ export function baseIAG(ov) {
       fondoOtros: 0,
       descuento: 6,
       priceVar: PRICE_VAR_IAG.slice(),
-      // Orchard 2 (Lanuvio): solo para replicar el reparto de la amortización del Excel
-      cons: { supO2: 350, plantO2: 5169.172932330828, irrO2: 4500 },
+      // otra finca con la que repartir la amortización (como el Excel original); a 0, cada
+      // finca amortiza solo sus propios activos
+      cons: { supO2: 0, plantO2: 0, irrO2: 0 },
       capexGroups: buildCapexIAG(),
       opexItems: buildOpexIAG(),
     },

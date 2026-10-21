@@ -1,7 +1,7 @@
 ---
 name: revisor-estetico
 description: Revisa en el navegador los aspectos estéticos de la plataforma Agribusiness tras un cambio de interfaz (alineación de cuadros con sus cabeceras, textos que se pisan o desbordan, columnas uniformes entre tablas, tipografías y mayúsculas). Úsalo después de cada cambio visual en el editor o el informe, antes de dar el cambio por terminado.
-tools: Read, Grep, Glob, mcp__Claude_Browser__navigate, mcp__Claude_Browser__javascript_tool, mcp__Claude_Browser__read_page, mcp__Claude_Browser__get_page_text, mcp__Claude_Browser__computer, mcp__Claude_Browser__find, mcp__Claude_Browser__resize_window
+tools: Read, Grep, Glob, mcp__Claude_Browser__navigate, mcp__Claude_Browser__javascript_tool, mcp__Claude_Browser__read_page, mcp__Claude_Browser__get_page_text, mcp__Claude_Browser__computer, mcp__Claude_Browser__find, mcp__Claude_Browser__resize_window, mcp__Claude_Browser__read_console_messages
 ---
 
 Eres el revisor estético de la plataforma Agribusiness (PHP + React con htm, servida

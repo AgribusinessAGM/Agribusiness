@@ -189,7 +189,7 @@ export const PAIRS = [
 ['Nombre del modelo','Model name'],['Plantilla','Template'],['Superficie (Ha)','Surface area (Ha)'],['Cancelar','Cancel'],['Crear modelo','Create model'],
 ['Ej. Finca Los Olivos · Jaén','E.g. Los Olivos Estate · Jaén'],
 ['Escenario guardado para comparar','Scenario saved for comparison'],['Invitación enviada (demo)','Invitation sent (demo)'],['Modelo guardado','Model saved'],
-['Exportando a Excel…','Exporting to Excel…'],['Generando informe PDF…','Generating PDF report…'],['Modelo creado','Model created'],
+['Nombre actualizado','Name updated'],['No se pudo cambiar el nombre','Could not change the name'],['Modelo duplicado','Model duplicated'],['No se pudo duplicar el modelo','Could not duplicate the model'],['Duplicar','Duplicate'],['Exportando a Excel…','Exporting to Excel…'],['Generando informe PDF…','Generating PDF report…'],['Modelo creado','Model created'],
 ['Olivar en cosecha','Olive grove at harvest'],
 ['Protección vegetal','Plant protection products'],['Productos fitosanitarios','Plant protection products'],
 ['Ciclo de precios del AOVE: precio inicial en supuestos y variación anual editable aquí. Alimenta los ingresos desde el año 1 hasta el 35.','EVOO price cycle: initial price in assumptions and editable annual variation here. It feeds revenue from year 1 to year 35.'],

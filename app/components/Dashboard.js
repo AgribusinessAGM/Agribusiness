@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react';
 import { html } from '../lib/html.js';
 import { compute } from '../engine/compute.js';
 import { nf, pct } from '../engine/format.js';
@@ -16,7 +17,16 @@ const ALMENDRO_THEME = {
 };
 
 function ModelCard({ m }) {
-  const { openModel, openResults } = useApp();
+  const { state, openModel, openResults, duplicateModel, renameModel } = useApp();
+  const canRename = state.currentUser?.role === 'admin' || m.myAccess === 'edit';
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(m.name);
+  const nameRef = useRef(null);
+  const [nameH, setNameH] = useState(0); // alto del nombre, para que el campo no cambie la tarjeta
+  const finish = (ok) => {
+    if (ok) renameModel(m.id, draft);
+    setEditing(false);
+  };
   const r = compute(m.a);
   const cropLabel = m.crop === 'almendro' ? 'Almendro SHD' : 'Olivo SHD';
   // El modelo IAG no tiene capa Fondo: su TIR de referencia es la del SPV.
@@ -35,7 +45,38 @@ function ModelCard({ m }) {
     >
       <div style=${{ padding: '18px 18px 14px' }}>
         <div style=${{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
-          <div style=${{ fontWeight: 700, fontSize: 16, lineHeight: 1.3 }}>${m.name}</div>
+          ${editing
+            ? html`<textarea
+                autoFocus
+                value=${draft}
+                onInput=${(e) => setDraft(e.target.value)}
+                onKeyDown=${(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault(); // el nombre no lleva saltos de línea
+                    finish(true);
+                  } else if (e.key === 'Escape') finish(false);
+                }}
+                onBlur=${() => finish(true)}
+                style=${{ fontFamily: 'inherit', fontWeight: 700, fontSize: 16, lineHeight: 1.3, minWidth: 0, flex: 1, height: nameH ? nameH + 2 : undefined, padding: '0 6px', border: '1px solid var(--editableLine)', borderRadius: 6, resize: 'none', overflow: 'hidden' }}
+              />`
+            : html`<div style=${{ display: 'flex', alignItems: 'flex-start', gap: 6, minWidth: 0 }}>
+                <div ref=${nameRef} style=${{ fontWeight: 700, fontSize: 16, lineHeight: 1.3 }}>${m.name}</div>
+                ${canRename &&
+                html`<button
+                  onClick=${() => {
+                    setDraft(m.name);
+                    setNameH(nameRef.current ? nameRef.current.offsetHeight : 0);
+                    setEditing(true);
+                  }}
+                  style=${{ background: 'none', border: 'none', padding: 2, marginTop: 2, cursor: 'pointer', color: 'var(--ink2)', display: 'flex' }}
+                >
+                  <!-- lápiz -->
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                  </svg>
+                </button>`}
+              </div>`}
           <span
             style=${{
               fontSize: 11,
@@ -143,6 +184,22 @@ function ModelCard({ m }) {
           }}
         >
           Resultados
+        </button>
+        <button
+          onClick=${() => duplicateModel(m.id)}
+          style=${{
+            flex: 1,
+            padding: 12,
+            background: 'none',
+            border: 'none',
+            borderLeft: '1px solid var(--line)',
+            cursor: 'pointer',
+            fontWeight: 600,
+            color: 'var(--ink2)',
+            fontSize: 13,
+          }}
+        >
+          Duplicar
         </button>
       </div>
       <div style=${{ padding: '8px 18px', borderTop: '1px solid var(--line)', fontSize: 11, color: 'var(--ink2)' }}>

@@ -518,6 +518,39 @@ export function useAppStore() {
       .catch((e) => flash(e.message || 'No se pudo crear el modelo'));
   }, [state.newName, state.newHa, state.newTemplate, flash]);
 
+  // Duplica un modelo: copia todos sus supuestos en uno nuevo, en Borrador, y lo abre
+  const duplicateModel = useCallback(
+    (id) => {
+      const m = state.models.find((x) => x.id === id);
+      if (!m) return;
+      api
+        .createModel({ name: m.name + ' (copia)', crop: m.crop, region: m.region, status: 'Borrador', a: structuredClone(m.a) })
+        .then(({ model }) => {
+          setState((s) => ({ ...s, models: s.models.concat([model]), activeId: model.id, screen: 'editor', etab: 'supuestos' }));
+          flash('Modelo duplicado');
+        })
+        .catch((e) => flash(e.message || 'No se pudo duplicar el modelo'));
+    },
+    [state.models, flash],
+  );
+
+  // Cambia el nombre de un modelo desde el panel y lo guarda al momento
+  const renameModel = useCallback(
+    (id, name) => {
+      const m = state.models.find((x) => x.id === id);
+      const nm = (name || '').trim();
+      if (!m || !nm || nm === m.name) return;
+      api
+        .updateModel(id, { ...m, name: nm })
+        .then(({ model }) => {
+          setState((s) => ({ ...s, models: s.models.map((x) => (x.id === model.id ? model : x)) }));
+          flash('Nombre actualizado');
+        })
+        .catch((e) => flash(e.message || 'No se pudo cambiar el nombre'));
+    },
+    [state.models, flash],
+  );
+
   const saveScenario = useCallback((sc) => {
     setState((s) => ({ ...s, scenario: sc }));
     flash('Escenario guardado para comparar');
@@ -577,6 +610,8 @@ export function useAppStore() {
       setNewTemplate,
       createModel,
       saveScenario,
+      duplicateModel,
+      renameModel,
       clearScenario,
       flash,
     }),
@@ -632,6 +667,8 @@ export function useAppStore() {
       setNewTemplate,
       createModel,
       saveScenario,
+      duplicateModel,
+      renameModel,
       clearScenario,
       flash,
     ],
