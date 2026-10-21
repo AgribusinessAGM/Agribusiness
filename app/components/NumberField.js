@@ -16,7 +16,7 @@ export function NumberField({ id, value, onChangeRaw, width = 98, style }) {
       onBlur=${onNumBlur}
       onChange=${(e) => canEdit && onChangeRaw(e.target.value)}
       style=${{
-        width,
+        width: width - 3, // todos los campos 3 px más estrechos
         textAlign: 'right',
         fontFamily: 'var(--num)',
         fontSize: 14,

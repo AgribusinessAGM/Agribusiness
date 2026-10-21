@@ -305,7 +305,7 @@ export function Report({ title }) {
     { k: 'Plazo · carencia', v: a.plazo + ' · ' + a.carencia + years },
     { k: 'Cuota anual', v: nf(r.cuota) + ' k€' },
     { k: 'Inflación', v: fmt2(a.inflacion) + ' %' },
-    { k: 'Impuesto de sociedades', v: fmt2(a.is) + ' %' },
+    { k: 'Impuesto de Sociedades', v: fmt2(a.is) + ' %' },
   ];
   const grpHa = (g) => g.items.reduce((s, it) => s + capexItemHa(it, g, r.densidad, sup), 0);
   // Resumen del OPEX en plena producción por bloque (sin la fila "Otros"); el % es sobre el OPEX total
@@ -580,7 +580,7 @@ export function Report({ title }) {
               title="Flujo del fondo al inversor"
               intro=${T('Equity del inversor ', 'Investor equity ') + nf(r.fondoEquity) + ' k€' + T(' · TIR fondo ', ' · Fund IRR ') + kpis.tirF}
             />
-            <${RentTable} rows=${fundRows} />
+            <${RentTable} rows=${fundRows} pad=${38} labW=${labW45} />
             <div style=${{ padding: '0 60px 14px', flex: 'none', display: 'flex', gap: 12 }}>
               <div style=${{ flex: 1, padding: '16px 20px', border: '1px solid ' + C.line, borderLeft: '4px solid ' + C.green, borderRadius: 4 }}>
                 <div style=${{ fontSize: 10, textTransform: 'uppercase', color: C.muted, marginBottom: 6 }}>TIR agrícola</div>

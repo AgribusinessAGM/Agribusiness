@@ -37,7 +37,7 @@ export function CapexTab({ a, r }) {
   return html`
     <div>
       <div style=${{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-        <h2 style=${{ fontSize: 18, fontWeight: 800, margin: 0 }}>2. CAPEX — Inversión inicial</h2>
+        <h2 style=${{ fontSize: 18, fontWeight: 800, fontFamily: "Rockwell, 'Rockwell Nova', 'Roboto Slab', serif", margin: 0 }}>2. CAPEX — Inversión inicial</h2>
         <span
           style=${{
             fontSize: 11,
@@ -53,7 +53,7 @@ export function CapexTab({ a, r }) {
         </span>
       </div>
       <p style=${{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 20px' }}>
-        Coste de establecimiento por hectárea, con el mismo detalle que la hoja Excel. Las partidas de plantación se introducen en €/Árbol y se multiplican por la densidad (${nf(r.densidad)}${' '}árboles/Ha); el resto en €/Ha.
+        Coste de establecimiento por hectárea, con el mismo detalle que la hoja Excel. Las partidas de plantación se introducen en €/Árbol y se multiplican por la densidad (${nf(r.densidad)}${' '}Árboles/Ha); el resto en €/Ha.
       </p>
 
       <div style=${{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -79,14 +79,13 @@ export function CapexTab({ a, r }) {
                 Densidad
               </div>
               <div style=${{ fontFamily: 'var(--num)', fontSize: 20, fontWeight: 600 }}>${nf(r.densidad)}</div>
-              <div style=${{ fontSize: 11, color: 'var(--ink2)' }}>árboles/Ha</div>
+              <div style=${{ fontSize: 11, color: 'var(--ink2)' }}>Árboles/Ha</div>
             </div>
             <div style=${{ padding: '14px 18px' }}>
               <div style=${smallHead}>
                 # Plantas
               </div>
               <div style=${{ fontFamily: 'var(--num)', fontSize: 20, fontWeight: 600 }}>${nf(r.arboles)}</div>
-              <div style=${{ fontSize: 11, color: 'var(--ink2)' }}>${'sobre ' + nf(a.superficie) + ' Ha'}</div>
             </div>
           </div>
         </div>
@@ -166,11 +165,11 @@ export function CapexTab({ a, r }) {
             }}
           >
             <div style=${{ fontSize: 13.5 }}>
-              Total CAPEX${' '}<span style=${{ fontWeight: 500, color: 'var(--ink2)', fontSize: 12 }}>(no incluye la capitalización del OPEX)</span>
+              Total CAPEX
             </div>
             <div />
             <div />
-            <div style=${{ textAlign: 'right', fontFamily: 'var(--num)', fontSize: 14 }}>
+            <div style=${{ textAlign: 'right', fontSize: 14 }}>
               ${nf(r.capexEstab, 0)} €/Ha
             </div>
           </div>
@@ -184,9 +183,9 @@ export function CapexTab({ a, r }) {
             }}
           >
             <div style=${{ fontSize: 13.5 }}>
-              Capitalización OPEX${' '}<span style=${{ color: 'var(--ink2)', fontSize: 11.5 }}>· OPEX año 1 + año 2</span>
+              Capitalización OPEX${' '}<span style=${{ color: 'var(--ink2)', fontSize: 11.5 }}>(OPEX Año 1 + Año 2)</span>
             </div>
-            <div style=${{ textAlign: 'right', fontSize: 11, color: 'var(--ink2)' }}>calculado</div>
+            <div style=${{ textAlign: 'right', fontSize: 11, color: 'var(--ink2)' }}>Calculado</div>
             <div style=${{ textAlign: 'center', fontSize: 12, color: 'var(--ink2)' }}>€/Ha</div>
             <div style=${{ textAlign: 'right', fontFamily: 'var(--num)', fontSize: 14, color: 'var(--ink2)' }}>
               ${nf(r.capexOpex, 0)} €/Ha
@@ -203,8 +202,8 @@ export function CapexTab({ a, r }) {
             }}
           >
             <div>Total Inversión Inicial (por Ha)</div>
-            <div style=${{ textAlign: 'right', fontFamily: 'var(--num)' }}>${nf(r.capexHa)} €</div>
-            <div style=${{ textAlign: 'right', fontFamily: 'var(--num)' }}>${nf(r.totalCapex, 0)} k€ total</div>
+            <div style=${{ textAlign: 'right' }}>${nf(r.capexHa)} €</div>
+            <div style=${{ textAlign: 'right' }}>${nf(r.totalCapex, 0)} k€ total</div>
           </div>
         </div>
       </div>

@@ -19,11 +19,11 @@ function PriceChart({ price, priceVar }) {
   const sx = (i) => pl + i * ((W - pl - pr) / (N - 1));
 
   // alturas reducidas para que la pestaña quepa en una pantalla sin desplazarse
-  const H = 125;
-  const pt = 16;
-  const pb = 10;
-  // eje desde 0 con marcas cada 0,5
-  const STEP = 0.5;
+  const H = 176;
+  const pt = 8;
+  const pb = 5;
+  // eje desde 0 con marcas cada 1
+  const STEP = 1;
   const mn = 0;
   const mx = Math.ceil((Math.max(...p, avg) * 1.02) / STEP) * STEP;
   const sy = (v) => H - pb - ((v - mn) / (mx - mn || 1)) * (H - pb - pt);
@@ -31,7 +31,7 @@ function PriceChart({ price, priceVar }) {
 
   const H2 = 55;
   const pt2 = 6;
-  const pb2 = 22;
+  const pb2 = 16;
   const mid = (H2 - pb2 + pt2) / 2;
   const vmax = Math.max(0.05, ...Array.from(priceVar, (x) => Math.abs(x || 0)));
   const half = (H2 - pb2 - pt2) / 2;
@@ -51,7 +51,7 @@ function PriceChart({ price, priceVar }) {
           (v, k) => html`
             <g key=${k}>
               <line x1=${pl} y1=${sy(v)} x2=${W - pr} y2=${sy(v)} stroke=${c.line} strokeDasharray=${k ? '2 3' : undefined} />
-              <text x=${0} y=${sy(v) + 3} fill=${c.ink2} fontSize=${8} textAnchor="start" fontFamily=${c.num}>${nf(v, 1)}</text>
+              <text x=${0} y=${sy(v) + 3} fill=${c.ink2} fontSize=${8} textAnchor="start" fontFamily=${c.num}>${nf(v, 0)}</text>
             </g>
           `,
         )}
@@ -83,7 +83,7 @@ function PriceChart({ price, priceVar }) {
         )}
         ${p.map(
           (_, i) => html`
-            <text key=${i} x=${sx(i)} y=${H2 - 6} fill=${c.ink2} fontSize=${9} textAnchor="middle" fontFamily=${c.num}>${i + 1}</text>
+            <text key=${i} x=${sx(i)} y=${H2 - 5} fill=${c.ink2} fontSize=${8} textAnchor="middle" fontFamily=${c.num}>${i + 1}</text>
           `,
         )}
       </svg>
@@ -126,7 +126,7 @@ export function PrecioTab({ a, r, title }) {
 
   return html`
     <div>
-      <h2 style=${{ fontSize: 18, fontWeight: 800, margin: '0 0 6px' }}>${title}</h2>
+      <h2 style=${{ fontSize: 18, fontWeight: 800, fontFamily: "Rockwell, 'Rockwell Nova', 'Roboto Slab', serif", margin: '0 0 6px' }}>${title}</h2>
       <p style=${{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 18px' }}>
         ${'Ciclo de precios del AOVE: precio inicial en supuestos y variación anual editable aquí. Alimenta los ingresos desde el año 1 hasta el ' +
         years.length +
@@ -188,7 +188,6 @@ export function PrecioTab({ a, r, title }) {
                         textAlign: 'right',
                         padding: '9px 6px',
                         color: 'var(--ink2)',
-                        fontFamily: 'var(--num)',
                         fontSize: 11,
                         whiteSpace: 'nowrap',
                         borderBottom: '1px solid var(--line)',
@@ -210,7 +209,6 @@ export function PrecioTab({ a, r, title }) {
                       style=${{
                         textAlign: 'right',
                         padding: '8px 6px',
-                        fontFamily: 'var(--num)',
                         fontWeight: 700,
                         background: 'var(--brandL)',
                         whiteSpace: 'nowrap',
@@ -245,9 +243,9 @@ export function PrecioTab({ a, r, title }) {
           </table>
         </div>
       </div>
-      <div style=${{ ...card, padding: 18, marginTop: 18 }}>
+      <div style=${{ ...card, padding: '18px 18px 5px', marginTop: 18 }}>
         <div style=${{ fontWeight: 700, fontSize: 14, marginBottom: 2 }}>Ciclo de precios</div>
-        <div style=${{ fontSize: 12, color: 'var(--ink2)', marginBottom: 12 }}>
+        <div style=${{ fontSize: 12, color: 'var(--ink2)', marginBottom: 3 }}>
           <span style=${{ color: c.brand, fontWeight: 700 }}>■</span> Precio €/Kg${'  '}
           <span style=${{ color: UP, fontWeight: 700 }}>■</span> % Var. (+)${'  '}
           <span style=${{ color: DOWN, fontWeight: 700 }}>■</span> % Var. (-)

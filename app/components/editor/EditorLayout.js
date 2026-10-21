@@ -32,13 +32,19 @@ const TAB_DEFS_IAG = [
   ['informe', '7. Informe', false],
 ];
 
+// estados del proyecto, con los mismos colores que la etiqueta del panel
+const STATUSES = ['Activo', 'Borrador'];
+const STATUS_COLOR = { Activo: 'var(--brand)', Borrador: '#595959' };
+
 function editorKpis(a, r) {
   const p = r.price.slice(1);
   const avgPrice = { label: 'Precio medio', value: nf(p.length ? p.reduce((x, v) => x + v, 0) / p.length : NaN, 2) + ' €/Kg' };
   if (a.engine === 'iag') {
     return [
-      { label: 'TIR SPV · Orchard 1', value: pct(r.tirL), highlight: true },
       { label: 'TIR Agrícola', value: pct(r.tirA) },
+      { label: 'TIR SPV', value: pct(r.tirL) },
+      // la capa Fondo aún no existe en este modelo: 0 hasta que se construya (luego 0 o N/A)
+      { label: 'TIR Fondo', value: pct(r.tirF ?? 0) },
       { label: 'VAN por ha (' + nf(discountPct(a), 1) + '%)', value: nf(r.vanHa) + ' €' },
       { label: 'Inversión total', value: nf(r.totalCapex / 1000, 2) + ' M€' },
       avgPrice,
@@ -103,7 +109,7 @@ function KpiBox({ label, value, highlight }) {
 }
 
 export function EditorLayout() {
-  const { state, gotoDash, setEtab, gotoResults, save, exportXlsx, exportPdf, canEdit } = useApp();
+  const { state, gotoDash, setEtab, gotoResults, save, exportXlsx, exportPdf, canEdit, onStatus } = useApp();
   const { model, a, r } = useActiveCompute();
   const isIAG = a.engine === 'iag';
   const tabDefs = isIAG ? TAB_DEFS_IAG : TAB_DEFS;
@@ -283,7 +289,27 @@ export function EditorLayout() {
           >
             <div>
               <div style=${{ fontSize: 12, color: 'var(--ink2)', fontWeight: 600 }}>${model.region}</div>
-              <div style=${{ fontSize: 19, fontWeight: 800, letterSpacing: '-.01em' }}>${model.name}</div>
+              <div style=${{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style=${{ fontSize: 19, fontWeight: 800, letterSpacing: '-.01em' }}>${model.name}</div>
+                <select
+                  value=${model.status}
+                  disabled=${!canEdit}
+                  onChange=${(e) => onStatus(e.target.value)}
+                  style=${{
+                    fontFamily: 'inherit',
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: '#fff',
+                    background: STATUS_COLOR[model.status] || 'var(--muted)',
+                    border: 'none',
+                    borderRadius: 999,
+                    padding: '3px 10px',
+                    cursor: canEdit ? 'pointer' : 'default',
+                  }}
+                >
+                  ${STATUSES.map((st) => html`<option key=${st} value=${st} style=${{ color: 'var(--ink)', background: '#fff' }}>${st}</option>`)}
+                </select>
+              </div>
             </div>
             <button
               onClick=${gotoResults}

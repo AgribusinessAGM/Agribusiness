@@ -1,4 +1,4 @@
-import { nf, nfAcc, pct } from './format.js';
+import { nfAcc, pct } from './format.js';
 
 // Arma las capas de P&L a partir del resultado de compute(): Proyecto agrícola ·
 // SPV · Fondo (modelo normal) o Orchard 1 · SPV (modelo IAG). Cada capa tiene
@@ -121,11 +121,17 @@ export function buildPnlLayers(r, a) {
   const netOp = [];
   for (let y = 0; y <= nc; y++) netOp[y] = (r.ebit[y] || 0) + (r.tax[y] || 0);
 
+  // serie a 0 cuando el motor no la calcula
+  const zf = (arr) => arr || Array(nc + 1).fill(0);
+  // capital del fondo = inversión inicial (CAPEX + OPEX capitalizada) × (1 − % financiación);
+  // es el mismo importe todos los años (el capital permanece) y es la base de la comisión
+  const capF = r.capitalF ?? -r.capexRow.reduce((s, v) => s + (v || 0), 0) * (1 - (+a.financiacion || 0) / 100);
+  const capFondo = r.capexRow.map((_, y) => (y === 0 ? 0 : capF));
+
   if (r.engine === 'iag') {
-    const ha = nf(a.superficie) + ' Ha';
     return [
       {
-        title: '4 · Rentabilidad agrícola',
+        title: 'Rentabilidad agrícola',
         sub: '',
         tirLabel: 'TIR',
         tir: pct(r.tirA),
@@ -149,8 +155,8 @@ export function buildPnlLayers(r, a) {
         ],
       },
       {
-        title: 'SPV – Orchard 1',
-        sub: 'deuda, fees y auditoría aplicados a ' + ha,
+        title: 'SPV',
+        sub: '',
         tirLabel: 'TIR SPV',
         tir: pct(r.tirL),
         rows: [
@@ -180,6 +186,26 @@ export function buildPnlLayers(r, a) {
           mkRow('Financiación', r.financ),
           mkRow('Amortización deuda', negArr(r.principal)),
           mkRow('FCF Apalancado', r.fcfL, { strong: true }),
+        ],
+      },
+      // Capa Fondo: este modelo aún no la calcula, así que sale a 0; cuando el motor
+      // IAG devuelva las series del fondo (mismos nombres que el modelo estándar) se vuelcan aquí
+      {
+        title: 'Fondo',
+        sub: '',
+        tirLabel: 'TIR Fondo',
+        tir: pct(r.tirF ?? 0),
+        rows: [
+          // capital del fondo: la parte de la inversión inicial que no se financia con deuda
+          mkRow('Capital', capFondo, { strong: true }),
+          mkRow('Ingresos del fondo', zf(r.fundRev), { strong: true }),
+          mkRow('Comisión Gestión Fondo', negArr(zf(r.fundCosts))),
+          mkRow('Inversión en SPV', zf(r.spvInv)),
+          mkRow('Impuestos', negArr(zf(r.impFondo))),
+          mkRow('Auditoría', negArr(zf(r.otherF))),
+          mkRow('Costes del fondo', zf(r.costesF), { strong: true }),
+          mkRow('FCF', zf(r.fcfF), { strong: true }),
+          mkRow('FCF acumulado', zf(r.fcfFAcum)),
         ],
       },
     ];
@@ -253,12 +279,12 @@ export function buildPnlLayers(r, a) {
       tirLabel: 'TIR Fondo',
       tir: pct(r.tirF),
       rows: [
-        mkHead('Capital'),
+        mkRow('Capital', capFondo, { strong: true }),
         mkRow('Ingresos del fondo', r.fundRev, { strong: true }),
         mkRow('Comisión Gestión Fondo', negArr(r.fundCosts)),
         mkRow('Inversión en SPV', r.spvInv),
         mkRow('Impuestos', negArr(r.impFondo)),
-        mkRow('Otros', negArr(r.otherF)),
+        mkRow('Auditoría', negArr(r.otherF)),
         mkRow('Costes del fondo', r.costesF, { strong: true }),
         mkRow('FCF', r.fcfF, { strong: true }),
         mkRow('FCF acumulado', r.fcfFAcum),

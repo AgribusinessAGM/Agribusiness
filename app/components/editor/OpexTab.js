@@ -32,7 +32,14 @@ const projLabel = (strong) => ({
 const TWO_LINES = {
   'Aplicación foliar (calle sí/no)': 'Aplicación foliar\n(calle Sí/No)',
   'Aplicación foliar (todas hileras)': 'Aplicación foliar\n(todas las hileras)',
+  'Mechanical top pruning': 'Poda mecánica\nde cobertura',
+  'Mechanical side pruning': 'Poda mecánica\nlateral',
+  // no es de dos líneas: se muestra como "PAC" (EN: "CAP (Common Agricultural Policy)")
+  'CAP processing (Common Agricultural Policy)': 'PAC',
 };
+// Unidad de las partidas por kilo de aceituna: siempre "€/Kg/" y "Aceituna" en dos líneas
+// (los datos la traen como '€/Kg/Olives' o '€/Kg/\nAceitunas')
+const unitLabel = (u) => (/^€\/Kg\/\s*(Olives|Aceitunas?)$/.test(u) ? '€/Kg/\nAceituna' : u);
 // En Sanidad vegetal la partida de productos se llama "Protección vegetal" (en
 // Control de malezas el mismo texto del Excel sigue como "Productos fitosanitarios")
 const splitLabel = (label, catKey) =>
@@ -47,9 +54,8 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
     let catPlena = 0;
     const items = cat.items.map((it) => {
       const plena = opexItemYear(it, MP, a);
-      const year1 = opexItemYear(it, 1, a);
       catPlena += plena;
-      return { ...it, catKey: cat.key, plenaFmt: nf(plena, 0), year1Fmt: nf(year1, 0) };
+      return { ...it, catKey: cat.key, plenaFmt: nf(plena, 0) };
     });
     return {
       key: cat.key,
@@ -143,7 +149,7 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
     <div style=${{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
       <div style=${{ gridColumn: '1 / 4' }}>
         <div style=${{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-          <h2 style=${{ fontSize: 18, fontWeight: 800, margin: 0 }}>3. OPEX — Costes operativos</h2>
+          <h2 style=${{ fontSize: 18, fontWeight: 800, fontFamily: "Rockwell, 'Rockwell Nova', 'Roboto Slab', serif", margin: 0 }}>3. OPEX — Costes operativos</h2>
           <span
             style=${{
               fontSize: 11,
@@ -185,7 +191,8 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
                 <div
                   style=${{
                     display: 'grid',
-                    gridTemplateColumns: '2.2fr 1.9fr 1.3fr 1fr 1fr',
+                    gridTemplateColumns: 'minmax(0,1fr) auto 52px 90px',
+                    columnGap: 8,
                     padding: '8px 18px',
                     fontSize: 11,
                     color: 'var(--ink2)',
@@ -194,13 +201,12 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
                   }}
                 >
                   <div>Partida</div>
-                  <div style=${{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-                    <div style=${{ width: 84, textAlign: 'right' }}>Cantidad</div>
-                    <div style=${{ width: 84, textAlign: 'right' }}>Coste unitario</div>
+                  <div style=${{ display: 'flex', justifyContent: 'flex-end', gap: 17 }}>
+                    <div style=${{ width: 58, display: 'flex', justifyContent: 'flex-end', whiteSpace: 'nowrap', fontSize: 10 }}><span>Cantidad</span></div>
+                    <div style=${{ width: 58, display: 'flex', justifyContent: 'flex-end', whiteSpace: 'nowrap', fontSize: 10 }}><span>Coste unitario</span></div>
                   </div>
                   <div style=${{ textAlign: 'center' }}>Unidad</div>
-                  <div style=${{ textAlign: 'right' }}>€/Ha 1er Año</div>
-                  <div style=${{ textAlign: 'right' }}>€/Ha pleno</div>
+                  <div style=${{ textAlign: 'right', whiteSpace: 'nowrap' }}>€/Ha Plena Prod.</div>
                 </div>
                 ${g.items.map(
                   (it, ii) => html`
@@ -208,32 +214,32 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
                       key=${it.key}
                       style=${{
                         display: 'grid',
-                        gridTemplateColumns: '2.2fr 1.9fr 1.3fr 1fr 1fr',
+                        gridTemplateColumns: 'minmax(0,1fr) auto 52px 90px',
+                    columnGap: 8,
                         alignItems: 'center',
                         padding: '8px 18px',
                         // línea gris entre sub-partidas; la de la última la pone el relleno de abajo
                         borderBottom: ii < g.items.length - 1 ? '1px solid var(--line)' : 'none',
                       }}
                     >
-                      <div style=${{ fontSize: 13.5, whiteSpace: 'pre-line' }}>${splitLabel(it.label, it.catKey)}</div>
-                      <div style=${{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                      <div lang="es" style=${{ fontSize: 13.5, whiteSpace: 'pre-line', hyphens: 'auto', overflowWrap: 'anywhere' }}>${splitLabel(it.label, it.catKey)}</div>
+                      <div style=${{ display: 'flex', justifyContent: 'flex-end', gap: 17 }}>
                         <${NumberField}
                           id=${'op:cant:' + it.catKey + '.' + it.key}
                           value=${it.cant}
-                          width=${84}
+                          width=${61}
                           style=${{ fontSize: 13.5 }}
                           onChangeRaw=${(raw) => onOpexField(it.catKey, it.key, 'cant', raw)}
                         />
                         <${NumberField}
                           id=${'op:coste:' + it.catKey + '.' + it.key}
                           value=${it.coste}
-                          width=${84}
+                          width=${61}
                           style=${{ fontSize: 13.5 }}
                           onChangeRaw=${(raw) => onOpexField(it.catKey, it.key, 'coste', raw)}
                         />
                       </div>
-                      <div style=${{ textAlign: 'center', fontSize: 12, color: 'var(--ink2)', whiteSpace: 'pre-line' }}>${it.unidad}</div>
-                      <div style=${{ textAlign: 'right', fontFamily: 'var(--num)', fontSize: 14, color: 'var(--ink2)' }}>${it.year1Fmt}</div>
+                      <div style=${{ textAlign: 'center', fontSize: 12, color: 'var(--ink2)', whiteSpace: 'pre-line' }}>${unitLabel(it.unidad)}</div>
                       <div style=${{ textAlign: 'right', fontFamily: 'var(--num)', fontSize: 14 }}>${it.plenaFmt}</div>
                     </div>
                   `,

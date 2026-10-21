@@ -207,6 +207,14 @@ export function useAppStore() {
     return m?.myAccess === 'edit';
   };
 
+  // estado del proyecto (Activo / Borrador); se guarda con "Guardar cambios"
+  const onStatus = useCallback((status) => {
+    setState((s) => {
+      if (!isActiveEditable(s)) return s;
+      return { ...s, models: s.models.map((m) => (m.id === s.activeId ? { ...m, status } : m)) };
+    });
+  }, []);
+
   const onField = useCallback((key, raw) => {
     const v = parseNum(raw);
     setState((s) => {
@@ -537,6 +545,7 @@ export function useAppStore() {
       onNumFocus,
       onNumBlur,
       onField,
+      onStatus,
       onCapexField,
       onOpexField,
       onProjHaField,
@@ -591,6 +600,7 @@ export function useAppStore() {
       onNumFocus,
       onNumBlur,
       onField,
+      onStatus,
       onCapexField,
       onOpexField,
       onProjHaField,

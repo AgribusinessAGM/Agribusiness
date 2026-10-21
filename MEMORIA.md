@@ -45,6 +45,11 @@ solo a sus modelos.
 5. Cada cambio se comprueba de verdad (navegador o API), no solo compilando.
 6. Commits pequeños, con mensaje descriptivo en inglés y las líneas de
    atribución de la sesión.
+7. **Revisión estética tras cada cambio visual:** lanzar el agente
+   `revisor-estetico` (`.claude/agents/revisor-estetico.md`), que mide en el
+   navegador la alineación de cuadros con sus cabeceras, columnas uniformes,
+   textos que se pisan, tipografías y las reglas de texto. Corregir lo que
+   marque antes de dar el cambio por terminado.
 
 ## 3. Dónde está todo
 
@@ -758,3 +763,49 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   "5. Rentabilidad" con texto IAG provisional "PDTE.".
 - 2026-10-20: **OPEX:** texto de entrada empieza por "Costes operativos anuales…"; "Bioestimulantes y nutrición".
 - 2026-10-20: **OPEX:** "Aplicación foliar (todas las hileras)".
+- 2026-10-20: **Gráfico de Precio:** marcas del eje cada 1 €/Kg (sin decimales).
+- 2026-10-20: **Gráfico de Precio:** números de año a 8; márgenes del gráfico 10 arriba y 5 abajo (más alto).
+- 2026-10-20: **Gráfico de Precio:** años 5 px por encima del fondo, a ~10 px del borde de la tarjeta; las barras up/down bajan con ellos.
+- 2026-10-20: **CAPEX:** "Calculado", "Árboles/Ha" y fuera el "sobre N Ha" bajo # Plantas.
+- 2026-10-20: **CAPEX:** "Total CAPEX" sin el paréntesis "(no incluye la capitalización del OPEX)".
+- 2026-10-20: **CAPEX:** la fila Total Inversión Inicial usa la fuente normal (como las cabeceras verdes).
+- 2026-10-20: **OPEX:** "Mechanical / top pruning" y "Mechanical / side pruning" en dos líneas (ES: "Poda mecánica / de cobertura", "Poda mecánica / lateral").
+- 2026-10-20: **OPEX (IAG):** la partida "CAP processing…" se muestra "PAC" (ES) y "CAP (Common Agricultural Policy)" (EN).
+- 2026-10-20: **Textos EN:** CAPEX/OPEX Fee (Year 1 / Annual), Audit (Prorated…), Discount Rate, Corporate Income Tax, "Planting layout" sin (n)/(m).
+- 2026-10-20: **Textos EN:** "Surface area" y "Editable cells".
+- 2026-10-20: **Rentabilidad (IAG):** capas "Rentabilidad agrícola" y "SPV", sin subtítulos.
+- 2026-10-20: **Editor:** títulos de sección (h2 de cada pestaña) en Rockwell.
+- 2026-10-21: **Editor (IAG):** tarjetas TIR en orden Agrícola, SPV y Fondo (nueva, 0% hasta que exista la capa Fondo; decidir luego 0 o N/A); ninguna resaltada en verde.
+- 2026-10-21: **Supuestos:** "Marco de plantación" sin (n)/(m), "CAPEX Fee (Año 1)" y "Auditoría" (EN: Audit).
+- 2026-10-21: **CAPEX:** "Capitalización OPEX (OPEX Año 1 + Año 2)".
+- 2026-10-21: **Textos:** "Impuesto de Sociedades" (también en el informe) y "OPEX Fee (Anual)" / "(Annual)".
+- 2026-10-21: **CAPEX:** "Árboles/Ha" con mayúscula en el texto de entrada.
+- 2026-10-21: **CAPEX:** la cifra de Total CAPEX usa la fuente normal (como las cabeceras verdes).
+- 2026-10-21: **Campos editables (azules):** todos 3 px más estrechos (NumberField).
+- 2026-10-21: **OPEX:** columnas de ancho fijo (minmax(0,fr)) para que todos los cuadros queden alineados aunque la etiqueta sea larga.
+- 2026-10-21: **OPEX:** unidad "€/Kg/Aceituna" (antes Aceitunas).
+- 2026-10-21: **OPEX:** fuera la columna "€/Ha 1er Año" de las tablas.
+- 2026-10-21: **OPEX:** columnas de tabla: Partida flexible (hace salto de línea), cuadros de 69 px, Unidad 52 px, €/Ha pleno 64 px; "Coste unitario" en una línea.
+- 2026-10-21: **OPEX:** "Coste unitario" alineado a la derecha con su cuadro. Nuevo agente `revisor-estetico` (regla 7).
+- 2026-10-21: **OPEX:** cuadros de 58 px, huecos más estrechos (Partida gana ~35 px) y unidad "€/Kg/" + "Aceituna" en dos líneas en todos los modelos.
+- 2026-10-21: **OPEX:** cabeceras Cantidad/Coste unitario a 10 px, 10 px entre cuadros, etiquetas con guionado (hyphens) para palabras largas. Revisor estético: sin fallos (2 modelos × ES/EN).
+- 2026-10-21: **OPEX:** bloque Cantidad 7 px más a la izquierda (17 px entre cuadros). Revisor: sin solapes.
+- 2026-10-21: **Gráfico de Precio:** gráfico pegado a la leyenda (~5 px entre la leyenda y el primer número del eje).
+- 2026-10-21: **Gráfico de Precio:** más alto (H=176) para que la tarjeta llegue a ~5 px del botón inferior a 1400×900.
+- 2026-10-21: **Rentabilidad (IAG):** nueva capa "Fondo" (mismas filas que el modelo estándar) a 0 hasta que el motor IAG calcule el fondo; se vuelca sola cuando existan r.fundRev, r.fcfF, r.tirF…
+- 2026-10-21: **Rentabilidad:** las tablas de capas comparten anchos fijos (Concepto 230 px, año 88 px) para que los años queden alineados entre tablas.
+- 2026-10-21: **Supuestos (IAG):** nueva tarjeta "Fondo de inversión" (participación %, comisión gestión % equity/Año, otros €/Año; por defecto 0). El motor IAG calcula la capa Fondo: su % del FCF apalancado, comisión, IS de Supuestos sobre ingresos del fondo y otros con inflación. Con 0 % todo sale a 0.
+- 2026-10-21: **Supuestos (IAG):** el campo de participación del fondo se llama "Capital Fondo" (EN "Fund Capital").
+- 2026-10-21: **Supuestos (IAG):** "Capital Fondo" pasa a ser calculado = 100 % − % financiación (no editable); el motor usa ese % para la capa Fondo.
+- 2026-10-21: **Supuestos:** unidad "% Capital" (EN "% Equity") (antes "% equity/Año").
+- 2026-10-21: **Rentabilidad (capa Fondo):** la fila "Capital" = inversión inicial (CAPEX + OPEX capitalizada) × (1 − % financiación), el mismo importe todos los años. En Torrimpietra (IAG) es la base de la comisión de gestión del fondo; en el modelo estándar la comisión sigue sobre el equity comprometido.
+- 2026-10-21: **Supuestos (IAG):** campo "Success Fee" (%) en "Fees y costes del SPV", entre OPEX Fee y Auditoría; por defecto 0 y aún sin cálculo (pendiente de que Marc defina la base).
+- 2026-10-21: **Informe (tablas de 35 años):** cifras a 7,3 px y separación derecha de cada columna 0,05 cm (antes 6,6 px y 0,1 cm).
+- 2026-10-21: **Informe:** la tabla Fondo usa los mismos márgenes y columna de texto que Agrícola y SPV (pad 38, labW45), así sus cifras caben a 7,3 px.
+- 2026-10-21: **Fondo (IAG):** ingresos del fondo = FCF apalancado positivo del SPV (y aportaciones = el negativo), igual que el modelo original; ya no se multiplica por el % Capital Fondo (lo contaba dos veces). El % solo da el capital base de la comisión.
+- 2026-10-21: **Fondo:** la partida "Otros" del fondo pasa a llamarse "Auditoría" (Supuestos IAG, capas Fondo de Rentabilidad en ambos modelos e informe).
+- 2026-10-21: **OPEX:** última columna a 90 px con cabecera "€/Ha Plena Prod." en una línea (EN "€/Ha Full Prod."); Partida cede el ancho y puede ir en dos líneas.
+- 2026-10-21: **Editor:** selector de estado del proyecto (Activo / Borrador / En revisión) junto al nombre, con los colores del panel; se guarda con "Guardar cambios" (solo quien puede editar).
+- 2026-10-21: **Estado del proyecto:** "Borrador" con letras blancas (a petición de Marc, se descarta el texto oscuro).
+- 2026-10-21: **Estado del proyecto:** solo "Activo" y "Borrador" (fuera "En revisión").
+- 2026-10-21: **Estado del proyecto:** fondo de "Borrador" en gris #595959 (editor y panel).

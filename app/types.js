@@ -60,7 +60,7 @@
  */
 
 /** @typedef {'olivo' | 'almendro'} CropType */
-/** @typedef {'Activo' | 'Borrador' | 'En revisión'} ModelStatus */
+/** @typedef {'Activo' | 'Borrador'} ModelStatus */
 /** @typedef {'edit' | 'view' | 'none'} AccessLevel */
 /** @typedef {'invited' | 'active'} UserStatus */
 /** @typedef {'admin' | 'user'} UserRole */

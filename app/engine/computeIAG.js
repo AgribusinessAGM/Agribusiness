@@ -175,6 +175,40 @@ export function computeIAG(a) {
 
   const tirA = irr(fcfU.slice(1));
   const tirL = irr(fcfL.slice(1));
+
+  // Capa Fondo (supuestos "Fondo de inversión"): el fondo pone el capital que no es deuda;
+  // como en el modelo original, sus ingresos son el FCF apalancado positivo del SPV y aporta
+  // el negativo (el capital que no es deuda ya está dentro de ese FCF). Le restan
+  // la comisión de gestión (% del capital del fondo), el IS de Supuestos sobre sus
+  // ingresos y "otros" (€/Año con inflación).
+  const fPct = (100 - (+a.financiacion || 0)) / 100; // Capital Fondo = 1 − % financiación
+  const fundRev = [0];
+  const spvInv = [0];
+  const fundCosts = [0];
+  const impFondo = [0];
+  const otherF = [0];
+  const costesF = [0];
+  const fcfF = [0];
+  const fcfFAcum = [0];
+  for (let y = 1; y <= HZ; y++) {
+    fundRev[y] = Math.max(0, fcfL[y]);
+    spvInv[y] = Math.min(0, fcfL[y]);
+  }
+  // capital del fondo: inversión inicial sin la parte financiada; base de la comisión de gestión
+  const capitalF = -capexRow.reduce((s, v) => s + v, 0) * fPct;
+  const fondoEquity = capitalF;
+  let acumF = 0;
+  for (let y = 1; y <= HZ; y++) {
+    fundCosts[y] = fondoEquity * ((+a.fondoCost || 0) / 100);
+    impFondo[y] = fundRev[y] * ((+a.is || 0) / 100);
+    otherF[y] = fPct > 0 ? ((+a.fondoOtros || 0) * inflF(y)) / 1000 : 0;
+    costesF[y] = spvInv[y] - fundCosts[y] - impFondo[y] - otherF[y];
+    fcfF[y] = fundRev[y] + costesF[y];
+    acumF += fcfF[y];
+    fcfFAcum[y] = acumF;
+  }
+  const tirF = fPct > 0 ? irr(fcfF.slice(1)) : 0;
+  const vanF = fcfF.slice(1).reduce((s, v, i) => s + v / Math.pow(1 + dr, i), 0);
   const vanHa = sup > 0 ? (fcfU.slice(1).reduce((s, v, i) => s + v / Math.pow(1 + dr, i), 0) * 1000) / sup : 0;
   let payback = null;
   for (let y = 1; y <= HZ; y++) {
@@ -236,13 +270,22 @@ export function computeIAG(a) {
     aidApl,
     aidRest,
     isPay,
-    fondoEquity: 0,
+    fondoEquity,
+    capitalF,
+    fundRev,
+    spvInv,
+    fundCosts,
+    impFondo,
+    otherF,
+    costesF,
+    fcfF,
+    fcfFAcum,
     tirA,
     tirL,
-    tirF: null,
+    tirF,
     van: (vanHa * sup) / 1000,
     vanHa,
-    vanF: null,
+    vanF,
     payback,
     totalIntereses,
     opexByItem,

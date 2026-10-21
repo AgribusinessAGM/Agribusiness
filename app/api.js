@@ -118,7 +118,17 @@ export function normalizeModel(m) {
       .filter((c) => c.key !== 'farm')
       .map((c) => (c.key === 'infra' ? { ...c, items: [...c.items, ...farm.items] } : c));
   }
-  return changed ? { ...m, a: { ...m.a, capexGroups, opexItems } } : m;
+  // Torrimpietra: supuestos del fondo de inversión añadidos después (0 = sin fondo)
+  const fondo = {};
+  if (m.a.engine === 'iag') {
+    for (const k of ['successFee', 'fondoCost', 'fondoOtros']) {
+      if (m.a[k] == null) {
+        fondo[k] = 0;
+        changed = true;
+      }
+    }
+  }
+  return changed ? { ...m, a: { ...m.a, capexGroups, opexItems, ...fondo } } : m;
 }
 
 export async function fetchModels() {

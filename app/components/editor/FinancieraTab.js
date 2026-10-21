@@ -1,7 +1,7 @@
 import { html } from '../../lib/html.js';
 import { k, nf, nfAcc } from '../../engine/format.js';
 
-// Impuesto de sociedades del SPV visto como activo por impuesto diferido
+// Impuesto de Sociedades del SPV visto como activo por impuesto diferido
 // ('E. Financial' filas 10-14 del Excel IAG; en el resto de modelos es el mismo
 // arrastre de pérdidas que ya calculaba el motor).
 function DeferredTaxTable({ r }) {
@@ -164,7 +164,7 @@ export function FinancieraTab({ a, r }) {
 
   return html`
     <div style=${{ minWidth: 0 }}>
-      <h2 style=${{ fontSize: 18, fontWeight: 800, margin: '0 0 6px' }}>Estructura financiera</h2>
+      <h2 style=${{ fontSize: 18, fontWeight: 800, fontFamily: "Rockwell, 'Rockwell Nova', 'Roboto Slab', serif", margin: '0 0 6px' }}>Estructura financiera</h2>
       <p style=${{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 20px' }}>
         Préstamo francés sobre la deuda, con años de carencia.
       </p>

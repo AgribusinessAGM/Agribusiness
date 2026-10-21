@@ -180,6 +180,10 @@ export function baseIAG(ov) {
       capexFee: 1000,
       opexFee: 355,
       audit: Math.round((10000 * 300) / 650),
+      // fondo de inversión (su capital se calcula: 100 % − financiación)
+      successFee: 0,
+      fondoCost: 0,
+      fondoOtros: 0,
       descuento: 6,
       priceVar: PRICE_VAR_IAG.slice(),
       // Orchard 2 (Lanuvio): solo para replicar el reparto de la amortización del Excel

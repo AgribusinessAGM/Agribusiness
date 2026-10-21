@@ -50,9 +50,9 @@ const GROUPS = [
   {
     title: 'Fees y fondo',
     rows: [
-      { key: 'capexFee', label: 'CAPEX Fee (año 1)', unit: '€/Ha' },
-      { key: 'opexFee', label: 'OPEX Fee (anual, plano)', unit: '€/Ha' },
-      { key: 'fondoCost', label: 'Costes del fondo', unit: '% equity/Año' },
+      { key: 'capexFee', label: 'CAPEX Fee (Año 1)', unit: '€/Ha' },
+      { key: 'opexFee', label: 'OPEX Fee (Anual)', unit: '€/Ha' },
+      { key: 'fondoCost', label: 'Costes del fondo', unit: '% Capital' },
     ],
   },
 ];
@@ -64,8 +64,8 @@ const GROUPS_IAG = [
     title: 'Parcela y plantación',
     rows: [
       { key: 'superficie', label: 'Superficie de la parcela', unit: 'Ha' },
-      { key: 'marcoN', label: 'Marco de plantación (n)', unit: 'm' },
-      { key: 'marcoM', label: 'Marco de plantación (m)', unit: 'm' },
+      { key: 'marcoN', label: 'Marco de plantación', unit: 'm' },
+      { key: 'marcoM', label: 'Marco de plantación', unit: 'm' },
     ],
   },
   {
@@ -87,7 +87,7 @@ const GROUPS_IAG = [
     title: 'Supuestos macro',
     rows: [
       { key: 'inflacion', label: 'Inflación', unit: '%' },
-      { key: 'is', label: 'Impuesto de sociedades', unit: '%' },
+      { key: 'is', label: 'Impuesto de Sociedades', unit: '%' },
       { key: 'descuento', label: 'Tasa de descuento (VAN)', unit: '%' },
     ],
   },
@@ -103,9 +103,20 @@ const GROUPS_IAG = [
   {
     title: 'Fees y costes del SPV',
     rows: [
-      { key: 'capexFee', label: 'CAPEX Fee (año 1)', unit: '€/Ha' },
-      { key: 'opexFee', label: 'OPEX Fee (anual, plano)', unit: '€/Ha' },
-      { key: 'audit', label: 'Auditoría (prorrateada al Orchard 1)', unit: '€/Año' },
+      { key: 'capexFee', label: 'CAPEX Fee (Año 1)', unit: '€/Ha' },
+      { key: 'opexFee', label: 'OPEX Fee (Anual)', unit: '€/Ha' },
+      // pendiente de definir su cálculo (de momento no afecta a los resultados)
+      { key: 'successFee', label: 'Success Fee', unit: '%' },
+      { key: 'audit', label: 'Auditoría', unit: '€/Año' },
+    ],
+  },
+  {
+    title: 'Fondo de inversión',
+    rows: [
+      // calculado: lo que no se financia con deuda (100 % − financiación)
+      { key: 'fondoPct', label: 'Capital Fondo', unit: '%', calc: (a) => 100 - (+a.financiacion || 0) },
+      { key: 'fondoCost', label: 'Comisión Gestión Fondo', unit: '% Capital' },
+      { key: 'fondoOtros', label: 'Auditoría', unit: '€/Año' },
     ],
   },
 ];
@@ -116,7 +127,7 @@ export function SupuestosTab({ a, r }) {
   return html`
     <div>
       <div style=${{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-        <h2 style=${{ fontSize: 18, fontWeight: 800, margin: 0 }}>Supuestos generales</h2>
+        <h2 style=${{ fontSize: 18, fontWeight: 800, fontFamily: "Rockwell, 'Rockwell Nova', 'Roboto Slab', serif", margin: 0 }}>Supuestos generales</h2>
         <span
           style=${{
             fontSize: 11,
@@ -177,11 +188,25 @@ export function SupuestosTab({ a, r }) {
                     >
                       <div style=${{ fontSize: 13.5 }}>${row.label}</div>
                       <div style=${{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <${NumberField}
-                          id=${'sup:' + row.key}
-                          value=${row.key === 'descuento' ? discountPct(a) : a[row.key]}
-                          onChangeRaw=${(raw) => onField(row.key, raw)}
-                        />
+                        ${row.calc
+                          ? html`<div
+                              title="Calculado"
+                              style=${{
+                                width: 95,
+                                textAlign: 'right',
+                                fontSize: 14,
+                                padding: '6px 9px',
+                                border: '1px solid var(--line)',
+                                borderRadius: 6,
+                              }}
+                            >
+                              ${nf(row.calc(a), 0)}
+                            </div>`
+                          : html`<${NumberField}
+                              id=${'sup:' + row.key}
+                              value=${row.key === 'descuento' ? discountPct(a) : a[row.key]}
+                              onChangeRaw=${(raw) => onField(row.key, raw)}
+                            />`}
                         <span style=${{ fontSize: 12, color: 'var(--ink2)', width: 74 }}>${row.unit}</span>
                       </div>
                     </div>

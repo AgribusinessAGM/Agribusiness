@@ -19,9 +19,9 @@ const T = {
 function rowStyles(kind, wide, vAdj) {
   // [padding vertical, tamaño etiqueta, tamaño número] según el tipo de fila
   const v = { f: 7, p: 3, s: 5, n: 4 }[kind] + (wide ? 2.5 : 0) + vAdj;
-  const numFs = wide ? 6.6 : kind === 'p' ? 8 : 8.5;
+  const numFs = wide ? 7.3 : kind === 'p' ? 8 : 8.5;
   const lblFs = kind === 'p' ? 9.5 : wide ? 9 : kind === 'f' ? 10.5 : 10;
-  const base = { lbl: { textAlign: 'left', padding: `${v}px 0 ${v}px 8px`, fontSize: lblFs, whiteSpace: 'nowrap' }, num: { textAlign: 'right', padding: `${v}px 0.1cm ${v}px 0`, fontSize: numFs } };
+  const base = { lbl: { textAlign: 'left', padding: `${v}px 0 ${v}px 8px`, fontSize: lblFs, whiteSpace: 'nowrap' }, num: { textAlign: 'right', padding: `${v}px 0.05cm ${v}px 0`, fontSize: numFs } };
   if (kind === 'f')
     return {
       tr: { background: T.finalBg, color: '#fff' },
@@ -81,7 +81,7 @@ export function RentTable({ rows, pad = 60, vAdj = 0, labW: labWProp }) {
                 <th
                   key=${y}
                   className="num"
-                  style=${{ textAlign: 'right', padding: `${thV}px 0.1cm ${thV}px 0`, fontSize: 8, color: '#8a9182', fontWeight: 700 }}
+                  style=${{ textAlign: 'right', padding: `${thV}px 0.05cm ${thV}px 0`, fontSize: 8, color: '#8a9182', fontWeight: 700 }}
                 >
                   ${y}
                 </th>

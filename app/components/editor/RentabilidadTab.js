@@ -2,6 +2,9 @@ import { html } from '../../lib/html.js';
 import { nf } from '../../engine/format.js';
 import { buildPnlHeader, buildPnlLayers } from '../../engine/pnlLayers.js';
 
+const LAB_W = 230;
+const YEAR_W = 88; // cabe un negativo de 5 cifras en miles, p. ej. (10.000)
+
 export function RentabilidadTab({ a, r }) {
   const horizon = r.ingresos.length - 1;
   const pnlHeader = buildPnlHeader(horizon);
@@ -10,7 +13,7 @@ export function RentabilidadTab({ a, r }) {
 
   return html`
     <div>
-      <h2 style=${{ fontSize: 18, fontWeight: 800, margin: '0 0 6px' }}>5. Rentabilidad</h2>
+      <h2 style=${{ fontSize: 18, fontWeight: 800, fontFamily: "Rockwell, 'Rockwell Nova', 'Roboto Slab', serif", margin: '0 0 6px' }}>5. Rentabilidad</h2>
       <p style=${{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 18px' }}>
         ${isIAG
           ? 'PDTE.'
@@ -61,7 +64,9 @@ export function RentabilidadTab({ a, r }) {
                 </div>
               </div>
               <div style=${{ overflow: 'auto' }}>
-                <table style=${{ borderCollapse: 'collapse', width: '100%', minWidth: 840, fontSize: 13 }}>
+                <table style=${{ borderCollapse: 'collapse', tableLayout: 'fixed', width: LAB_W + pnlHeader.length * YEAR_W, fontSize: 13 }}>
+                  <!-- mismos anchos en todas las capas para que los años queden alineados -->
+                  <colgroup><col style=${{ width: LAB_W }} />${pnlHeader.map((h) => html`<col key=${h.label} style=${{ width: YEAR_W }} />`)}</colgroup>
                   <thead>
                     <tr>
                       <th

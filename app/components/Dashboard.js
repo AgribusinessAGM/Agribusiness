@@ -5,8 +5,7 @@ import { useApp } from '../state/store.js';
 
 const statusColor = {
   Activo: 'var(--brand)',
-  Borrador: 'var(--muted)',
-  'En revisión': 'var(--accent)',
+  Borrador: '#595959',
 };
 
 const ALMENDRO_THEME = {
