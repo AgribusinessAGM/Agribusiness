@@ -871,3 +871,7 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-22: **Informe, CAPEX:** la fila de plantación se llama "Plantación Manual" o "Plantación Mecanizada" (los mismos nombres que en el CAPEX).
 - 2026-10-22: **CAPEX:** "Método plantación 1. (Espaldera + Protector)" pasa a "Sistema de guiado y soporte (Espaldera + Protector)" (ES).
 - 2026-10-22: **CAPEX:** "Sistema de guiado y soporte (Tutor + Protector)" también; EN "Training and support system (Trellis/Stake + Protector)" (datos, migración y BD local de Torrimpietra y Lanuvio).
+- 2026-10-22: **Informe, CAPEX:** nueva fila "Sistema de guiado y soporte" (espaldera/tutor + protector) separada de Plantación.
+- 2026-10-22: **Informe, CAPEX:** la fila de guiado lleva la modalidad elegida: "(Espaldera + Protector)" o "(Tutor + Protector)".
+- 2026-10-22: **CAPEX EN:** "Manual planting" / "Mechanised planting" (antes "Planting method 1./2."), también en el informe; guardado en Torrimpietra y Lanuvio.
+- 2026-10-22: **Informe pág. 3:** 15 px entre la banda y la tabla CAPEX y entre CAPEX y OPEX.

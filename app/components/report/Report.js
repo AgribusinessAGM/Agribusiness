@@ -331,7 +331,18 @@ export function Report({ title }) {
   // Partidas del CAPEX de mayor a menor peso (la capitalización del OPEX va siempre al final)
   // El bloque de plantación se parte en "Plantas" (planta + royalties) y "Plantación" (el resto)
   const PLANT_KEYS = ['olive', 'smarttree', 'royalties'];
+  // espaldera / tutor (+ protector): fila propia "Sistema de guiado y soporte"
+  const GUIDE_KEYS = ['trellis', 'stake', 'tutor'];
   // nombre de la fila según el sistema de plantación con importe (mismos nombres que en el CAPEX)
+  // nombre de la fila de guiado con la modalidad elegida (la que tiene importe)
+  const guideSys = (g) => {
+    const val = (k) => +(g.items.find((it) => it.key === k) || {}).v || 0;
+    return val('trellis') > 0
+      ? 'Sistema de guiado y soporte (Espaldera + Protector)'
+      : val('stake') > 0 || val('tutor') > 0
+        ? 'Sistema de guiado y soporte (Tutor + Protector)'
+        : 'Sistema de guiado y soporte';
+  };
   const plantSys = (g) => {
     const val = (k) => +(g.items.find((it) => it.key === k) || {}).v || 0;
     return val('mechanical') > 0 ? 'Plantación Mecanizada' : val('manual') > 0 ? 'Plantación Manual' : 'Plantación';
@@ -341,7 +352,8 @@ export function Report({ title }) {
       ? [g]
       : [
           { ...g, key: 'plantas', title: 'Plantas', items: g.items.filter((it) => PLANT_KEYS.includes(it.key)) },
-          { ...g, key: 'plantacion', title: plantSys(g), items: g.items.filter((it) => !PLANT_KEYS.includes(it.key)) },
+          { ...g, key: 'guiado', title: guideSys(g), items: g.items.filter((it) => GUIDE_KEYS.includes(it.key)) },
+          { ...g, key: 'plantacion', title: plantSys(g), items: g.items.filter((it) => !PLANT_KEYS.includes(it.key) && !GUIDE_KEYS.includes(it.key)) },
         ],
   );
   const capexRows = capexBlocks
@@ -506,7 +518,7 @@ export function Report({ title }) {
           <div style=${{ padding: '20px 60px 0', flex: 'none' }}>
             <div
               style=${{
-                marginBottom: 20,
+                marginBottom: 15,
                 padding: '13px 22px',
                 background: '#eaf1e8',
                 borderRadius: 8,
@@ -555,7 +567,7 @@ export function Report({ title }) {
               ]}
               totalRow=${{ title: 'Inversión total', perHa: nf(r.capexHa), total: nf(r.totalCapex) + ' k€' }}
             />
-            <div style=${{ height: 20 }} />
+            <div style=${{ height: 15 }} />
             <${SummaryTable}
               first="OPEX · Plena producción"
               rows=${opexBlocks.map((b) => ({
