@@ -70,7 +70,7 @@ export const PAIRS = [
 ['Plantas','Plants'],['Sistema de guiado y soporte','Trellis system'],['Plantación','Planting'],['Smarttree Olivo con protector','Smarttree olive with protector'],['Royalties','Royalties'],
 ['Tutor en campo 1M 18-20 mm & colocación y atado','Field stake 1M 18-20 mm & placing and tying'],['Fertilizante','Fertiliser'],
 ['Sistema de riego','Irrigation system'],['Energía','Energy'],
-['Viabilidad, Proyecto, Dirección ejecución, Administración','Feasibility, Project, Construction Management, Administration'],
+['Viabilidad, Proyecto, Dirección ejecución, Administración','Feasibility, Project, Construction Management, Admin.'],
 ['Captación de Fincas','Land sourcing'],['Levantamiento topográfico','Topographic survey'],['Estudio y Mapa Suelo','Soil study and mapping'],
 ['Due Diligence Técnica Idoneidad ubicación','Technical Due Diligence on site suitability'],
 ['Limpieza y drenaje del terreno','Clearing and drainage'],['Nivelación del terreno','Land levelling'],['Subsolado','Subsoiling'],['Chisel/Grada','Chisel/Harrow'],

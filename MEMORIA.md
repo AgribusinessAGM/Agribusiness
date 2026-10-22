@@ -885,3 +885,9 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-22: **Informe, hojas 4 y 5:** la columna agrupada de las tablas de 35 años empieza en el año 25 (Σ 25–35). Las filas agrupadas llevan `grouped` para no confundirlas con tablas de 25 años.
 - 2026-10-22: **Informe, resumen ejecutivo:** los 6 KPI son cuadros flotantes (sin borde, sombra abajo a la izquierda, 14 px de separación) con un icono de línea por categoría (KPI_ICON_PATHS en Report.js).
 - 2026-10-22: **EN:** "Sistema de guiado y soporte" se traduce "Trellis system" (antes Training and support system); etiquetas de iag.js y migración PM en api.js actualizadas.
+- 2026-10-22: **EN:** bloque CAPEX de viabilidad se titula "Feasibility, Project, Construction Management, Admin." (migración VIAB_TITLE en api.js).
+- 2026-10-22: **Informe, cuadros KPI:** título en verde (C.value) y cifra en negro.
+- 2026-10-22: **Informe, cuadros KPI:** todas las cifras a 28 px (antes 32 y 34 la TIR agrícola).
+- 2026-10-22: **Informe, cuadros KPI:** iconos a 20 px.
+- 2026-10-22: **Cifras en negrita:** se carga IBM Plex Mono 700 en index.html (antes solo hasta 600), para que las cifras de las filas destacadas (fontWeight 700) se vean en negrita como su etiqueta.
+- 2026-10-22: **Informe, cuadros KPI:** orden TIR agrícola, TIR SPV, Payback / VAN proyecto, Inversión total, Préstamo (TIR fondo en estándar).

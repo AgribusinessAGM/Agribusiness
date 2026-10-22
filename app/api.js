@@ -177,6 +177,13 @@ export function normalizeModel(m) {
         g.key !== 'plant' ? g : { ...g, items: g.items.map((it) => (PM[it.key] ? { ...it, label: PM[it.key] } : it)) },
       );
     }
+    // título abreviado del bloque de viabilidad ("Admin.")
+    const VIAB_TITLE = 'Feasibility, Project, Construction Management, Admin.';
+    const VIAB_OLD = 'Feasibility, Project, Construction Management, Administration';
+    if (capexGroups.some((g) => g.key === 'viab' && g.title === VIAB_OLD)) {
+      changed = true;
+      capexGroups = capexGroups.map((g) => (g.key === 'viab' && g.title === VIAB_OLD ? { ...g, title: VIAB_TITLE } : g));
+    }
     // plantación manual, mecánica y fertilizante pasan de €/Árbol a €/Ha (mismo importe por Ha)
     const dens = m.a.marcoN > 0 && m.a.marcoM > 0 ? 10000 / (m.a.marcoN * m.a.marcoM) : 0;
     const HA_KEYS = ['manual', 'mechanical', 'fert'];

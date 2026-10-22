@@ -43,7 +43,7 @@ export function buildCapexIAG() {
     },
     {
       key: 'viab',
-      title: 'Feasibility, Project, Construction Management, Administration',
+      title: 'Feasibility, Project, Construction Management, Admin.',
       unit: 'ha',
       items: [
         { key: 'sourcing', label: 'Land sourcing', v: 0 },

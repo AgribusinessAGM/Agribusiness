@@ -86,7 +86,7 @@ function today() {
   return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
 }
 
-// Iconos de línea (18 px, verde corporativo) de los cuadros de KPI del resumen
+// Iconos de línea (20 px, verde corporativo) de los cuadros de KPI del resumen
 const KPI_ICON_PATHS = {
   // VAN: monedas apiladas
   van: ['M12 4c4.4 0 8 1.3 8 3s-3.6 3-8 3-8-1.3-8-3 3.6-3 8-3z', 'M4 7v5c0 1.7 3.6 3 8 3s8-1.3 8-3V7', 'M4 12v5c0 1.7 3.6 3 8 3s8-1.3 8-3v-5'],
@@ -107,7 +107,7 @@ function KpiIcon(name) {
   const paths = KPI_ICON_PATHS[name];
   if (!paths) return null;
   return html`
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke=${C.value} stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style=${{ flex: 'none' }}>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke=${C.value} stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style=${{ flex: 'none' }}>
       ${paths.map((d) => html`<path d=${d} />`)}
     </svg>
   `;
@@ -438,10 +438,10 @@ export function Report({ title }) {
         boxShadow: '-4px 6px 14px rgba(15, 42, 23, 0.14)',
       }}
     >
-      <div style=${{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', color: '#000', marginBottom: 10 }}>
+      <div style=${{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', color: C.value, marginBottom: 10 }}>
         ${KpiIcon(opts.icon)}${label}
       </div>
-      <div className="num" style=${{ fontSize: opts.big ? 34 : 32, fontWeight: 600, color: C.value, lineHeight: 1 }}>${value}</div>
+      <div className="num" style=${{ fontSize: 28, fontWeight: 600, color: '#000', lineHeight: 1 }}>${value}</div>
       <div style=${{ fontSize: 13, color: C.muted, marginTop: 6 }}>${sub}</div>
     </div>
   `;
@@ -516,14 +516,14 @@ export function Report({ title }) {
           <${SectionHead} num="01" kicker="Resumen ejecutivo" title="Escenario central" intro=${intro1} />
           <div style=${{ padding: '20px 60px 0', flex: 'none' }}>
             <div style=${{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
-              ${kpiCell('VAN proyecto', kpis.van, vanSub, { icon: 'van' })}
-              ${kpiCell('TIR agrícola', kpis.tirA, 'Proyecto sin apalancar', { big: true, icon: 'tir' })}
-              ${kpiCell('Payback', kpis.payback, 'Recuperación FCF Acum.', { icon: 'payback' })}
+              ${kpiCell('TIR agrícola', kpis.tirA, 'Proyecto sin apalancar', { icon: 'tir' })}
               ${kpiCell('TIR SPV', kpis.tirL, 'Apalancada', { icon: 'spv' })}
+              ${kpiCell('Payback', kpis.payback, 'Recuperación FCF Acum.', { icon: 'payback' })}
+              ${kpiCell('VAN proyecto', kpis.van, vanSub, { icon: 'van' })}
+              ${kpiCell('Inversión total', kpis.inv, kpis.invHa, { icon: 'inv' })}
               ${isIAG
                 ? kpiCell('Préstamo', nf(r.deuda) + ' k€', finPct + T(' de la inversión', ' of the investment'), { icon: 'loan' })
                 : kpiCell('TIR fondo', kpis.tirF, 'Vehículo inversor', { icon: 'fund' })}
-              ${kpiCell('Inversión total', kpis.inv, kpis.invHa, { icon: 'inv' })}
             </div>
           </div>
           <div style=${{ padding: '30px 60px 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 34, flex: 'none' }}>
