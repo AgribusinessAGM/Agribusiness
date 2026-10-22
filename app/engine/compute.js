@@ -42,12 +42,15 @@ export function opexItemYear(it, y, a) {
 // Año desde el que una sub-partida OPEX se actualiza con la inflación (pedido de Marc, 22/10/2026):
 // mientras el importe de los años 1–5 cambia, va tal cual; la inflación empieza en el segundo año
 // del último tramo igual (1–5 iguales → año 2; 2–5 iguales → año 3; año 5 distinto del 4 → año 6).
-// Las partidas €/Kg siguen la regla general (desde el año 2).
+// Las partidas €/Kg se miran con su importe de cada año (siguen la rampa de producción).
 // Dos años seguidos cuentan como "iguales" si el cambio no supera la inflación del modelo más un
 // 0,5 % (decimales de Excel o importes que ya traen la inflación); un salto mayor es rampa.
-export function opexInflStart(it, inflPct = 0) {
-  if (it.perKg || !Array.isArray(it.sched)) return 2;
-  const v = it.sched;
+const opexSeries = (it, a) =>
+  it.perKg ? Array.from({ length: 13 }, (_, k) => opexItemYear(it, k + 1, a)) : Array.isArray(it.sched) ? it.sched : null;
+
+export function opexInflStart(it, inflPct = 0, a = null) {
+  const v = it.perKg && !a ? null : opexSeries(it, a);
+  if (!v) return 2;
   // partida periódica (alterna en los últimos años, p. ej. cada 2 años): regla general
   if (Math.abs(v[v.length - 2] - v[v.length - 1]) > 1e-9) return 2;
   const tol = Math.max(0, inflPct) / 100 + 0.005;
@@ -62,10 +65,10 @@ export function opexInflStart(it, inflPct = 0) {
 // importe de su primer año y se le aplica la inflación (así no se infla dos veces lo que ya la traía)
 export function opexItemYearInfl(it, y, a) {
   const i = (+a.inflacion || 0) / 100;
-  const first = opexInflStart(it, +a.inflacion || 0) - 1; // primer año del tramo constante
-  const v = it.sched;
-  const periodic = Array.isArray(v) && Math.abs(v[v.length - 2] - v[v.length - 1]) > 1e-9;
-  if (it.perKg || !Array.isArray(v) || periodic) return opexItemYear(it, y, a) * Math.pow(1 + i, y - 1);
+  const first = opexInflStart(it, +a.inflacion || 0, a) - 1; // primer año del tramo constante
+  const v = opexSeries(it, a);
+  const periodic = !!v && Math.abs(v[v.length - 2] - v[v.length - 1]) > 1e-9;
+  if (!v || periodic) return opexItemYear(it, y, a) * Math.pow(1 + i, y - 1);
   if (y < first) return opexItemYear(it, y, a);
   return opexItemYear(it, first, a) * Math.pow(1 + i, y - first);
 }
