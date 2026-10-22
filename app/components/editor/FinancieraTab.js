@@ -158,13 +158,13 @@ export function FinancieraTab({ a, r }) {
 
   const kpiCard = { background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 'var(--radius)', padding: '14px 16px', boxShadow: 'var(--shadow)' };
   const kpiLabel = { fontSize: 11, color: 'var(--ink2)', textTransform: 'uppercase', letterSpacing: '.05em', fontWeight: 600 };
-  const kpiValue = { fontFamily: 'var(--num)', fontSize: 22, fontWeight: 600 };
+  const kpiValue = { fontFamily: 'Arial, Helvetica, sans-serif', fontSize: 22, fontWeight: 700 };
   const tableCard = { background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow)', overflow: 'hidden' };
   const tableHead = { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 16px', fontWeight: 700, fontSize: 13, borderBottom: '1px solid var(--line)' };
 
   return html`
     <div style=${{ minWidth: 0 }}>
-      <h2 style=${{ fontSize: 18, fontWeight: 800, fontFamily: "Rockwell, 'Rockwell Nova', 'Roboto Slab', serif", margin: '0 0 6px' }}>Estructura financiera</h2>
+      <h2 style=${{ fontSize: 18, fontWeight: 800, fontFamily: "Rockwell, 'Rockwell Nova', 'Roboto Slab', serif", margin: '0 0 6px' }}>6. Estructura financiera</h2>
       <p style=${{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 20px' }}>
         Préstamo francés sobre la deuda, con años de carencia.
       </p>

@@ -19,7 +19,7 @@ const GROUPS = [
     title: 'Producción y precio',
     rows: [
       { key: 'prodPlena', label: 'Productividad plena', unit: 'kg aceite/Ha' },
-      { key: 'precioEVOO', label: 'Precio EVOO (constante)', unit: '€/Kg' },
+      { key: 'precioEVOO', label: 'Precio AOVE (constante)', unit: '€/Kg' },
       { key: 'duracionProyecto', label: 'Duración proyecto', unit: 'Años' },
     ],
   },
@@ -73,7 +73,7 @@ const GROUPS_IAG = [
     rows: [
       { key: 'kgOil', label: 'Kg AOVE/Ha · Plena Producción', unit: 'Kg/Ha' },
       { key: 'oilYield', label: 'Rendimiento graso', unit: '%' },
-      { key: 'precioEVOO', label: 'Precio inicial (EVOO)', unit: '€/Kg' },
+      { key: 'precioEVOO', label: 'Precio inicial (AOVE)', unit: '€/Kg' },
     ],
   },
   {

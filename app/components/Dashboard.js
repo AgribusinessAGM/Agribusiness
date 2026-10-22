@@ -131,7 +131,7 @@ function ModelCard({ m }) {
             >
               ${isIAG ? 'TIR SPV' : 'TIR Fondo'}
             </div>
-            <div style=${{ fontFamily: 'var(--num)', fontSize: 22, fontWeight: 600, color: 'var(--ink)' }}>
+            <div style=${{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: 22, fontWeight: 700, color: 'var(--ink)' }}>
               ${pct(isIAG ? r.tirL : r.tirF)}
             </div>
           </div>
@@ -147,7 +147,7 @@ function ModelCard({ m }) {
             >
               Inversión
             </div>
-            <div style=${{ fontFamily: 'var(--num)', fontSize: 22, fontWeight: 600 }}>
+            <div style=${{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: 22, fontWeight: 700 }}>
               ${nf(r.totalCapex / 1000, 1)} M€
             </div>
           </div>

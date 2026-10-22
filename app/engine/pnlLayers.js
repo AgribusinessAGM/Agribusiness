@@ -94,7 +94,8 @@ export function buildPnlLayers(r, a) {
         },
       });
     }
-    return { label, kind: 'p', vals, cells, labelStyle: pctLabelStyle };
+    // num/den: para recalcular el % de un tramo de años agrupado (cociente de sumas)
+    return { label, kind: 'p', vals, num: numArr.slice(1, nc + 1), den: ingresos.slice(1, nc + 1), cells, labelStyle: pctLabelStyle };
   }
 
   function mkHead(label) {

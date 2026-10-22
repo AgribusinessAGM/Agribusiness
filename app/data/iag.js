@@ -24,8 +24,8 @@ export function buildCapexIAG() {
       items: [
         { key: 'olive', label: 'Olive plant', v: 2.75 },
         { key: 'royalties', label: 'Royalties', v: 0.05 },
-        { key: 'trellis', label: 'Planting method 1. (Trellis + Protector)', v: 0 },
-        { key: 'stake', label: 'Planting method 2. (Stake + Protector)', v: 0.8 },
+        { key: 'trellis', label: 'Training and support system (Trellis + Protector)', v: 0 },
+        { key: 'stake', label: 'Training and support system (Stake + Protector)', v: 0.8 },
         { key: 'manual', label: 'Planting method 1. (Manual)', v: 1316, unit: 'ha' },
         { key: 'mechanical', label: 'Planting method 2. (Mechanical)', v: 0, unit: 'ha' },
         { key: 'fert', label: 'Fertiliser', v: 0, unit: 'ha' },
@@ -155,15 +155,16 @@ export function buildOpexIAG() {
 
 // Ciclo de precios del EVOO: variación % anual, años 1..35. Modelo de ciclicidad de Marc
 // (Book7, hoja Ciclo_AOVE, 22/10/2026): tendencia +2,09 %/año × ciclo sinusoidal de 9,5 años,
-// calibrado 2000-2026 sin la sequía 2023-2024 y con tope de 6 €/Kg. Año 1 = 2,85 €/Kg (precioEVOO).
+// sin la sequía 2023-2024, con tope de 6 €/Kg y la amplitud reducida (en escala log) para que
+// el mínimo sea 2,92 €/Kg. Año 1 = 3,36 €/Kg (precioEVOO).
 export const PRICE_VAR_IAG = [
-  0, -0.10495829320752759, -0.06600094874749896, 0.01191365411160783, 0.10042328504199816, 0.15941237113241424,
-  0.15774821942561723, 0.09635554729068052, 0.007462364070705885, -0.06903581837092299, -0.10560975058106803,
-  -0.0914444452050045, -0.03054361435760189, 0.05724279149631317, 0.1360949613785476, 0.16700715684156986,
-  0.13301227862625353, 0.05271869068941415, -0.034463037472035496, -0.09335534802552192, -0.1049582932075277,
-  -0.06600094874749884, 0.011913654111607608, 0.10042328504199771, 0.15941237113241424, 0.15774821942561723,
-  0.09635554729068097, 0.007462364070705885, -0.06903581837092265, -0.10560975058106825, -0.09144444520500483,
-  -0.030543614357601667, 0.057242791496312506, 0.1360949613785476, 0.16700715684157008,
+  0, -0.08296765655673677, -0.05193629167282576, 0.009293710882837702, 0.07761207013050342, 0.1224743269212547,
+  0.12121566884546309, 0.07449935295595589, 0.005824125932951452, -0.05434339014731693, -0.08348905543822538,
+  -0.07217037030454065, -0.023938459912630217, 0.044438680710067624, 0.1048021649970825, 0.128213528300809,
+  0.10245990058670462, 0.04094605295894693, -0.02702215638817762, -0.07369499693948156, -0.0829676565567371,
+  -0.05193629167282543, 0.00929371088283748, 0.07761207013050275, 0.12247432692125515, 0.12121566884546264,
+  0.07449935295595633, 0.00582412593295123, -0.054343390147316484, -0.08348905543822538, -0.07217037030454088,
+  -0.023938459912629995, 0.044438680710066736, 0.1048021649970825, 0.128213528300809,
 ];
 
 export function baseIAG(ov) {
@@ -173,7 +174,7 @@ export function baseIAG(ov) {
       superficie: 300,
       marcoN: 3.8,
       marcoM: 1.4,
-      precioEVOO: 2.8545816105886579,
+      precioEVOO: 3.3586185003178937,
       kgOil: 1800,
       oilYield: 16,
       alquiler: 0,

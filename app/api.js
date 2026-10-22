@@ -157,8 +157,8 @@ export function normalizeModel(m) {
                 it.key !== 'accessories'
                   ? [it]
                   : [
-                      { key: 'trellis', label: 'Planting method 1. (Trellis + Protector)', v: 0 },
-                      { key: 'stake', label: 'Planting method 2. (Stake + Protector)', v: it.v },
+                      { key: 'trellis', label: 'Training and support system (Trellis + Protector)', v: 0 },
+                      { key: 'stake', label: 'Training and support system (Stake + Protector)', v: it.v },
                     ],
               ),
             },
@@ -166,8 +166,8 @@ export function normalizeModel(m) {
     }
     // nombres "Planting method 1./2." en los modelos que ya tenían las dos partidas
     const PM = {
-      trellis: 'Planting method 1. (Trellis + Protector)',
-      stake: 'Planting method 2. (Stake + Protector)',
+      trellis: 'Training and support system (Trellis + Protector)',
+      stake: 'Training and support system (Stake + Protector)',
       manual: 'Planting method 1. (Manual)',
       mechanical: 'Planting method 2. (Mechanical)',
     };

@@ -61,7 +61,7 @@ function editorKpis(a, r) {
 
 function TabWithPhoto({ photo, alt, objectPosition = 'center', children }) {
   return html`
-    <div style=${{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+    <div style=${{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 20 }}>
       <div style=${{ gridColumn: '1 / 4' }}>${children}</div>
       <img
         src=${photo}
@@ -101,7 +101,7 @@ function KpiBox({ label, value, highlight }) {
       >
         ${label}
       </div>
-      <div style=${{ fontFamily: 'var(--num)', fontSize: 20, fontWeight: 600, color: 'var(--ink)' }}>
+      <div style=${{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: 20, fontWeight: 700, color: 'var(--ink)' }}>
         ${value}
       </div>
     </div>
@@ -375,7 +375,12 @@ export function EditorLayout() {
               <${FinancieraTab} a=${a} r=${r} />
             <//>
           `}
-          ${etab === 'precio' && html`<${PrecioTab} a=${a} r=${r} title=${isIAG ? '4. Precio' : '4. Precio'} />`}
+          ${etab === 'precio' &&
+          html`
+            <${TabWithPhoto} photo="assets/precio-detalle.webp" alt="Aceitunas entrando en la almazara">
+              <${PrecioTab} a=${a} r=${r} title="4. Precio" />
+            <//>
+          `}
           ${etab === 'informe' && html`<${Report} title=${isIAG ? '7. Informe' : '7. Informe'} />`}
         </div>
       </div>

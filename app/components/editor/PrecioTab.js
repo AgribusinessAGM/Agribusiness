@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { html } from '../../lib/html.js';
 import { nf } from '../../engine/format.js';
 import { chartColors as c } from '../charts/theme.js';
@@ -8,7 +9,7 @@ const UP = '#2e8b4a';
 const DOWN = '#c0392b';
 
 // Precio año a año con su media y, debajo, la variación % de cada año (tipo volumen de bolsa).
-function PriceChart({ price, priceVar }) {
+function PriceChart({ price, priceVar, side }) {
   const p = price.slice(1);
   const N = p.length;
   const W = 1000;
@@ -18,8 +19,34 @@ function PriceChart({ price, priceVar }) {
   const avg = p.reduce((x, v) => x + v, 0) / N;
   const sx = (i) => pl + i * ((W - pl - pr) / (N - 1));
 
-  // alturas reducidas para que la pestaña quepa en una pantalla sin desplazarse
-  const H = 176;
+  // Alto del gráfico de precio dinámico: ocupa lo que queda de ventana para que la pestaña
+  // llegue justo al borde inferior sin barra de desplazamiento (mínimo 200 px de alto)
+  const svgRef = useRef(null);
+  const barsRef = useRef(null);
+  const [H, setH] = useState(200);
+  useEffect(() => {
+    const fit = () => {
+      const el = svgRef.current;
+      const bars = barsRef.current;
+      if (!el || !bars) return;
+      const r = el.getBoundingClientRect();
+      if (!r.width) return;
+      // debajo del gráfico: barras + su margen (4) + relleno de la tarjeta (5) + borde (1) + relleno de la página (26)
+      const below = bars.getBoundingClientRect().height + 4 + 5 + 1 + 26;
+      const px = window.innerHeight - (r.top + window.scrollY) - below;
+      // mínimo de 200 px de alto: en ventanas bajas se acepta algo de scroll antes que un gráfico ilegible
+      const next = Math.round((Math.max(200, px) / r.width) * 1000);
+      setH((h) => (Math.abs(h - next) > 1 ? next : h));
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(document.documentElement);
+    window.addEventListener('resize', fit);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', fit);
+    };
+  }, []);
   const pt = 8;
   const pb = 5;
   // eje desde 0 con marcas cada 1
@@ -45,8 +72,8 @@ function PriceChart({ price, priceVar }) {
   const svgStyle = { maxWidth: '100%', display: 'block' };
 
   return html`
-    <div>
-      <svg viewBox=${`0 0 ${W} ${H}`} width="100%" style=${svgStyle}>
+    <div style=${{ display: 'grid', gridTemplateColumns: side ? 'minmax(0,1fr) 150px' : 'minmax(0,1fr)', columnGap: 16 }}>
+      <svg ref=${svgRef} viewBox=${`0 0 ${W} ${H}`} width="100%" style=${svgStyle}>
         ${grid.map(
           (v, k) => html`
             <g key=${k}>
@@ -66,7 +93,12 @@ function PriceChart({ price, priceVar }) {
           strokeLinejoin="round"
         />
       </svg>
-      <svg viewBox=${`0 0 ${W} ${H2}`} width="100%" style=${{ ...svgStyle, marginTop: 4 }}>
+      ${side &&
+      html`<div style=${{ position: 'relative' }}>
+        <!-- de la línea superior del eje (y = pt) al eje 0 (y = H − pb), en % del alto del gráfico -->
+        <div style=${{ position: 'absolute', left: 0, right: 0, top: (pt / H) * 100 + '%', bottom: (pb / H) * 100 + '%' }}>${side}</div>
+      </div>`}
+      <svg ref=${barsRef} viewBox=${`0 0 ${W} ${H2}`} width="100%" style=${{ ...svgStyle, marginTop: 4, gridColumn: 1 }}>
         <line x1=${pl} y1=${mid} x2=${W - pr} y2=${mid} stroke=${c.line} />
         ${bars.map(
           (b) => html`
@@ -98,7 +130,7 @@ function priceKpis(price) {
   const iMin = p.indexOf(Math.min(...p));
   const flat = p[iMax] - p[iMin] < 0.005;
   return [
-    { label: 'Precio medio', v: p.reduce((s, v) => s + v, 0) / p.length, sub: p.length + ' años' },
+    { label: 'Precio medio', v: p.reduce((s, v) => s + v, 0) / p.length, sub: '' },
     // precio plano: máximo y mínimo no caen en un año concreto
     { label: 'Precio máximo', v: p[iMax], sub: flat ? '—' : 'Año ' + (iMax + 1) },
     { label: 'Precio mínimo', v: p[iMin], sub: flat ? '—' : 'Año ' + (iMin + 1) },
@@ -215,7 +247,7 @@ export function PrecioTab({ a, r, title }) {
             </thead>
             <tbody>
               <tr>
-                <td style=${stickyLabel('var(--brandL)', 800)}>Precio €/Kg EVOO</td>
+                <td style=${stickyLabel('var(--brandL)', 800)}>Precio €/Kg AOVE</td>
                 ${years.map(
                   (y) => html`
                     <td
@@ -264,13 +296,12 @@ export function PrecioTab({ a, r, title }) {
           <span style=${{ color: UP, fontWeight: 700 }}>■</span> % Var. (+)${'  '}
           <span style=${{ color: DOWN, fontWeight: 700 }}>■</span> % Var. (-)
         </div>
-        <div style=${{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 150px', gap: 16, alignItems: 'stretch' }}>
-          <${PriceChart} price=${r.price} priceVar=${priceVar} />
-          <!-- KPIs del precio en el horizonte del proyecto -->
-          <!-- la columna toma el alto del gráfico (no lo empuja): recuadros a partes iguales -->
-          <!-- alto mínimo para que el texto quepa cuando el gráfico es pequeño (pantallas estrechas) -->
-          <div style=${{ position: 'relative', minHeight: 170 }}>
-          <div style=${{ position: 'absolute', inset: '0 0 2px 0', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <${PriceChart}
+          price=${r.price}
+          priceVar=${priceVar}
+          side=${html`
+          <!-- KPIs del precio: entre la línea superior del eje (máximo) y el eje 0 del gráfico -->
+          <div style=${{ display: 'flex', flexDirection: 'column', gap: 6, height: '100%' }}>
             ${priceKpis(r.price).map(
               (k) => html`
                 <div
@@ -279,22 +310,30 @@ export function PrecioTab({ a, r, title }) {
                     flex: 1,
                     border: '1px solid var(--line)',
                     borderRadius: 'var(--radius)',
-                    padding: '4px 12px',
+                    padding: '0 10px',
                     minHeight: 0,
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
+                    overflow: 'hidden',
+                    // el alto lo marca el gráfico: la letra se reduce con el alto del recuadro (cqh)
+                    containerType: 'size',
                   }}
                 >
-                  <div style=${{ fontSize: 11, color: 'var(--ink2)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.04em' }}>${k.label}</div>
-                  <div style=${{ fontSize: 18, fontWeight: 800, color: 'var(--brandD)', lineHeight: 1.2 }}>${nf(k.v, 2)} €/Kg</div>
-                  <div style=${{ fontSize: 11, color: 'var(--ink2)' }}>${k.sub}</div>
+                  <div style=${{ fontSize: 'clamp(9px, 26cqh, 10px)', lineHeight: 1.2, color: 'var(--ink2)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.04em', whiteSpace: 'nowrap' }}>
+                    ${k.label}
+                  </div>
+                  <div style=${{ fontSize: 'clamp(12px, 44cqh, 17px)', fontWeight: 800, color: 'var(--brandD)', lineHeight: 1.2, whiteSpace: 'nowrap' }}>
+                    ${nf(k.v, 2)} €/Kg
+                  </div>
+                  ${k.sub &&
+                  html`<div style=${{ fontSize: 'clamp(9px, 26cqh, 10px)', lineHeight: 1.2, color: 'var(--ink2)', fontWeight: 600, whiteSpace: 'nowrap' }}>${k.sub}</div>`}
                 </div>
               `,
             )}
           </div>
-          </div>
-        </div>
+          `}
+        />
       </div>
     </div>
   `;

@@ -60,12 +60,26 @@ function renRows(layer, withPct) {
       (withPct || r.kind !== 'p') &&
       !(OPTIONAL_ROWS.has(r.label) && allZero(r.vals)),
   );
-  return rows.map((r, i) => ({
-    label: r.label,
-    kind: i === rows.length - 1 ? 'f' : r.kind,
-    cells: r.vals.map((v) => (r.kind === 'p' ? (v == null ? '-' : (v * 100).toFixed(0) + '%') : acc(v))),
-  }));
+  const pctTxt = (v) => (v == null ? '-' : (v * 100).toFixed(0) + '%');
+  return rows.map((r, i) => {
+    let vals = r.vals.map((v) => (r.kind === 'p' ? pctTxt(v) : acc(v)));
+    // tablas de 35 años: los 10 últimos (26–35) van en una sola columna con su suma
+    // (en las filas de % , el % del tramo = suma del numerador / suma de ingresos)
+    if (r.vals.length === 35) {
+      const sum = (arr) => arr.slice(GROUP_FROM - 1).reduce((s, v) => s + (+v || 0), 0);
+      const g =
+        r.kind === 'p'
+          ? pctTxt(r.den && sum(r.den) > 0 ? sum(r.num) / sum(r.den) : null)
+          : acc(sum(r.vals));
+      vals = [...vals.slice(0, GROUP_FROM - 1), g];
+    }
+    return { label: r.label, kind: i === rows.length - 1 ? 'f' : r.kind, cells: vals };
+  });
 }
+// primer año del tramo final agrupado en las tablas de 35 años
+const GROUP_FROM = 26;
+const GROUP_HEADS = [...Array.from({ length: GROUP_FROM - 1 }, (_, i) => String(i + 1)), 'Σ ' + GROUP_FROM + '–35'];
+const headsOf = (rows) => (rows && rows[0] && rows[0].cells.length === GROUP_FROM ? GROUP_HEADS : undefined);
 
 function today() {
   const d = new Date();
@@ -287,25 +301,25 @@ export function Report({ title }) {
   const finPct = fmt2(a.financiacion) + ' %';
   const premisas = [
     { k: 'Superficie', v: supTxt },
-    { k: 'Marco de plantación', v: nf(a.marcoN, 2) + ' × ' + nf(a.marcoM, 2) + ' m' },
-    { k: 'Densidad', v: nf(r.densidad) + T(' árb/Ha', ' trees/Ha') },
+    { k: 'Marco de plantación', v: nf(a.marcoN, 2) + ' m × ' + nf(a.marcoM, 2) + ' m' },
+    { k: 'Densidad', v: nf(r.densidad) + T(' Árboles/Ha', ' Trees/Ha') },
     { k: 'Árboles totales', v: nf(r.arboles) },
-    { k: 'Producción plena', v: nf(prodPlena) + ' kg EVOO/Ha' },
+    { k: 'Producción plena', v: nf(prodPlena) + T(' kg AOVE/Ha', ' kg EVOO/Ha') },
     hasCycle
-      ? { k: 'Precio EVOO inicial', v: nf(a.precioEVOO, 2) + T(' €/Kg · con ciclo', ' €/Kg · with cycle') }
-      : { k: 'Precio EVOO', v: nf(a.precioEVOO, 2) + ' €/Kg' },
+      ? { k: 'Precio AOVE inicial', v: nf(a.precioEVOO, 2) + ' €/Kg' }
+      : { k: 'Precio AOVE', v: nf(a.precioEVOO, 2) + ' €/Kg' },
     { k: 'Alquiler', v: nf(a.alquiler) + T(' €/Ha/Año', ' €/Ha/Year') },
     { k: 'Coste personal', v: nf(a.personal) + T(' €/Ha/Año', ' €/Ha/Year') },
   ];
   const fin = [
     { k: 'Financiación', v: finPct },
+    { k: 'Tipo de interés', v: fmt2(a.interes) + ' %' },
     { k: 'Deuda', v: nf(r.deuda) + ' k€' },
     { k: 'Equity (SPV)', v: nf(r.equity) + ' k€' },
-    { k: 'Tipo de interés', v: fmt2(a.interes) + ' %' },
-    { k: 'Plazo · carencia', v: a.plazo + ' · ' + a.carencia + years },
     { k: 'Cuota anual', v: nf(r.cuota) + ' k€' },
-    { k: 'Inflación', v: fmt2(a.inflacion) + ' %' },
+    { k: 'Plazo · carencia', v: a.plazo + ' · ' + a.carencia + years },
     { k: 'Impuesto de Sociedades', v: fmt2(a.is) + ' %' },
+    { k: 'Inflación', v: fmt2(a.inflacion) + ' %' },
   ];
   const grpHa = (g) => g.items.reduce((s, it) => s + capexItemHa(it, g, r.densidad, sup), 0);
   // Resumen del OPEX en plena producción por bloque (sin la fila "Otros"); el % es sobre el OPEX total
@@ -317,12 +331,17 @@ export function Report({ title }) {
   // Partidas del CAPEX de mayor a menor peso (la capitalización del OPEX va siempre al final)
   // El bloque de plantación se parte en "Plantas" (planta + royalties) y "Plantación" (el resto)
   const PLANT_KEYS = ['olive', 'smarttree', 'royalties'];
+  // nombre de la fila según el sistema de plantación con importe (mismos nombres que en el CAPEX)
+  const plantSys = (g) => {
+    const val = (k) => +(g.items.find((it) => it.key === k) || {}).v || 0;
+    return val('mechanical') > 0 ? 'Plantación Mecanizada' : val('manual') > 0 ? 'Plantación Manual' : 'Plantación';
+  };
   const capexBlocks = a.capexGroups.flatMap((g) =>
     g.key !== 'plant'
       ? [g]
       : [
           { ...g, key: 'plantas', title: 'Plantas', items: g.items.filter((it) => PLANT_KEYS.includes(it.key)) },
-          { ...g, key: 'plantacion', title: 'Plantación', items: g.items.filter((it) => !PLANT_KEYS.includes(it.key)) },
+          { ...g, key: 'plantacion', title: plantSys(g), items: g.items.filter((it) => !PLANT_KEYS.includes(it.key)) },
         ],
   );
   const capexRows = capexBlocks
@@ -497,6 +516,12 @@ export function Report({ title }) {
               }}
             >
               <div>
+                <div style=${{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: C.sub, marginBottom: 6 }}>Superficie</div>
+                <div className="num" style=${{ fontSize: 20, fontWeight: 600, color: C.green }}>
+                  ${nf(sup)}${' '}<span style=${{ fontSize: 12, color: '#7b8473' }}>Ha</span>
+                </div>
+              </div>
+              <div>
                 <div style=${{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: C.sub, marginBottom: 6 }}>Marco</div>
                 <div className="num" style=${{ fontSize: 20, fontWeight: 600, color: C.green }}>
                   ${nf(a.marcoN, 2)}${' '}<span style=${{ fontSize: 12, color: '#7b8473' }}>m</span>${' × '}${nf(a.marcoM, 2)}${' '}<span
@@ -509,12 +534,6 @@ export function Report({ title }) {
                 <div style=${{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: C.sub, marginBottom: 6 }}>Densidad</div>
                 <div className="num" style=${{ fontSize: 20, fontWeight: 600, color: C.green }}>
                   ${nf(r.densidad)}${' '}<span style=${{ fontSize: 12, color: '#7b8473' }}>Árboles/Ha</span>
-                </div>
-              </div>
-              <div>
-                <div style=${{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: C.sub, marginBottom: 6 }}>Superficie</div>
-                <div className="num" style=${{ fontSize: 20, fontWeight: 600, color: C.green }}>
-                  ${nf(sup)}${' '}<span style=${{ fontSize: 12, color: '#7b8473' }}>Ha</span>
                 </div>
               </div>
               <div>
@@ -563,7 +582,7 @@ export function Report({ title }) {
             title=${isIAG ? T('Modelo Financiero Agrícola', 'Agricultural Financial Model') : 'Cuenta de resultados y FCF — proyecto agrícola'}
             intro=${T('Explotación del olivar sin apalancar · TIR agrícola ', 'Unlevered olive grove operation · agricultural IRR ') + kpis.tirA}
           />
-          <${RentTable} rows=${projectRows} pad=${38} labW=${labW45} />
+          <${RentTable} rows=${projectRows} heads=${headsOf(projectRows)} pad=${38} labW=${labW45} />
           <${Footer} page=${4} />
         <//>
 
@@ -576,7 +595,7 @@ export function Report({ title }) {
             intro=${T('Vehículo con deuda, fees y auditoría · TIR SPV ', 'Vehicle with debt, fees and audit · SPV IRR ') + kpis.tirL}
           />
           <!-- filas algo más bajas: el hueco entre la tabla y el pie es igual al que hay entre la entradilla y la tabla -->
-          <${RentTable} rows=${spvRows} pad=${38} vAdj=${-0.56} labW=${labW45} />
+          <${RentTable} rows=${spvRows} heads=${headsOf(spvRows)} pad=${38} vAdj=${-0.56} labW=${labW45} />
           <${Footer} page=${5} />
         <//>
 
@@ -590,7 +609,7 @@ export function Report({ title }) {
               title="Flujo del fondo al inversor"
               intro=${T('Equity del inversor ', 'Investor equity ') + nf(r.fondoEquity) + ' k€' + T(' · TIR fondo ', ' · Fund IRR ') + kpis.tirF}
             />
-            <${RentTable} rows=${fundRows} pad=${38} labW=${labW45} />
+            <${RentTable} rows=${fundRows} heads=${headsOf(fundRows)} pad=${38} labW=${labW45} />
             <div style=${{ padding: '0 60px 14px', flex: 'none', display: 'flex', gap: 12 }}>
               <div style=${{ flex: 1, padding: '16px 20px', border: '1px solid ' + C.line, borderLeft: '4px solid ' + C.green, borderRadius: 4 }}>
                 <div style=${{ fontSize: 10, textTransform: 'uppercase', color: C.muted, marginBottom: 6 }}>TIR agrícola</div>

@@ -78,14 +78,14 @@ export function CapexTab({ a, r }) {
               <div style=${smallHead}>
                 Densidad
               </div>
-              <div style=${{ fontFamily: 'var(--num)', fontSize: 20, fontWeight: 600 }}>${nf(r.densidad)}</div>
+              <div style=${{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: 20, fontWeight: 700 }}>${nf(r.densidad)}</div>
               <div style=${{ fontSize: 11, color: 'var(--ink2)' }}>Árboles/Ha</div>
             </div>
             <div style=${{ padding: '14px 18px' }}>
               <div style=${smallHead}>
                 # Plantas
               </div>
-              <div style=${{ fontFamily: 'var(--num)', fontSize: 20, fontWeight: 600 }}>${nf(r.arboles)}</div>
+              <div style=${{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: 20, fontWeight: 700 }}>${nf(r.arboles)}</div>
             </div>
           </div>
         </div>

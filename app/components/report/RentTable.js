@@ -19,7 +19,8 @@ const T = {
 function rowStyles(kind, wide, vAdj) {
   // [padding vertical, tamaño etiqueta, tamaño número] según el tipo de fila
   const v = { f: 7, p: 3, s: 5, n: 4 }[kind] + (wide ? 2.5 : 0) + vAdj;
-  const numFs = wide ? 7.3 : kind === 'p' ? 8 : 8.5;
+  // con 26 columnas (35 años con el tramo final agrupado) las cifras caben más grandes
+  const numFs = wide ? 9.5 : kind === 'p' ? 8 : 8.5;
   const lblFs = kind === 'p' ? 9.5 : wide ? 9 : kind === 'f' ? 10.5 : 10;
   const base = { lbl: { textAlign: 'left', padding: `${v}px 0 ${v}px 8px`, fontSize: lblFs, whiteSpace: 'nowrap' }, num: { textAlign: 'right', padding: `${v}px 0.05cm ${v}px 0`, fontSize: numFs } };
   if (kind === 'f')
@@ -49,12 +50,13 @@ function rowStyles(kind, wide, vAdj) {
 
 // vAdj: px que se suman (o restan) al relleno vertical de cada fila del cuerpo
 // labW: ancho de la columna de etiquetas (por defecto, según el número de años)
-export function RentTable({ rows, pad = 60, vAdj = 0, labW: labWProp }) {
+export function RentTable({ rows, pad = 60, vAdj = 0, labW: labWProp, heads }) {
   const n = rows[0]?.cells.length || 25;
   const wide = n > 25;
   const labW = labWProp || (wide ? 115 : 172);
   const thV = wide ? 5 : 7;
-  const years = Array.from({ length: n }, (_, i) => i + 1);
+  // cabeceras de columna: los años, o las que se pasen (p. ej. "Σ 26–35")
+  const years = heads || Array.from({ length: n }, (_, i) => i + 1);
   return html`
     <div style=${{ padding: `10px calc(${pad}px + 0.1cm) 0 ${pad}px`, flex: 1, minHeight: 0 }}>
       <table style=${{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
@@ -81,7 +83,15 @@ export function RentTable({ rows, pad = 60, vAdj = 0, labW: labWProp }) {
                 <th
                   key=${y}
                   className="num"
-                  style=${{ textAlign: 'right', padding: `${thV}px 0.05cm ${thV}px 0`, fontSize: 8, color: '#8a9182', fontWeight: 700 }}
+                  style=${{
+                    textAlign: 'right',
+                    // la columna de suma (Σ) lleva cifras más largas: algo más ancha
+                    width: String(y).startsWith('Σ') ? 44 : undefined,
+                    padding: `${thV}px 0.05cm ${thV}px 0`,
+                    fontSize: 8,
+                    color: '#8a9182',
+                    fontWeight: 700,
+                  }}
                 >
                   ${y}
                 </th>

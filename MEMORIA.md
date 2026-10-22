@@ -835,3 +835,39 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-22: **CAPEX:** etiquetas "Método plantación 1. (Espaldera + Protector)" y "Método plantación 2. (Tutor + Protector)" (EN "Planting method 1./2. …").
 - 2026-10-22: **CAPEX (IAG):** "Método Plantación 1. (Manual)" y "Método Plantación 2. (Mecánica)" (EN "Planting method 1. (Manual)" / "2. (Mechanical)"); guardado en Torrimpietra y Lanuvio.
 - 2026-10-22: **Supuestos (IAG):** "Kg AOVE/Ha · Plena Producción" (EN "Kg EVOO/Ha · Full Production").
+- 2026-10-22: **Est. Financiera:** título de la pestaña "6. Estructura financiera".
+- 2026-10-22: **Precio (IAG):** ciclo Book7 con mínimo 2,92 €/Kg (amplitud reducida en escala log, máximo 6): año 1 = 3,36, medio 4,35. Guardado en Torrimpietra y Lanuvio y por defecto. TIR agrícola 10,37 % / 8,87 %, TIR SPV 9,23 % / 7,82 %.
+- 2026-10-22: **Campos editables:** borde verde #385723 (variable --editableLine; afecta también a las pastillas "editable" y al campo de renombrar).
+- 2026-10-22: **Campos editables:** fondo azul #dceaf7 con un 25 % de transparencia (rgba 0,75).
+- 2026-10-22: **Precio:** los KPIs van dentro de PriceChart (prop side), junto al gráfico de precio: de la línea superior del eje al eje 0 (las barras ocupan solo la columna del gráfico).
+- 2026-10-22: **Precio:** KPIs en dos líneas (etiqueta; cifra + año) con letra que escala con el alto del recuadro (cqh); el medio ya no lleva "35 años". En pantallas estrechas (~1000 px) la letra queda pequeña.
+- 2026-10-22: **Pestañas 1-3:** 20 px entre las tablas y la foto (gap de la rejilla repeat(4,1fr)).
+- 2026-10-22: **Precio:** foto a la derecha (assets/precio-detalle.webp, aceitunas en la almazara) con el mismo ancho y márgenes que las pestañas 1-3 (TabWithPhoto).
+- 2026-10-22: **Editor:** el área de pestañas reserva siempre el hueco de la barra de desplazamiento (scrollbar-gutter: stable): mismo margen derecho con y sin scroll.
+- 2026-10-22: **OPEX:** separación entre columnas de 12 px (Partida baja a ~54 px y se parten más palabras); el guionado usa el idioma activo (lang es/en).
+- 2026-10-22: **Editor:** el hueco de la barra se reserva en `html` (scrollbar-gutter: stable en styles.css), que es lo que hace scroll; el del contenedor de pestañas no bastaba.
+- 2026-10-22: **Editor:** quitado el scrollbar-gutter del contenedor de pestañas (duplicaba el hueco y dejaba las fotos 15 px más a la izquierda que la cabecera); solo queda el de html.
+- 2026-10-22: **Precio:** gráfico más alto (H=364) para que la tarjeta y la foto acaben a la altura del botón PDF a 1536×864 (en otros anchos no coincide exacto).
+- 2026-10-22: **Informe pág. 3:** banda superior en orden Superficie, Marco, Densidad, Nº árboles.
+- 2026-10-22: **Precio:** alto del gráfico dinámico (ResizeObserver): llena la ventana hasta 26 px del borde inferior para que la pestaña no tenga scroll (mínimo 200 px de alto).
+- 2026-10-22: **Precio:** en los KPIs de máximo y mínimo el año va en una línea debajo de la cifra.
+- 2026-10-22: **Informe (tablas de 35 años):** los 10 últimos años (26–35) se agrupan en una columna "Σ 26–35" con la suma (en filas de %: suma del numerador / suma de ingresos). 26 columnas; cifras a 9,5 px. Las filas de % guardan num/den en pnlLayers.
+- 2026-10-22: **Est. Financiera:** cifras de las tarjetas KPI (deuda, intereses…) en Arial.
+- 2026-10-22: **Cifras grandes en Arial negrita:** KPI de la cabecera del editor, densidad y nº de plantas en CAPEX, cifras de las tarjetas del panel y KPI de Est. Financiera.
+- 2026-10-22: **Informe:** columna "Σ 26–35" más ancha (44 px) para que quepan las sumas largas a 9,5 px.
+- 2026-10-22: **Informe:** densidad como "Árboles/Ha" (EN "Trees/Ha").
+- 2026-10-22: **Informe:** marco de plantación "3,80 m × 1,40 m".
+- 2026-10-22: **Informe:** producción plena "kg AOVE/Ha" en ES (EN "kg EVOO/Ha").
+- 2026-10-22: **Informe:** precio inicial sin "· con ciclo".
+- 2026-10-22: **Informe, Estructura financiera:** orden Financiación, Tipo de interés, Deuda, Equity (SPV), Cuota anual, Plazo · carencia, Impuesto de Sociedades, Inflación.
+- 2026-10-22: **Regla de textos:** en español siempre "AOVE", en inglés "EVOO". Corregidos: Precio inicial (AOVE), Precio AOVE (constante), Precio €/Kg AOVE (tabla de precios), Precio AOVE inicial / Precio AOVE (informe), Precios · €/Kg AOVE.
+- 2026-10-22: **CAPEX:** "Sistema Plantación 1. (Manual)" y "Sistema Plantación 2. (Mecánica)" en ES (EN sigue "Planting method 1./2.").
+- 2026-10-22: **CAPEX (IAG):** Sistema Plantación 1 (manual) y 2 (mecánica) excluyentes: al poner valor en uno, el otro pasa a 0 (onCapexField, store.js).
+- 2026-10-22: **Campos editables:** Intro cierra la edición y fija el valor (blur).
+- 2026-10-22: **CAPEX (IAG):** Método plantación 1 (espaldera) y 2 (tutor) también excluyentes.
+- 2026-10-22: **Informe, CAPEX:** la fila "Plantación" lleva "(Manual)" o "(Mecánica)" según el sistema de plantación con importe.
+- 2026-10-22: **CAPEX:** "Sistema Plantación 1. (Manual)" pasa a "Plantación Manual" (ES).
+- 2026-10-22: **CAPEX:** "Sistema Plantación 2. (Mecánica)" pasa a "Plantación Mecanizada" (ES).
+- 2026-10-22: **Informe, CAPEX:** la fila de plantación se llama "Plantación Manual" o "Plantación Mecanizada" (los mismos nombres que en el CAPEX).
+- 2026-10-22: **CAPEX:** "Método plantación 1. (Espaldera + Protector)" pasa a "Sistema de guiado y soporte (Espaldera + Protector)" (ES).
+- 2026-10-22: **CAPEX:** "Sistema de guiado y soporte (Tutor + Protector)" también; EN "Training and support system (Trellis/Stake + Protector)" (datos, migración y BD local de Torrimpietra y Lanuvio).

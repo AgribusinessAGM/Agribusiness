@@ -146,7 +146,7 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
   };
 
   return html`
-    <div style=${{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+    <div style=${{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 20 }}>
       <div style=${{ gridColumn: '1 / 4' }}>
         <div style=${{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
           <h2 style=${{ fontSize: 18, fontWeight: 800, fontFamily: "Rockwell, 'Rockwell Nova', 'Roboto Slab', serif", margin: 0 }}>3. OPEX — Costes operativos</h2>
@@ -192,7 +192,7 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
                   style=${{
                     display: 'grid',
                     gridTemplateColumns: 'minmax(0,1fr) auto 52px 90px',
-                    columnGap: 8,
+                    columnGap: 12, // aire entre Partida, cuadros, Unidad y €/Ha
                     padding: '8px 18px',
                     fontSize: 11,
                     color: 'var(--ink2)',
@@ -215,14 +215,14 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
                       style=${{
                         display: 'grid',
                         gridTemplateColumns: 'minmax(0,1fr) auto 52px 90px',
-                    columnGap: 8,
+                    columnGap: 12, // aire entre Partida, cuadros, Unidad y €/Ha
                         alignItems: 'center',
                         padding: '8px 18px',
                         // línea gris entre sub-partidas; la de la última la pone el relleno de abajo
                         borderBottom: ii < g.items.length - 1 ? '1px solid var(--line)' : 'none',
                       }}
                     >
-                      <div lang="es" style=${{ fontSize: 13.5, whiteSpace: 'pre-line', hyphens: 'auto', overflowWrap: 'anywhere' }}>${splitLabel(it.label, it.catKey)}</div>
+                      <div lang=${state.lang === "en" ? "en" : "es"} style=${{ fontSize: 13.5, whiteSpace: 'pre-line', hyphens: 'auto', overflowWrap: 'anywhere' }}>${splitLabel(it.label, it.catKey)}</div>
                       <div style=${{ display: 'flex', justifyContent: 'flex-end', gap: 17 }}>
                         <${NumberField}
                           id=${'op:cant:' + it.catKey + '.' + it.key}

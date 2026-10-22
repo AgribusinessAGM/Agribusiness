@@ -9,6 +9,10 @@ import * as api from '../api.js';
 // Estado global de la app y todas las acciones que lo cambian. Los componentes
 // lo leen con useApp().
 
+// Partidas de plantación que se excluyen entre sí (Sistema Plantación 1 manual / 2 mecánica)
+// y Método plantación 1 (espaldera + protector) / 2 (tutor + protector)
+const EXCLUSIVE = { manual: 'mechanical', mechanical: 'manual', trellis: 'stake', stake: 'trellis' };
+
 function savedLang() {
   try {
     return localStorage.getItem('om_lang') === 'en' ? 'en' : 'es';
@@ -241,7 +245,17 @@ export function useAppStore() {
           const groups = m.a.capexGroups.map((g) =>
             g.key !== gkey
               ? g
-              : { ...g, items: g.items.map((it) => (it.key === ikey ? { ...it, v } : it)) },
+              : {
+                  ...g,
+                  items: g.items.map((it) =>
+                    it.key === ikey
+                      ? { ...it, v }
+                      : // sistemas de plantación excluyentes: con valor en uno, el otro pasa a 0
+                        gkey === 'plant' && +v && EXCLUSIVE[ikey] === it.key
+                        ? { ...it, v: 0 }
+                        : it,
+                  ),
+                },
           );
           return { ...m, a: { ...m.a, capexGroups: groups } };
         }),
