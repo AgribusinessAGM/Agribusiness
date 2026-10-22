@@ -68,7 +68,20 @@ export function opexItemYearInfl(it, y, a) {
   const first = opexInflStart(it, +a.inflacion || 0, a) - 1; // primer año del tramo constante
   const v = opexSeries(it, a);
   const periodic = !!v && Math.abs(v[v.length - 2] - v[v.length - 1]) > 1e-9;
-  if (!v || periodic) return opexItemYear(it, y, a) * Math.pow(1 + i, y - 1);
+  if (!v) return opexItemYear(it, y, a) * Math.pow(1 + i, y - 1);
+  // Periódica (p. ej. enmiendas 66 · 132 · 132 · 132 · 132 · 0 · 132 · 0…): la inflación empieza en
+  // el segundo año de la primera repetición (aquí el año 3; si nunca repite, el año 2) y se acumula
+  // todos los años, también los de 0: el año que vuelve a tener importe trae la inflación de ambos.
+  if (periodic) {
+    let s = 2;
+    for (let k = 1; k < v.length; k++) {
+      if (v[k] !== 0 && Math.abs(v[k] - v[k - 1]) < 1e-9) {
+        s = k + 1;
+        break;
+      }
+    }
+    return opexItemYear(it, y, a) * (y >= s ? Math.pow(1 + i, y - s + 1) : 1);
+  }
   if (y < first) return opexItemYear(it, y, a);
   return opexItemYear(it, first, a) * Math.pow(1 + i, y - first);
 }

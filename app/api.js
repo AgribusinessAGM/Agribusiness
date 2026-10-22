@@ -251,6 +251,28 @@ export function normalizeModel(m) {
       );
     }
   }
+  // Partidas que alternan (años 12 y 13 distintos, p. ej. cada 2 años): desde el año en que el importe
+  // empieza a repetirse se reparten como una media constante, con el mismo total a 35 años
+  if (Array.isArray(opexItems)) {
+    const alt = (v) => Array.isArray(v) && v.length === 13 && Math.abs(v[11] - v[12]) > 1e-9;
+    if (opexItems.some((c) => (c.items || []).some((it) => !it.perKg && alt(it.sched)))) {
+      changed = true;
+      const yv = (v, y) => (y <= 13 ? v[y - 1] : y % 2 === 1 ? v[12] : v[11]);
+      opexItems = opexItems.map((c) => ({
+        ...c,
+        items: (c.items || []).map((it) => {
+          if (it.perKg || !alt(it.sched)) return it;
+          const v = it.sched;
+          let s = 1; // primer año del tramo que se reparte: el de la primera repetición no nula
+          for (let k = 1; k < 13; k++) if (v[k] !== 0 && Math.abs(v[k] - v[k - 1]) < 1e-9) { s = k; break; }
+          let sum = 0;
+          for (let y = s; y <= 35; y++) sum += yv(v, y);
+          const avg = sum / (35 - s + 1);
+          return { ...it, sched: v.map((x, k) => (k + 1 >= s ? avg : x)) };
+        }),
+      }));
+    }
+  }
   // "Poda de emergencia" pasa a "1ª Poda de formación" (EN: 1st training pruning)
   const EMERG = { 'Poda de emergencia': '1ª Poda de formación', 'Emergency pruning': '1st training pruning' };
   if (Array.isArray(opexItems) && opexItems.some((c) => (c.items || []).some((it) => EMERG[it.label]))) {

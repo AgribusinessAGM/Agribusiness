@@ -62,7 +62,7 @@ export function buildOpex() {
           'Ha',
           1,
           25,
-          [0, 25, 0, 25, 0, 25, 0, 25, 0, 25, 0, 25, 0],
+          Array(13).fill(425 / 35), // 25 € en los 17 años pares de 35, repartido: 12,14 €/año
         ),
       ],
     },
@@ -82,7 +82,7 @@ export function buildOpex() {
           'Ha',
           3,
           44,
-          [66, 132, 132, 132, 132, 0, 132, 0, 132, 0, 132, 0, 132],
+          [66].concat(Array(12).fill(2508 / 34)), // 132 € en 19 de los años 2–35, repartido: 73,76 €/año
         ),
         I('Materia orgánica', 'Ha', 1, 40.5, Array(13).fill(40.5)),
       ],
