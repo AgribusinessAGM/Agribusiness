@@ -24,6 +24,11 @@ const box = document.createElement('div');
 box.style.cssText =
   'position:fixed;right:16px;bottom:16px;z-index:99999;display:flex;gap:6px;font:600 12px system-ui,sans-serif';
 box.setAttribute('contenteditable', 'false');
+// al imprimir (informe PDF) los botones no salen
+box.className = 'dev-text-edit';
+const printCss = document.createElement('style');
+printCss.textContent = '@media print { .dev-text-edit { display: none !important; } }';
+document.head.appendChild(printCss);
 const btn = (label) => {
   const b = document.createElement('button');
   b.textContent = label;

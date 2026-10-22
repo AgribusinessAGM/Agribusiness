@@ -891,3 +891,4 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-22: **Informe, cuadros KPI:** iconos a 20 px.
 - 2026-10-22: **Cifras en negrita:** se carga IBM Plex Mono 700 en index.html (antes solo hasta 600), para que las cifras de las filas destacadas (fontWeight 700) se vean en negrita como su etiqueta.
 - 2026-10-22: **Informe, cuadros KPI:** orden TIR agrícola, TIR SPV, Payback / VAN proyecto, Inversión total, Préstamo (TIR fondo en estándar).
+- 2026-10-22: **Edición de texto:** los botones de devTextEdit.js no salen al imprimir (@media print).
