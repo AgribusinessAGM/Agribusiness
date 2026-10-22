@@ -880,3 +880,8 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-22: **Informe:** "Proyecto sin apalancar" (antes "desapalancado").
 - 2026-10-22: **Informe, portada almendro:** "Almendro SHD con regadío".
 - 2026-10-22: **Informe pág. 3:** la banda superior dice "Marco de plantación" en vez de "Marco".
+- 2026-10-22: **Barra superior:** logo más grande (alto 24 → 35 px, +20 % dos veces).
+- 2026-10-22: **Informe, pie:** logo de 15 → 29 px de alto con 15 px de margen arriba y abajo (pie igual de alto, 59 px).
+- 2026-10-22: **Informe, hojas 4 y 5:** la columna agrupada de las tablas de 35 años empieza en el año 25 (Σ 25–35). Las filas agrupadas llevan `grouped` para no confundirlas con tablas de 25 años.
+- 2026-10-22: **Informe, resumen ejecutivo:** los 6 KPI son cuadros flotantes (sin borde, sombra abajo a la izquierda, 14 px de separación) con un icono de línea por categoría (KPI_ICON_PATHS en Report.js).
+- 2026-10-22: **EN:** "Sistema de guiado y soporte" se traduce "Trellis system" (antes Training and support system); etiquetas de iag.js y migración PM en api.js actualizadas.

@@ -19,7 +19,7 @@ const T = {
 function rowStyles(kind, wide, vAdj) {
   // [padding vertical, tamaño etiqueta, tamaño número] según el tipo de fila
   const v = { f: 7, p: 3, s: 5, n: 4 }[kind] + (wide ? 2.5 : 0) + vAdj;
-  // con 26 columnas (35 años con el tramo final agrupado) las cifras caben más grandes
+  // en las tablas de 35 años (tramo final agrupado) las cifras caben más grandes
   const numFs = wide ? 9.5 : kind === 'p' ? 8 : 8.5;
   const lblFs = kind === 'p' ? 9.5 : wide ? 9 : kind === 'f' ? 10.5 : 10;
   const base = { lbl: { textAlign: 'left', padding: `${v}px 0 ${v}px 8px`, fontSize: lblFs, whiteSpace: 'nowrap' }, num: { textAlign: 'right', padding: `${v}px 0.05cm ${v}px 0`, fontSize: numFs } };
@@ -52,10 +52,10 @@ function rowStyles(kind, wide, vAdj) {
 // labW: ancho de la columna de etiquetas (por defecto, según el número de años)
 export function RentTable({ rows, pad = 60, vAdj = 0, labW: labWProp, heads }) {
   const n = rows[0]?.cells.length || 25;
-  const wide = n > 25;
+  const wide = n > 25 || !!heads; // tablas de 35 años agrupadas
   const labW = labWProp || (wide ? 115 : 172);
   const thV = wide ? 5 : 7;
-  // cabeceras de columna: los años, o las que se pasen (p. ej. "Σ 26–35")
+  // cabeceras de columna: los años, o las que se pasen (p. ej. "Σ 25–35")
   const years = heads || Array.from({ length: n }, (_, i) => i + 1);
   return html`
     <div style=${{ padding: `10px calc(${pad}px + 0.1cm) 0 ${pad}px`, flex: 1, minHeight: 0 }}>

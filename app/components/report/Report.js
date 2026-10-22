@@ -63,7 +63,7 @@ function renRows(layer, withPct) {
   const pctTxt = (v) => (v == null ? '-' : (v * 100).toFixed(0) + '%');
   return rows.map((r, i) => {
     let vals = r.vals.map((v) => (r.kind === 'p' ? pctTxt(v) : acc(v)));
-    // tablas de 35 años: los 10 últimos (26–35) van en una sola columna con su suma
+    // tablas de 35 años: los 11 últimos (25–35) van en una sola columna con su suma
     // (en las filas de % , el % del tramo = suma del numerador / suma de ingresos)
     if (r.vals.length === 35) {
       const sum = (arr) => arr.slice(GROUP_FROM - 1).reduce((s, v) => s + (+v || 0), 0);
@@ -73,17 +73,44 @@ function renRows(layer, withPct) {
           : acc(sum(r.vals));
       vals = [...vals.slice(0, GROUP_FROM - 1), g];
     }
-    return { label: r.label, kind: i === rows.length - 1 ? 'f' : r.kind, cells: vals };
+    return { label: r.label, kind: i === rows.length - 1 ? 'f' : r.kind, cells: vals, grouped: r.vals.length === 35 };
   });
 }
 // primer año del tramo final agrupado en las tablas de 35 años
-const GROUP_FROM = 26;
+const GROUP_FROM = 25;
 const GROUP_HEADS = [...Array.from({ length: GROUP_FROM - 1 }, (_, i) => String(i + 1)), 'Σ ' + GROUP_FROM + '–35'];
-const headsOf = (rows) => (rows && rows[0] && rows[0].cells.length === GROUP_FROM ? GROUP_HEADS : undefined);
+const headsOf = (rows) => (rows && rows[0] && rows[0].grouped ? GROUP_HEADS : undefined);
 
 function today() {
   const d = new Date();
   return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+}
+
+// Iconos de línea (18 px, verde corporativo) de los cuadros de KPI del resumen
+const KPI_ICON_PATHS = {
+  // VAN: monedas apiladas
+  van: ['M12 4c4.4 0 8 1.3 8 3s-3.6 3-8 3-8-1.3-8-3 3.6-3 8-3z', 'M4 7v5c0 1.7 3.6 3 8 3s8-1.3 8-3V7', 'M4 12v5c0 1.7 3.6 3 8 3s8-1.3 8-3v-5'],
+  // TIR agrícola: tendencia al alza
+  tir: ['M3 17l6-6 4 4 8-8', 'M15 7h6v6'],
+  // Payback: reloj con flecha de vuelta
+  payback: ['M3 12a9 9 0 1 0 3-6.7', 'M3 4v4h4', 'M12 8v4l3 2'],
+  // TIR SPV: barras
+  spv: ['M4 20h16', 'M7 16v-5', 'M12 16V7', 'M17 16v-8'],
+  // Préstamo: banco
+  loan: ['M3 9l9-5 9 5', 'M5 9v9', 'M10 9v9', 'M14 9v9', 'M19 9v9', 'M3 20h18'],
+  // TIR fondo: maletín
+  fund: ['M4 8h16v11H4z', 'M9 8V5h6v3', 'M4 13h16'],
+  // Inversión total: brote
+  inv: ['M12 20v-8', 'M12 12c0-4 3-7 7-7 0 4-3 7-7 7z', 'M12 14c0-3-2.5-5.5-6-5.5 0 3 2.5 5.5 6 5.5z', 'M7 20h10'],
+};
+function KpiIcon(name) {
+  const paths = KPI_ICON_PATHS[name];
+  if (!paths) return null;
+  return html`
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke=${C.value} stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style=${{ flex: 'none' }}>
+      ${paths.map((d) => html`<path d=${d} />`)}
+    </svg>
+  `;
 }
 
 function Footer({ page }) {
@@ -91,7 +118,7 @@ function Footer({ page }) {
     <div
       style=${{
         marginTop: 'auto',
-        padding: '22px 60px',
+        padding: '15px 60px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -103,7 +130,7 @@ function Footer({ page }) {
       }}
     >
       <span style=${{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-        <img src="assets/agromillora-logo.png" alt="Agromillora" style=${{ height: 15, opacity: 0.8 }} /> Agromillora Group
+        <img src="assets/agromillora-logo.png" alt="Agromillora" style=${{ height: 29, opacity: 0.8 }} /> Agromillora Group
       </span>
       <span>${'Confidencial · Página ' + String(page).padStart(2, '0')}</span>
     </div>
@@ -401,15 +428,19 @@ export function Report({ title }) {
   const pLegal = SHOW_FIN ? pFin + 1 : pFin;
   const sLegal = SHOW_FIN ? (isIAG ? '05' : '06') : sFin;
 
+  // cuadro flotante de KPI: sin borde, sombra abajo a la izquierda e icono de su categoría
   const kpiCell = (label, value, sub, opts = {}) => html`
     <div
       style=${{
-        padding: '22px 24px',
-        borderRight: opts.last ? undefined : '1px solid ' + C.line,
-        borderBottom: opts.top ? '1px solid ' + C.line : undefined,
+        padding: '20px 22px',
+        background: '#fff',
+        borderRadius: 10,
+        boxShadow: '-4px 6px 14px rgba(15, 42, 23, 0.14)',
       }}
     >
-      <div style=${{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', color: '#000', marginBottom: 10 }}>${label}</div>
+      <div style=${{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', color: '#000', marginBottom: 10 }}>
+        ${KpiIcon(opts.icon)}${label}
+      </div>
       <div className="num" style=${{ fontSize: opts.big ? 34 : 32, fontWeight: 600, color: C.value, lineHeight: 1 }}>${value}</div>
       <div style=${{ fontSize: 13, color: C.muted, marginTop: 6 }}>${sub}</div>
     </div>
@@ -484,15 +515,15 @@ export function Report({ title }) {
         <${Page}>
           <${SectionHead} num="01" kicker="Resumen ejecutivo" title="Escenario central" intro=${intro1} />
           <div style=${{ padding: '20px 60px 0', flex: 'none' }}>
-            <div style=${{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', border: '1px solid ' + C.line, borderRadius: 8, overflow: 'hidden' }}>
-              ${kpiCell('VAN proyecto', kpis.van, vanSub, { top: true })}
-              ${kpiCell('TIR agrícola', kpis.tirA, 'Proyecto sin apalancar', { top: true, big: true })}
-              ${kpiCell('Payback', kpis.payback, 'Recuperación FCF Acum.', { top: true, last: true })}
-              ${kpiCell('TIR SPV', kpis.tirL, 'Apalancada')}
+            <div style=${{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
+              ${kpiCell('VAN proyecto', kpis.van, vanSub, { icon: 'van' })}
+              ${kpiCell('TIR agrícola', kpis.tirA, 'Proyecto sin apalancar', { big: true, icon: 'tir' })}
+              ${kpiCell('Payback', kpis.payback, 'Recuperación FCF Acum.', { icon: 'payback' })}
+              ${kpiCell('TIR SPV', kpis.tirL, 'Apalancada', { icon: 'spv' })}
               ${isIAG
-                ? kpiCell('Préstamo', nf(r.deuda) + ' k€', finPct + T(' de la inversión', ' of the investment'))
-                : kpiCell('TIR fondo', kpis.tirF, 'Vehículo inversor')}
-              ${kpiCell('Inversión total', kpis.inv, kpis.invHa, { last: true })}
+                ? kpiCell('Préstamo', nf(r.deuda) + ' k€', finPct + T(' de la inversión', ' of the investment'), { icon: 'loan' })
+                : kpiCell('TIR fondo', kpis.tirF, 'Vehículo inversor', { icon: 'fund' })}
+              ${kpiCell('Inversión total', kpis.inv, kpis.invHa, { icon: 'inv' })}
             </div>
           </div>
           <div style=${{ padding: '30px 60px 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 34, flex: 'none' }}>

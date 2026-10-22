@@ -24,8 +24,8 @@ export function buildCapexIAG() {
       items: [
         { key: 'olive', label: 'Olive plant', v: 2.75 },
         { key: 'royalties', label: 'Royalties', v: 0.05 },
-        { key: 'trellis', label: 'Training and support system (Trellis + Protector)', v: 0 },
-        { key: 'stake', label: 'Training and support system (Stake + Protector)', v: 0.8 },
+        { key: 'trellis', label: 'Trellis system (Trellis + Protector)', v: 0 },
+        { key: 'stake', label: 'Trellis system (Stake + Protector)', v: 0.8 },
         { key: 'manual', label: 'Manual planting', v: 1316, unit: 'ha' },
         { key: 'mechanical', label: 'Mechanised planting', v: 0, unit: 'ha' },
         { key: 'fert', label: 'Fertiliser', v: 0, unit: 'ha' },
