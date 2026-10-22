@@ -84,7 +84,7 @@ export const PAIRS = [
 ['Sub-partida','Sub-item'],['€/Ha Plena Prod.','€/Ha Full Prod.'],['€/Ha 1er Año','€/Ha year 1'],['Total OPEX (año de referencia)','Total OPEX (reference year)'],
 ['Proyección OPEX a 35 años','35-year OPEX projection'],['€/Ha por año · con inflación','€/Ha per year · with inflation'],['Hectáreas','Hectares'],
 ['Riego y mantenimiento','Irrigation and maintenance'],
-['Control de malezas','Weed control'],['Tratamiento con herbicidas','Herbicide treatment'],
+['Manejo del suelo','Soil management'],['Tratamiento con herbicidas','Herbicide treatment'],
 ['Cosecha','Harvesting'],['Cabalgante','Straddle harvester'],['Transporte interno','Internal transport'],
 ['€/Kg/ Aceitunas','€/Kg/Olives'],['€/Kg/Aceituna','€/Kg/Olives'],['Transporte a planta central','Transport to central plant'],['Maquila','Toll milling'],
 ['Mantenimiento de infraestructura','Infrastructure maintenance'],['Reabastecimiento (de agua)','Water replenishment'],

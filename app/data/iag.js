@@ -75,7 +75,7 @@ export function buildOpexIAG() {
   return [
     {
       key: 'weed',
-      label: 'Weed control',
+      label: 'Soil management',
       items: [I('Plant protection products', 'Ha', 1, 200, rp([360, 320, 320], 200)), I('Herbicide treatment', 'Ha', 0, 0, z)],
     },
     {

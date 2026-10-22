@@ -42,7 +42,7 @@ const TWO_LINES = {
 // (los datos la traen como '€/Kg/Olives' o '€/Kg/\nAceitunas')
 const unitLabel = (u) => (/^€\/Kg\/\s*(Olives|Aceitunas?)$/.test(u) ? '€/Kg/\nAceituna' : u);
 // En Sanidad vegetal la partida de productos se llama "Protección vegetal" (en
-// Control de malezas el mismo texto del Excel sigue como "Productos fitosanitarios")
+// Manejo del suelo el mismo texto del Excel sigue como "Productos fitosanitarios")
 const splitLabel = (label, catKey) =>
   (catKey === 'health' || catKey === 'sanidad') && label === 'Plant protection products'
     ? 'Protección vegetal'

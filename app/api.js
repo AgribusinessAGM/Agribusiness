@@ -280,7 +280,13 @@ export function normalizeModel(m) {
     opexItems = opexItems.map((c) => ({ ...c, items: (c.items || []).map((it) => (EMERG[it.label] ? { ...it, label: EMERG[it.label] } : it)) }));
   }
   // categoría de cosecha: "Cosecha y comercialización" pasa a "Cosecha" (EN: Harvesting)
-  const HARV = { 'Cosecha y comercialización': 'Cosecha', 'Harvesting and marketing': 'Harvesting' };
+  // (y "Control de malezas" pasa a "Manejo del suelo", EN: Soil management)
+  const HARV = {
+    'Cosecha y comercialización': 'Cosecha',
+    'Harvesting and marketing': 'Harvesting',
+    'Control de malezas': 'Manejo del suelo',
+    'Weed control': 'Soil management',
+  };
   if (Array.isArray(opexItems) && opexItems.some((c) => HARV[c.label])) {
     changed = true;
     opexItems = opexItems.map((c) => (HARV[c.label] ? { ...c, label: HARV[c.label] } : c));

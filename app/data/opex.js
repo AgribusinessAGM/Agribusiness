@@ -17,7 +17,7 @@ export function buildOpex() {
   return [
     {
       key: 'malezas',
-      label: 'Control de malezas',
+      label: 'Manejo del suelo',
       items: [
         I('Productos fitosanitarios', 'Ha', 1, 72.534, rep([72.53, 72.53], 60.23, 11)),
         I('Tratamiento con herbicidas', 'Ha', 1, 40, rep([160, 160], 120, 11)),
