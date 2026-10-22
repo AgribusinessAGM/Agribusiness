@@ -23,6 +23,12 @@ export function opexItemScale(it) {
 // kg de aceituna por Ha en el año y (modelo IAG): rampa 0 · 0 · 50% · 75% · 100%.
 export function kgOlivesHa(a, y) {
   const ramp = y <= 2 ? 0 : y === 3 ? 0.5 : y === 4 ? 0.75 : 1;
+  // el supuesto es kg de aceite/Ha en plena producción; la aceituna sale del rendimiento graso
+  // (modelos antiguos sin kgOil: kg de aceituna por árbol × densidad)
+  if (a.kgOil != null) {
+    const yld = (+a.oilYield || 0) / 100;
+    return yld > 0 ? ((+a.kgOil || 0) / yld) * ramp : 0;
+  }
   return ((+a.kgTree || 0) * ramp * 10000) / (a.marcoN * a.marcoM);
 }
 
@@ -79,7 +85,8 @@ export function discountPct(a) {
 export function capexItemHa(it, g, densidad, sup) {
   const v = +it.v || 0;
   if (it.total) return sup > 0 ? v / sup : 0;
-  return v * (g.unit === 'ud' ? densidad : 1);
+  // una partida puede llevar su propia unidad (it.unit) distinta de la de su bloque
+  return v * ((it.unit || g.unit) === 'ud' ? densidad : 1);
 }
 
 export function compute(a) {

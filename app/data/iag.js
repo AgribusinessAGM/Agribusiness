@@ -24,9 +24,11 @@ export function buildCapexIAG() {
       items: [
         { key: 'olive', label: 'Olive plant', v: 2.75 },
         { key: 'royalties', label: 'Royalties', v: 0.05 },
-        { key: 'accessories', label: 'Accessories (Stake + Protector)', v: 0.8 },
-        { key: 'manual', label: 'Manual planting (all inc.)', v: 0.7 },
-        { key: 'fert', label: 'Fertiliser', v: 0 },
+        { key: 'trellis', label: 'Planting method 1. (Trellis + Protector)', v: 0 },
+        { key: 'stake', label: 'Planting method 2. (Stake + Protector)', v: 0.8 },
+        { key: 'manual', label: 'Manual planting (all inc.)', v: 1316, unit: 'ha' },
+        { key: 'mechanical', label: 'Mechanical planting', v: 0, unit: 'ha' },
+        { key: 'fert', label: 'Fertiliser', v: 0, unit: 'ha' },
       ],
     },
     {
@@ -34,6 +36,7 @@ export function buildCapexIAG() {
       title: 'Irrigation system',
       unit: 'ha',
       items: [
+        { key: 'irrproj', label: 'Irrigation project', v: 200 },
         { key: 'irrsys', label: 'Irrigation system (all inc.)', v: 3000 },
         { key: 'energy', label: 'Energy', v: 350 },
       ],
@@ -46,8 +49,8 @@ export function buildCapexIAG() {
         { key: 'sourcing', label: 'Land sourcing', v: 0 },
         { key: 'topo', label: 'Topographic survey', v: 200 },
         { key: 'soil', label: 'Soil study and mapping', v: 350 },
-        { key: 'irrproj', label: 'Irrigation project', v: 200 },
-        { key: 'dd', label: 'Due Diligence', v: 15000, total: true },
+        // Due Diligence en €/Ha (ddHa: ya no es un importe total)
+        { key: 'dd', label: 'Due Diligence', v: 70, ddHa: true },
       ],
     },
   ];
@@ -150,13 +153,17 @@ export function buildOpexIAG() {
   ];
 }
 
-// Ciclo de precios del EVOO: variación % anual ('E. Financial' fila 32), años 1..35.
+// Ciclo de precios del EVOO: variación % anual, años 1..35. Modelo de ciclicidad de Marc
+// (Book7, hoja Ciclo_AOVE, 22/10/2026): tendencia +2,09 %/año × ciclo sinusoidal de 9,5 años,
+// calibrado 2000-2026 sin la sequía 2023-2024 y con tope de 6 €/Kg. Año 1 = 2,85 €/Kg (precioEVOO).
 export const PRICE_VAR_IAG = [
-  0, -0.1, -0.05, -0.06600094874749907, 0.05, 0.10042328504199816, 0.15941237113241424, 0.157748219425617,
-  0.09635554729068052, 0.007462364070705663, -0.06903581837092287, -0.10560975058106803, -0.0914444452050045,
-  -0.03054361435760189, 0.05724279149631317, 0.09, 0.11, 0.07, 0.1, -0.034463037472035385, -0.09335534802552203,
-  -0.10495829320752759, -0.06600094874749896, 0.011913654111607608, 0.05, 0.05, 0.05, 0.06, 0.007462364070705885,
-  -0.08, -0.09, -0.09144444520500494, -0.030543614357601778, 0.05724279149631273, 0.1,
+  0, -0.10495829320752759, -0.06600094874749896, 0.01191365411160783, 0.10042328504199816, 0.15941237113241424,
+  0.15774821942561723, 0.09635554729068052, 0.007462364070705885, -0.06903581837092299, -0.10560975058106803,
+  -0.0914444452050045, -0.03054361435760189, 0.05724279149631317, 0.1360949613785476, 0.16700715684156986,
+  0.13301227862625353, 0.05271869068941415, -0.034463037472035496, -0.09335534802552192, -0.1049582932075277,
+  -0.06600094874749884, 0.011913654111607608, 0.10042328504199771, 0.15941237113241424, 0.15774821942561723,
+  0.09635554729068097, 0.007462364070705885, -0.06903581837092265, -0.10560975058106825, -0.09144444520500483,
+  -0.030543614357601667, 0.057242791496312506, 0.1360949613785476, 0.16700715684157008,
 ];
 
 export function baseIAG(ov) {
@@ -166,9 +173,9 @@ export function baseIAG(ov) {
       superficie: 300,
       marcoN: 3.8,
       marcoM: 1.4,
-      precioEVOO: 5,
-      kgTree: 8,
-      oilYield: 14.5,
+      precioEVOO: 2.8545816105886579,
+      kgOil: 1800,
+      oilYield: 16,
       alquiler: 0,
       personal: 500,
       inflacion: 2,

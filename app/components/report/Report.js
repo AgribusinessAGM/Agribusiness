@@ -3,7 +3,7 @@ import { createPortal, flushSync } from 'react-dom';
 import { html } from '../../lib/html.js';
 import { fmt2, nf } from '../../engine/format.js';
 import { buildPnlLayers } from '../../engine/pnlLayers.js';
-import { MP, capexItemHa, discountPct, opexItemYear } from '../../engine/compute.js';
+import { MP, capexItemHa, discountPct, kgOlivesHa, opexItemYear } from '../../engine/compute.js';
 import { useApp } from '../../state/store.js';
 import { useActiveCompute } from '../../state/useActiveCompute.js';
 import { RentTable } from './RentTable.js';
@@ -273,7 +273,7 @@ export function Report({ title }) {
   const dr = discountPct(a);
   const hasCycle = (a.priceVar || []).some((v) => v);
   const vanHa = isIAG ? r.vanHa : sup > 0 ? (r.van * 1000) / sup : 0;
-  const prodPlena = isIAG ? (+a.kgTree || 0) * r.densidad * ((+a.oilYield || 0) / 100) : a.prodPlena;
+  const prodPlena = isIAG ? kgOlivesHa(a, MP) * ((+a.oilYield || 0) / 100) : a.prodPlena;
   const years = T(' años', ' years');
   const kpis = {
     van: nf(r.van) + ' k€',
@@ -315,7 +315,17 @@ export function Report({ title }) {
     .sort((x, y) => y.ha - x.ha); // de mayor a menor peso
   const opexBlocksHa = r.opexHa; // el total incluye "Otros", aunque no se muestre como bloque
   // Partidas del CAPEX de mayor a menor peso (la capitalización del OPEX va siempre al final)
-  const capexRows = a.capexGroups
+  // El bloque de plantación se parte en "Plantas" (planta + royalties) y "Plantación" (el resto)
+  const PLANT_KEYS = ['olive', 'smarttree', 'royalties'];
+  const capexBlocks = a.capexGroups.flatMap((g) =>
+    g.key !== 'plant'
+      ? [g]
+      : [
+          { ...g, key: 'plantas', title: 'Plantas', items: g.items.filter((it) => PLANT_KEYS.includes(it.key)) },
+          { ...g, key: 'plantacion', title: 'Plantación', items: g.items.filter((it) => !PLANT_KEYS.includes(it.key)) },
+        ],
+  );
+  const capexRows = capexBlocks
     .map((g) => ({ g, ha: grpHa(g) }))
     .sort((x, y) => y.ha - x.ha)
     .map(({ g, ha }) => ({ key: g.key, title: g.title, perHa: nf(ha), pct: pctR(ha / r.capexEstab, 0), total: nf((ha * sup) / 1000) + ' k€' }));

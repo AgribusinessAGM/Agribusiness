@@ -99,15 +99,106 @@ export function normalizeModel(m) {
   if (!m || !m.a || !Array.isArray(m.a.capexGroups)) return m;
   const sup = +m.a.superficie || 0;
   let changed = false;
-  const capexGroups = m.a.capexGroups.map((g) => ({
+  const iag = m.a.engine === 'iag';
+  let capexGroups = m.a.capexGroups.map((g) => ({
     ...g,
     items: g.items.map((it) => {
-      if (it.key !== 'dd' || it.total) return it;
+      if (it.key !== 'dd' || it.total || it.ddHa) return it;
       changed = true;
       const label = it.label === 'Due Diligence (15.000 € / 300 ha)' ? 'Due Diligence' : it.label;
       return { ...it, label, v: Math.round((+it.v || 0) * sup * 100) / 100, total: true };
     }),
   }));
+  // Modelos IAG: Due Diligence pasa de importe total a 70 €/Ha editable, el proyecto de riego
+  // sube al bloque de riego y se añade la plantación mecánica
+  if (iag) {
+    const grp = (k) => capexGroups.find((g) => g.key === k);
+    const viab = grp('viab');
+    const riego = grp('riego');
+    const plant = grp('plant');
+    const dd = viab && viab.items.find((it) => it.key === 'dd');
+    if (dd && !dd.ddHa) {
+      changed = true;
+      capexGroups = capexGroups.map((g) =>
+        g.key !== 'viab' ? g : { ...g, items: g.items.map((it) => (it.key === 'dd' ? { key: 'dd', label: 'Due Diligence', v: 70, ddHa: true } : it)) },
+      );
+    }
+    const proj = viab && viab.items.find((it) => it.key === 'irrproj');
+    if (proj && riego) {
+      changed = true;
+      capexGroups = capexGroups.map((g) =>
+        g.key === 'viab'
+          ? { ...g, items: g.items.filter((it) => it.key !== 'irrproj') }
+          : g.key === 'riego'
+            ? { ...g, items: [...g.items, proj] }
+            : g,
+      );
+    }
+    // orden del bloque de riego: proyecto, sistema, energía
+    const RIEGO_ORDER = ['irrproj', 'irrsys', 'energy'];
+    const rg = grp('riego');
+    if (rg) {
+      const sorted = [...rg.items].sort((x, y) => (RIEGO_ORDER.indexOf(x.key) + 1 || 99) - (RIEGO_ORDER.indexOf(y.key) + 1 || 99));
+      if (sorted.some((it, i) => it !== rg.items[i])) {
+        changed = true;
+        capexGroups = capexGroups.map((g) => (g.key === 'riego' ? { ...g, items: sorted } : g));
+      }
+    }
+    // "Accessories (Stake + Protector)" se parte en "Trellis + Protector" (nueva, 0) y
+    // "Stake + Protector" (conserva el importe que había)
+    if (plant && plant.items.some((it) => it.key === 'accessories')) {
+      changed = true;
+      capexGroups = capexGroups.map((g) =>
+        g.key !== 'plant'
+          ? g
+          : {
+              ...g,
+              items: g.items.flatMap((it) =>
+                it.key !== 'accessories'
+                  ? [it]
+                  : [
+                      { key: 'trellis', label: 'Planting method 1. (Trellis + Protector)', v: 0 },
+                      { key: 'stake', label: 'Planting method 2. (Stake + Protector)', v: it.v },
+                    ],
+              ),
+            },
+      );
+    }
+    // nombres "Planting method 1./2." en los modelos que ya tenían las dos partidas
+    const PM = { trellis: 'Planting method 1. (Trellis + Protector)', stake: 'Planting method 2. (Stake + Protector)' };
+    if (capexGroups.some((g) => g.key === 'plant' && g.items.some((it) => PM[it.key] && it.label !== PM[it.key]))) {
+      changed = true;
+      capexGroups = capexGroups.map((g) =>
+        g.key !== 'plant' ? g : { ...g, items: g.items.map((it) => (PM[it.key] ? { ...it, label: PM[it.key] } : it)) },
+      );
+    }
+    // plantación manual, mecánica y fertilizante pasan de €/Árbol a €/Ha (mismo importe por Ha)
+    const dens = m.a.marcoN > 0 && m.a.marcoM > 0 ? 10000 / (m.a.marcoN * m.a.marcoM) : 0;
+    const HA_KEYS = ['manual', 'mechanical', 'fert'];
+    if (plant && plant.items.some((it) => HA_KEYS.includes(it.key) && it.unit !== 'ha')) {
+      changed = true;
+      capexGroups = capexGroups.map((g) =>
+        g.key !== 'plant'
+          ? g
+          : { ...g, items: g.items.map((it) => (HA_KEYS.includes(it.key) && it.unit !== 'ha' ? { ...it, v: Math.round((+it.v || 0) * dens), unit: 'ha' } : it)) },
+      );
+    }
+    if (plant && !plant.items.some((it) => it.key === 'mechanical')) {
+      changed = true;
+      capexGroups = capexGroups.map((g) => {
+        if (g.key !== 'plant') return g;
+        const items = [...g.items];
+        const i = items.findIndex((it) => it.key === 'manual');
+        items.splice(i < 0 ? items.length : i + 1, 0, { key: 'mechanical', label: 'Mechanical planting', v: 0, unit: 'ha' });
+        return { ...g, items };
+      });
+    }
+  }
+  // la categoría "3LIS System" se añadió y luego se descartó (22/10/2026): se quita si está
+  if (capexGroups.some((g) => g.key === 'lis')) {
+    changed = true;
+    capexGroups = capexGroups.filter((g) => g.key !== 'lis');
+  }
   // Torrimpietra: "Roads, facilities, etc." pasa de "Farm maintenance" a "Infrastructure
   // maintenance" y la categoría "farm" desaparece
   let opexItems = m.a.opexItems;

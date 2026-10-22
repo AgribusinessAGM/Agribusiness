@@ -12,7 +12,7 @@ export function CapexTab({ a, r }) {
   const capexDetail = a.capexGroups.map((g) => {
     const items = g.items.map((it) => {
       const ha = capexItemHa(it, g, r.densidad, +a.superficie || 0);
-      return { ...it, ha: nf(ha, 0), unitLabel: it.total ? '€/Total' : CAP_UNIT[g.unit] };
+      return { ...it, ha: nf(ha, 0), unitLabel: it.total ? '€/Total' : CAP_UNIT[it.unit || g.unit] };
     });
     const subtotal = g.items.reduce((s, it) => s + capexItemHa(it, g, r.densidad, +a.superficie || 0), 0);
     return {
@@ -53,7 +53,7 @@ export function CapexTab({ a, r }) {
         </span>
       </div>
       <p style=${{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 20px' }}>
-        Coste de establecimiento por hectárea, con el mismo detalle que la hoja Excel. Las partidas de plantación se introducen en €/Árbol y se multiplican por la densidad (${nf(r.densidad)}${' '}Árboles/Ha); el resto en €/Ha.
+        Coste de establecimiento por hectárea, con el mismo detalle que la hoja Excel. Las partidas en €/Árbol se multiplican por la densidad (${nf(r.densidad)}${' '}Árboles/Ha); el resto en €/Ha.
       </p>
 
       <div style=${{ display: 'flex', flexDirection: 'column', gap: 16 }}>

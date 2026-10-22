@@ -71,7 +71,7 @@ const GROUPS_IAG = [
   {
     title: 'Producción y precio',
     rows: [
-      { key: 'kgTree', label: 'Kg/Aceituna/Árbol · Plena Producción', unit: 'kg' },
+      { key: 'kgOil', label: 'Kg Aceite/Ha · Plena Producción', unit: 'Kg/Ha' },
       { key: 'oilYield', label: 'Rendimiento graso', unit: '%' },
       { key: 'precioEVOO', label: 'Precio inicial (EVOO)', unit: '€/Kg' },
     ],
@@ -181,6 +181,7 @@ export function SupuestosTab({ a, r }) {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
+                        gap: 12, // aire entre etiquetas de dos líneas y el cuadro
                         padding: '8px 0',
                         // sin línea en la última fila antes del borde de la tarjeta
                         borderBottom: ri < g.rows.length - 1 || g.title === 'Fees y fondo' ? '1px solid var(--line)' : 'none',

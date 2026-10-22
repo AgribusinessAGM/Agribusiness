@@ -91,6 +91,20 @@ function PriceChart({ price, priceVar }) {
   `;
 }
 
+// Precio máximo, mínimo y medio de los años del proyecto (con el año en que se da)
+function priceKpis(price) {
+  const p = price.slice(1);
+  const iMax = p.indexOf(Math.max(...p));
+  const iMin = p.indexOf(Math.min(...p));
+  const flat = p[iMax] - p[iMin] < 0.005;
+  return [
+    { label: 'Precio medio', v: p.reduce((s, v) => s + v, 0) / p.length, sub: p.length + ' años' },
+    // precio plano: máximo y mínimo no caen en un año concreto
+    { label: 'Precio máximo', v: p[iMax], sub: flat ? '—' : 'Año ' + (iMax + 1) },
+    { label: 'Precio mínimo', v: p[iMin], sub: flat ? '—' : 'Año ' + (iMin + 1) },
+  ];
+}
+
 export function PrecioTab({ a, r, title }) {
   const { onPriceVar, resetPriceVar, canEdit } = useApp();
   const priceVar = a.priceVar || [];
@@ -250,7 +264,37 @@ export function PrecioTab({ a, r, title }) {
           <span style=${{ color: UP, fontWeight: 700 }}>■</span> % Var. (+)${'  '}
           <span style=${{ color: DOWN, fontWeight: 700 }}>■</span> % Var. (-)
         </div>
-        <${PriceChart} price=${r.price} priceVar=${priceVar} />
+        <div style=${{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 150px', gap: 16, alignItems: 'stretch' }}>
+          <${PriceChart} price=${r.price} priceVar=${priceVar} />
+          <!-- KPIs del precio en el horizonte del proyecto -->
+          <!-- la columna toma el alto del gráfico (no lo empuja): recuadros a partes iguales -->
+          <!-- alto mínimo para que el texto quepa cuando el gráfico es pequeño (pantallas estrechas) -->
+          <div style=${{ position: 'relative', minHeight: 170 }}>
+          <div style=${{ position: 'absolute', inset: '0 0 2px 0', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            ${priceKpis(r.price).map(
+              (k) => html`
+                <div
+                  key=${k.label}
+                  style=${{
+                    flex: 1,
+                    border: '1px solid var(--line)',
+                    borderRadius: 'var(--radius)',
+                    padding: '4px 12px',
+                    minHeight: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <div style=${{ fontSize: 11, color: 'var(--ink2)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.04em' }}>${k.label}</div>
+                  <div style=${{ fontSize: 18, fontWeight: 800, color: 'var(--brandD)', lineHeight: 1.2 }}>${nf(k.v, 2)} €/Kg</div>
+                  <div style=${{ fontSize: 11, color: 'var(--ink2)' }}>${k.sub}</div>
+                </div>
+              `,
+            )}
+          </div>
+          </div>
+        </div>
       </div>
     </div>
   `;
