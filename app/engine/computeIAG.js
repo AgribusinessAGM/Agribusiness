@@ -1,4 +1,4 @@
-import { HZ, MP, capexItemHa, discountPct, irr, kgOlivesHa, opexItemYear } from './compute.js';
+import { HZ, MP, capexItemHa, discountPct, irr, kgOlivesHa, opexItemYear, opexItemYearInfl } from './compute.js';
 
 // Réplica de "3. Profitability" del Excel IAG (sección 4 · Orchard 1 en solitario)
 // más la capa SPV aplicada a sus Ha. Años 1..35; sin capa Fondo.
@@ -19,8 +19,8 @@ export function computeIAG(a) {
     const cells = [0];
     for (let y = 1; y <= HZ; y++) {
       let cy = 0;
-      for (const it of cat.items) cy += opexItemYear(it, y, a);
-      cells[y] = (cy * sup * inflF(y)) / 1000;
+      for (const it of cat.items) cy += opexItemYearInfl(it, y, a); // con la inflación de cada partida
+      cells[y] = (cy * sup) / 1000;
     }
     return { key: cat.key, label: cat.label, cells };
   });

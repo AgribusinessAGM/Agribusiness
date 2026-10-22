@@ -251,6 +251,12 @@ export function normalizeModel(m) {
       );
     }
   }
+  // "Poda de emergencia" pasa a "1ª Poda de formación" (EN: 1st training pruning)
+  const EMERG = { 'Poda de emergencia': '1ª Poda de formación', 'Emergency pruning': '1st training pruning' };
+  if (Array.isArray(opexItems) && opexItems.some((c) => (c.items || []).some((it) => EMERG[it.label]))) {
+    changed = true;
+    opexItems = opexItems.map((c) => ({ ...c, items: (c.items || []).map((it) => (EMERG[it.label] ? { ...it, label: EMERG[it.label] } : it)) }));
+  }
   // categoría de cosecha: "Cosecha y comercialización" pasa a "Cosecha" (EN: Harvesting)
   const HARV = { 'Cosecha y comercialización': 'Cosecha', 'Harvesting and marketing': 'Harvesting' };
   if (Array.isArray(opexItems) && opexItems.some((c) => HARV[c.label])) {

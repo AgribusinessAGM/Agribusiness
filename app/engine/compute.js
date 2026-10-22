@@ -39,6 +39,37 @@ export function opexItemYear(it, y, a) {
   return opexYear(it.sched, y) * opexItemScale(it);
 }
 
+// Año desde el que una sub-partida OPEX se actualiza con la inflación (pedido de Marc, 22/10/2026):
+// mientras el importe de los años 1–5 cambia, va tal cual; la inflación empieza en el segundo año
+// del último tramo igual (1–5 iguales → año 2; 2–5 iguales → año 3; año 5 distinto del 4 → año 6).
+// Las partidas €/Kg siguen la regla general (desde el año 2).
+// Dos años seguidos cuentan como "iguales" si el cambio no supera la inflación del modelo más un
+// 0,5 % (decimales de Excel o importes que ya traen la inflación); un salto mayor es rampa.
+export function opexInflStart(it, inflPct = 0) {
+  if (it.perKg || !Array.isArray(it.sched)) return 2;
+  const v = it.sched;
+  // partida periódica (alterna en los últimos años, p. ej. cada 2 años): regla general
+  if (Math.abs(v[v.length - 2] - v[v.length - 1]) > 1e-9) return 2;
+  const tol = Math.max(0, inflPct) / 100 + 0.005;
+  const eq = (x, y) => Math.abs(x - y) <= Math.max(1e-9, tol * Math.max(Math.abs(x), Math.abs(y)));
+  // último tramo igual de todo el calendario (hay partidas que siguen subiendo después del año 5)
+  let k = v.length - 1;
+  while (k > 0 && eq(v[k - 1], v[k])) k--;
+  return k + 2;
+}
+
+// €/Ha de la sub-partida en el año y con su inflación. Dentro del tramo constante se parte del
+// importe de su primer año y se le aplica la inflación (así no se infla dos veces lo que ya la traía)
+export function opexItemYearInfl(it, y, a) {
+  const i = (+a.inflacion || 0) / 100;
+  const first = opexInflStart(it, +a.inflacion || 0) - 1; // primer año del tramo constante
+  const v = it.sched;
+  const periodic = Array.isArray(v) && Math.abs(v[v.length - 2] - v[v.length - 1]) > 1e-9;
+  if (it.perKg || !Array.isArray(v) || periodic) return opexItemYear(it, y, a) * Math.pow(1 + i, y - 1);
+  if (y < first) return opexItemYear(it, y, a);
+  return opexItemYear(it, first, a) * Math.pow(1 + i, y - first);
+}
+
 // Busca cambios de signo del VAN en una malla y devuelve la raíz más cercana al 10% (guess de Excel).
 export function irr(cfs) {
   const npv = (r) => cfs.reduce((s, c, i) => s + c / Math.pow(1 + r, i), 0);
@@ -108,13 +139,14 @@ function computeStd(a) {
   const inflF = (y) => Math.pow(1 + infl, y - 1);
   const pr = (y) => (y <= 2 ? 0 : y === 3 ? 5 / 7.5 : y === 4 ? 6 / 7.5 : y === 5 ? 6.5 / 7.5 : 1); // rampa de producción (5 · 6 · 6,5 · 7,5 kg/árbol)
 
-  // OPEX por categoría y año, sumando sub-partidas (cada una escalada por cant×coste); inflación desde el año 2
+  // OPEX por categoría y año, sumando sub-partidas (cada una escalada por cant×coste) con la
+  // inflación de cada una (opexInflStart)
   const opexByItem = a.opexItems.map((cat) => {
     const cells = [0];
     for (let y = 1; y <= horizon; y++) {
       let cy = 0;
-      for (const it of cat.items) cy += opexYear(it.sched, y) * opexItemScale(it);
-      cells[y] = (cy * sup * inflF(y)) / 1000;
+      for (const it of cat.items) cy += opexItemYearInfl(it, y, a);
+      cells[y] = (cy * sup) / 1000;
     }
     return { key: cat.key, label: cat.label, cells };
   });

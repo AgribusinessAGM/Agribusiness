@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { html } from '../../lib/html.js';
-import { MP, opexItemYear } from '../../engine/compute.js';
+import { MP, opexItemYear, opexItemYearInfl } from '../../engine/compute.js';
 import { nf, pctShare } from '../../engine/format.js';
 import { NumberField } from '../NumberField.js';
 import { FillLine } from '../FillLine.js';
@@ -47,6 +47,16 @@ const splitLabel = (label, catKey) =>
   (catKey === 'health' || catKey === 'sanidad') && label === 'Plant protection products'
     ? 'Protección vegetal'
     : TWO_LINES[label] || label;
+
+// Partida de plena producción (asterisco rojo): su coste es constante del año 3 en adelante
+// y distinto en los años 1–2, así que la cifra de la tarjeta es la de plena producción
+const fullProdOnly = (it) => {
+  if (it.perKg || !Array.isArray(it.sched)) return false;
+  const last = it.sched[it.sched.length - 1];
+  const same = (v) => Math.abs(v - last) < 1e-9;
+  // las que acaban en 0 (podas de formación, en "U") son solo de formación: sin asterisco
+  return last > 0 && it.sched.slice(2).every(same) && !(same(it.sched[0]) && same(it.sched[1]));
+};
 
 export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' }) {
   const { state, onOpexField, onOpexSched, onProjHaField, canEdit } = useApp();
@@ -120,41 +130,44 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
     orderedCards.push(leftCards[i] || null, rightCards[i] || null);
   }
 
+  // Filas de la proyección en el orden de las tarjetas de arriba: primero la columna
+  // izquierda y luego la derecha (en el estándar, Riego lleva debajo Mantenimiento de infraestructura)
+  const cardKeys = [...leftCards, ...rightCards]
+    .filter(Boolean)
+    .flatMap((g) => (a.engine !== 'iag' && g.key === 'riego' && infraCard ? ['riego', 'infra'] : [g.key]));
+  const projCats = [
+    ...cardKeys.map((k) => a.opexItems.find((c) => c.key === k)).filter(Boolean),
+    ...a.opexItems.filter((c) => !cardKeys.includes(c.key)),
+  ];
   const projHa = +state.projHa || 0;
-  const inflFp = (y) => Math.pow(1 + a.inflacion / 100, y - 1);
   const horizon = r.opex.length - 1;
   const years = Array.from({ length: horizon }, (_, i) => i + 1);
 
-  const opexProjRows = a.opexItems.map((cat) => {
+  const opexProjRows = projCats.map((cat) => {
     const cells = years.map((y) => {
       let perHaY = 0;
-      for (const it of cat.items) perHaY += opexItemYear(it, y, a);
-      const v = perHaY * inflFp(y) * projHa;
+      for (const it of cat.items) perHaY += opexItemYearInfl(it, y, a);
+      const v = perHaY * projHa;
       return { v: v > 0 ? nf(v) : '·', style: projCell(false) };
     });
     return { label: cat.label, cells, labelStyle: projLabel(false) };
   });
-  // Modo "Editar": una fila por sub-partida con su €/Ha (sin inflación) de cada año; como en
-  // el Excel original, los años se pueden tocar hasta que el calendario se vuelve constante
-  // (desde ahí el importe es el de cantidad × coste unitario).
-  const firstConst = (sched) => {
-    let j = sched.length - 1;
-    while (j > 0 && Math.abs(sched[j - 1] - sched[sched.length - 1]) < 1e-9) j--;
-    // calendario que alterna en los últimos años: todo editable
-    return Math.abs(sched[11] - sched[12]) < 1e-9 ? j : sched.length;
-  };
-  const editRows = a.opexItems.map((cat) => ({
+  // Modo "Editar": una fila por sub-partida con su €/Ha (sin inflación) de cada año; se pueden
+  // tocar los años 1–5; el 5 fija el importe constante del año 5 en adelante (y con él, la inflación).
+  // en Editar solo se ven los años 1–5: del 5 en adelante el importe es constante
+  const colYears = editProj ? years.slice(0, 5) : years;
+  const editRows = projCats.map((cat) => ({
     key: cat.key,
     label: cat.label,
     items: cat.items
       .filter((it) => !it.perKg && Array.isArray(it.sched))
-      .map((it) => ({ ...it, editUpTo: Math.max(5, firstConst(it.sched)) })), // los 5 primeros años, siempre
+      .map((it) => ({ ...it, editUpTo: 5 })), // años 1–5; el 5 fija el importe constante del 5 en adelante
   }));
 
   const opexTotalCells = years.map((y) => {
     let tot = 0;
-    for (const cat of a.opexItems) for (const it of cat.items) tot += opexItemYear(it, y, a);
-    return { v: nf(tot * inflFp(y) * projHa), style: projCell(true) };
+    for (const cat of a.opexItems) for (const it of cat.items) tot += opexItemYearInfl(it, y, a);
+    return { v: nf(tot * projHa), style: projCell(true) };
   });
 
   const card = {
@@ -185,6 +198,9 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
         </div>
         <p style=${{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 20px' }}>
           Costes operativos anuales de la explotación necesarios para mantener la plantación y producir. Los importes de esta pestaña son los datos base por hectárea, sin inflación.
+        </p>
+        <p style=${{ color: 'var(--ink2)', fontSize: 13, margin: '-14px 0 20px' }}>
+          <span style=${{ color: '#c00000', fontWeight: 700 }}>*</span>${' '}<span>Estas partidas corresponden a los valores de plena producción.</span>
         </p>
         <div style=${{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           ${orderedCards.map((g, gi) =>
@@ -241,7 +257,7 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
                         borderBottom: ii < g.items.length - 1 ? '1px solid var(--line)' : 'none',
                       }}
                     >
-                      <div lang=${state.lang === "en" ? "en" : "es"} style=${{ fontSize: 13.5, whiteSpace: 'pre-line', hyphens: 'auto', overflowWrap: 'anywhere' }}>${splitLabel(it.label, it.catKey)}</div>
+                      <div lang=${state.lang === "en" ? "en" : "es"} style=${{ fontSize: 13.5, whiteSpace: 'pre-line', hyphens: 'auto', overflowWrap: 'anywhere' }}>${splitLabel(it.label, it.catKey)}${fullProdOnly(it) && html`<span style=${{ color: "#c00000", fontWeight: 700 }}>*</span>`}</div>
                       <div style=${{ display: 'flex', justifyContent: 'flex-end', gap: 17 }}>
                         <${NumberField}
                           id=${'op:cant:' + it.catKey + '.' + it.key}
@@ -312,7 +328,7 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
         <div>
           <h3 style=${{ fontSize: 15, fontWeight: 800, margin: 0 }}>${'Proyección OPEX a ' + horizon + ' años'}</h3>
           <div style=${{ fontSize: 11, color: 'var(--ink2)', marginTop: 3 }}>
-            ${editProj ? '€/Ha por año · sin inflación · editable hasta que el importe es constante' : '€/Ha por año · con inflación'}
+            ${editProj ? '€/Ha por año · sin inflación · la inflación empieza en el 2º año igual' : '€/Ha por año · con inflación'}
           </div>
         </div>
         ${canEdit &&
@@ -353,7 +369,7 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
         </div>
       </div>
       <div style=${{ ...card, overflow: 'auto' }}>
-        <table style=${{ borderCollapse: 'collapse', width: '100%', fontSize: 12 }}>
+        <table style=${{ borderCollapse: 'collapse', width: '100%', fontSize: 12, tableLayout: editProj ? 'fixed' : undefined }}>
           <thead>
             <tr>
               <th
@@ -366,11 +382,14 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
                   color: 'var(--brandD)',
                   fontSize: 11,
                   zIndex: 2,
+                  // en Editar: Partida a ancho fijo; los años 1–5 y una columna vacía al final se
+                  // reparten el resto por igual (así el hueco de la derecha mide lo mismo que el resto)
+                  width: editProj ? 320 : undefined,
                 }}
               >
                 Partida
               </th>
-              ${years.map(
+              ${colYears.map(
                 (y) => html`
                   <th
                     key=${y}
@@ -384,10 +403,11 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    ${y}
+                    ${editProj && y === 5 ? 'Constante 5–' + horizon : y}
                   </th>
                 `,
               )}
+            ${editProj && html`<th style=${{ background: 'var(--brandL)' }}></th>`}
             </tr>
           </thead>
           ${editProj
@@ -396,17 +416,18 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
                   (cat) => html`
                     <tr key=${'c:' + cat.key} style=${{ background: 'var(--brandL)' }}>
                       <td style=${projLabel(true)}>${cat.label}</td>
-                      ${years.map((y) => html`<td key=${y} style=${projCell(true)}></td>`)}
+                      ${colYears.map((y) => html`<td key=${y} style=${projCell(true)}></td>`)}
+                      <td></td>
                     </tr>
                     ${cat.items.map(
                       (it) => html`
                         <tr key=${cat.key + '.' + it.key}>
                           <td style=${{ ...projLabel(false), paddingLeft: 22 }}>${it.label}</td>
-                          ${years.map((y) => {
+                          ${colYears.map((y) => {
                             const v = opexItemYear(it, y, a);
-                            if (y > it.editUpTo) return html`<td key=${y} style=${projCell(false)}>${v > 0 ? nf(v) : '·'}</td>`;
+                            if (y > it.editUpTo) return html`<td key=${y} style=${{ ...projCell(false), paddingRight: 8 }}>${v > 0 ? nf(v) : '·'}</td>`;
                             return html`
-                              <td key=${y} style=${{ ...projCell(false), padding: '3px 4px' }}>
+                              <td key=${y} style=${{ ...projCell(false), padding: '3px 4px', paddingRight: 8 }}>
                                 <${NumberField}
                                   id=${'os:' + cat.key + '.' + it.key + ':' + (y - 1)}
                                   value=${v}
@@ -417,6 +438,7 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
                               </td>
                             `;
                           })}
+                          <td style=${{ borderTop: "1px solid var(--line)" }}></td>
                         </tr>
                       `,
                     )}

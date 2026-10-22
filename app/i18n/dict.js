@@ -79,7 +79,7 @@ export const PAIRS = [
 ['Proyecto de riego','Irrigation project'],['Due Diligence (15.000 € / 300 ha)','Due Diligence (15.000 € / 300 ha)'],
 // ---- OPEX
 ['3. OPEX — Costes operativos','3. OPEX — Operating costs'],['Cantidad y coste editables','Editable quantity and cost'],
-['Costes operativos anuales de la explotación necesarios para mantener la plantación y producir. Los importes de esta pestaña son los datos base por hectárea, sin inflación.','Annual operating costs of the farm needed to maintain the plantation and produce. The amounts in this tab are the base data per hectare, without inflation.'],
+['Estas partidas corresponden a los valores de plena producción.','These items correspond to full production values.'],['Costes operativos anuales de la explotación necesarios para mantener la plantación y producir. Los importes de esta pestaña son los datos base por hectárea, sin inflación.','Annual operating costs of the farm needed to maintain the plantation and produce. The amounts in this tab are the base data per hectare, without inflation.'],
 ['Cantidad','Quantity'],['y','and'],
 ['Sub-partida','Sub-item'],['€/Ha Plena Prod.','€/Ha Full Prod.'],['€/Ha 1er Año','€/Ha year 1'],['Total OPEX (año de referencia)','Total OPEX (reference year)'],
 ['Proyección OPEX a 35 años','35-year OPEX projection'],['€/Ha por año · con inflación','€/Ha per year · with inflation'],['Hectáreas','Hectares'],
@@ -92,7 +92,7 @@ export const PAIRS = [
 ['Mantenimiento de terrenos','Farm maintenance'],['Limpieza mecánica','Mechanical cleaning'],['Caminos, instalaciones, etc.','Roads, facilities, etc.'],
 ['Nutrición','Nutrition'],['Fertilizantes','Fertilisers'],['Análisis','Analyses'],['Enmiendas orgánicas','Organic amendments'],['Materia orgánica','Organic matter'],
 ['Otros','Other'],['Tramitación de la PAC','CAP processing'],['PAC','CAP (Common Agricultural Policy)'],['Abejas','Bees'],
-['Poda y formación','Pruning and training'],['Poda de emergencia','Emergency pruning'],['2ª Poda de formación','2nd training pruning'],['3ª Poda de formación','3rd training pruning'],
+['Poda y formación','Pruning and training'],['2ª Poda de formación','2nd training pruning'],['3ª Poda de formación','3rd training pruning'],
 ['1ª Poda de formación','1st training pruning'],['Atado','Tying'],['Poda de faldas','Skirt pruning'],
 ['Poda mecánica\nde cobertura','Mechanical\ntop pruning'],['Poda mecánica\nlateral','Mechanical\nside pruning'],['Poda de formación terciaria en forma de "U"','Tertiary "U" training pruning'],['Poda mecánica de cobertura','Mechanical top pruning'],['Poda mecánica lateral','Mechanical side pruning'],
 ['Poda manual en invierno','Manual winter pruning'],['Poda manual\nen invierno','Manual winter\npruning'],
@@ -152,7 +152,7 @@ export const PAIRS = [
 ['>35a','>35y'],['de la inversión','of the investment'],['VAN por ha (€)','NPV per ha (€)'],
 // ---- usuarios y permisos
 ['Asigna a cada persona el acceso a cada modelo. Haz clic en una celda para cambiar el permiso.','Assign each person access to each model. Click a cell to change the permission.'],
-['+ Invitar persona','+ Invite person'],['Editar','Edit'],['Listo','Done'],['€/Ha por año · sin inflación · editable hasta que el importe es constante','€/Ha per year · without inflation · editable until the amount is constant'],['Ver','View'],['Sin acceso','No access'],['Persona','Person'],
+['+ Invitar persona','+ Invite person'],['Editar','Edit'],['Listo','Done'],['Constante 5–35','Constant 5–35'],['Constante 5–25','Constant 5–25'],['€/Ha por año · sin inflación · la inflación empieza en el 2º año igual','€/Ha per year · without inflation · inflation starts on the 2nd equal year'],['Ver','View'],['Sin acceso','No access'],['Persona','Person'],
 ['Administrador','Administrator'],['Usuario','User'],['Rol','Role'],['Estado','Status'],['Acciones','Actions'],['Eliminar','Delete'],
 ['Invitada','Invited'],['Pendiente de activar','Pending activation'],['Restablecer contraseña','Reset password'],
 ['administrador','administrator'],['invitación pendiente','invitation pending'],['+ Añadir persona','+ Add person'],['Añadir persona','Add person'],

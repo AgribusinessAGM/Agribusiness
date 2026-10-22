@@ -311,7 +311,10 @@ export function useAppStore() {
                     const base = +it.base || 0;
                     const scale = base > 0 ? ((+it.cant || 0) * (+it.coste || 0)) / base : 1;
                     const sched = [...it.sched];
-                    sched[yIdx] = scale > 0 ? v / scale : v;
+                    const sv = scale > 0 ? v / scale : v;
+                    // el año 5 ("Constante 5–35") fija el importe de todos los años siguientes
+                    if (yIdx === 4) for (let k = 4; k < sched.length; k++) sched[k] = sv;
+                    else sched[yIdx] = sv;
                     return { ...it, sched };
                   }),
                 },

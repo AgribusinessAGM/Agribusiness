@@ -123,7 +123,7 @@ export function buildOpexIAG() {
       label: 'Pruning and training',
       items: [
         // mismas partidas y calendario que el modelo estándar (tabla de poda de Marc, 22/10/2026)
-        I('Emergency pruning', 'Ha', 5, 14.5, rp([72.5], 0)),
+        I('1st training pruning', 'Ha', 5, 14.5, rp([72.5], 0)),
         I('2nd training pruning', 'Ha', 14, 14.5, rp([203], 0)),
         I('3rd training pruning', 'Ha', 7.5, 14.5, rp([108.75], 0)),
         I('Tertiary "U" training pruning', 'Ha', 1, 65, rp([0, 65], 0)),

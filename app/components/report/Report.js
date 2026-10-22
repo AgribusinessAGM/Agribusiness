@@ -3,7 +3,7 @@ import { createPortal, flushSync } from 'react-dom';
 import { html } from '../../lib/html.js';
 import { fmt2, nf } from '../../engine/format.js';
 import { buildPnlLayers } from '../../engine/pnlLayers.js';
-import { MP, capexItemHa, discountPct, kgOlivesHa, opexItemYear } from '../../engine/compute.js';
+import { MP, capexItemHa, discountPct, kgOlivesHa, opexItemYear, opexItemYearInfl } from '../../engine/compute.js';
 import { useApp } from '../../state/store.js';
 import { useActiveCompute } from '../../state/useActiveCompute.js';
 import { RentTable } from './RentTable.js';
@@ -365,12 +365,11 @@ export function Report({ title }) {
   const opexBlocksHa = r.opexHa; // el total incluye "Otros", aunque no se muestre como bloque
   // OPEX en formación: media de los años 1 y 2 (con inflación; la mitad de lo que se
   // capitaliza en el CAPEX), por categoría y de mayor a menor
-  const inflY = (y) => Math.pow(1 + a.inflacion / 100, y - 1);
   const formBlocks = a.opexItems
     .map((cat) => ({
       key: cat.key,
       title: cat.label,
-      ha: [1, 2].reduce((s, y) => s + cat.items.reduce((t, it) => t + opexItemYear(it, y, a), 0) * inflY(y), 0) / 2, // media de los años 1 y 2
+      ha: [1, 2].reduce((s, y) => s + cat.items.reduce((t, it) => t + opexItemYearInfl(it, y, a), 0), 0) / 2, // media de los años 1 y 2
     }))
     .filter((b) => b.ha > 0)
     .sort((x, y) => y.ha - x.ha);
