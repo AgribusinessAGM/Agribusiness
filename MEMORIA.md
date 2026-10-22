@@ -875,3 +875,7 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-22: **Informe, CAPEX:** la fila de guiado lleva la modalidad elegida: "(Espaldera + Protector)" o "(Tutor + Protector)".
 - 2026-10-22: **CAPEX EN:** "Manual planting" / "Mechanised planting" (antes "Planting method 1./2."), también en el informe; guardado en Torrimpietra y Lanuvio.
 - 2026-10-22: **Informe pág. 3:** 15 px entre la banda y la tabla CAPEX y entre CAPEX y OPEX.
+- 2026-10-22: **Informe:** 5 px menos (51) entre la franja superior y el encabezado de sección (01, 02, 03…) en todas las hojas.
+- 2026-10-22: **Informe, portada:** "Olivar en seto con regadío".
+- 2026-10-22: **Informe:** "Proyecto sin apalancar" (antes "desapalancado").
+- 2026-10-22: **Informe, portada almendro:** "Almendro SHD con regadío".

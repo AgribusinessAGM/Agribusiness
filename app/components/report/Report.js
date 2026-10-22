@@ -156,7 +156,7 @@ function SummaryTable({ first, rows, totalRow }) {
 // Cabecera de sección: número, antetítulo, título y entradilla (igual en todas las hojas)
 function SectionHead({ num, kicker, title, intro }) {
   return html`
-    <div style=${{ padding: '56px 60px 0', flex: 'none' }}>
+    <div style=${{ padding: '51px 60px 0', flex: 'none' }}>
       <div style=${{ display: 'flex', alignItems: 'baseline', gap: 14, marginBottom: 4 }}>
         <span className="num" style=${{ fontFamily: HEAD_FONT, fontSize: 14, fontWeight: 600, color: C.gold }}>${num}</span>
         <span style=${{ fontFamily: HEAD_FONT, fontSize: 12, fontWeight: 700, textTransform: 'uppercase', color: C.muted }}>${kicker}</span>
@@ -383,7 +383,7 @@ export function Report({ title }) {
 
   // ---- textos
   // Título de portada en una sola línea
-  const coverTitle = almond ? T('Almendro SHD en regadío', 'Irrigated SHD almonds') : T('Olivar en seto en regadío', 'Irrigated SHD olives');
+  const coverTitle = almond ? T('Almendro SHD con regadío', 'Irrigated SHD almonds') : T('Olivar en seto con regadío', 'Irrigated SHD olives');
   const cropTxt = almond
     ? T('almendro superintensivo en regadío', 'irrigated super-high-density almond orchard')
     : isIAG
@@ -486,7 +486,7 @@ export function Report({ title }) {
           <div style=${{ padding: '20px 60px 0', flex: 'none' }}>
             <div style=${{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', border: '1px solid ' + C.line, borderRadius: 8, overflow: 'hidden' }}>
               ${kpiCell('VAN proyecto', kpis.van, vanSub, { top: true })}
-              ${kpiCell('TIR agrícola', kpis.tirA, 'Proyecto desapalancado', { top: true, big: true })}
+              ${kpiCell('TIR agrícola', kpis.tirA, 'Proyecto sin apalancar', { top: true, big: true })}
               ${kpiCell('Payback', kpis.payback, 'Recuperación FCF Acum.', { top: true, last: true })}
               ${kpiCell('TIR SPV', kpis.tirL, 'Apalancada')}
               ${isIAG
