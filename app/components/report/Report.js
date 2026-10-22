@@ -7,6 +7,7 @@ import { MP, capexItemHa, discountPct, kgOlivesHa, opexItemYear } from '../../en
 import { useApp } from '../../state/store.js';
 import { useActiveCompute } from '../../state/useActiveCompute.js';
 import { RentTable } from './RentTable.js';
+import { translateNow } from '../../i18n/translate.js';
 
 // Informe PDF del modelo activo (diseño "Informe PDF Torrimpietra" de Claude Design,
 // estilo institucional). Se ve en la pestaña Informe del editor. Son páginas A4 que
@@ -279,7 +280,11 @@ export function Report({ title }) {
   // si no recortaría las páginas dentro del editor.
   const [printing, setPrinting] = useState(false);
   useEffect(() => {
-    const before = () => flushSync(() => setPrinting(true));
+    const before = () => {
+      flushSync(() => setPrinting(true));
+      const portal = document.querySelector('.print-portal');
+      if (portal) translateNow(portal);
+    };
     const after = () => setPrinting(false);
     window.addEventListener('beforeprint', before);
     window.addEventListener('afterprint', after);

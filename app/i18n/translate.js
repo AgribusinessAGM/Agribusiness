@@ -118,6 +118,12 @@ function run(fn) {
   }
 }
 
+// Traduce ya (sin esperar al observador) un trozo recién pintado; p. ej. las páginas
+// que se copian a <body> justo antes de imprimir, que si no saldrían sin traducir.
+export function translateNow(el) {
+  run(() => node(el));
+}
+
 export function setLanguage(lang) {
   current = lang === 'en' ? 'en' : 'es';
   document.documentElement.lang = current;
