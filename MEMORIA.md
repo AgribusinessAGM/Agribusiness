@@ -879,3 +879,4 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-22: **Informe, portada:** "Olivar en seto con regadío".
 - 2026-10-22: **Informe:** "Proyecto sin apalancar" (antes "desapalancado").
 - 2026-10-22: **Informe, portada almendro:** "Almendro SHD con regadío".
+- 2026-10-22: **Informe pág. 3:** la banda superior dice "Marco de plantación" en vez de "Marco".

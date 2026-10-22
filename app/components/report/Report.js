@@ -534,7 +534,7 @@ export function Report({ title }) {
                 </div>
               </div>
               <div>
-                <div style=${{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: C.sub, marginBottom: 6 }}>Marco</div>
+                <div style=${{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: C.sub, marginBottom: 6 }}>Marco de plantación</div>
                 <div className="num" style=${{ fontSize: 20, fontWeight: 600, color: C.green }}>
                   ${nf(a.marcoN, 2)}${' '}<span style=${{ fontSize: 12, color: '#7b8473' }}>m</span>${' × '}${nf(a.marcoM, 2)}${' '}<span
                     style=${{ fontSize: 12, color: '#7b8473' }}
