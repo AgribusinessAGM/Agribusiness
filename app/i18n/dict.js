@@ -49,7 +49,7 @@ export const PAIRS = [
 ['Estructura financiera','Financial structure'],['Financiación (deuda)','Financing (debt)'],['Tasa de interés','Interest rate'],['Plazo préstamo','Loan term'],['años','years'],['Años de carencia','Grace years'],
 ['Fees y fondo','Fees and fund'],['CAPEX Fee (Año 1)','CAPEX Fee (Year 1)'],['OPEX Fee (Anual)','OPEX Fee (Annual)'],['Costes del fondo','Fund costs'],['% Capital','% Equity'],
 ['Superficie de la parcela','Surface area'],
-['Kg Aceite/Ha · Plena Producción','Kg Oil/Ha · Full Production'],['Rendimiento graso','Olive oil yield'],['Precio inicial (EVOO)','Start price (EVOO)'],
+['Kg AOVE/Ha · Plena Producción','Kg EVOO/Ha · Full Production'],['Rendimiento graso','Olive oil yield'],['Precio inicial (EVOO)','Start price (EVOO)'],
 ['Alquiler','Rent'],['Costes de personal (equipo de operaciones)','Staff costs (Operations Team)'],
 ['Inflación','Inflation'],['Impuesto de Sociedades','Corporate Income Tax'],['Tasa de descuento (VAN)','Discount Rate (NPV)'],
 ['Financiación','Financing'],['Tipo de interés','Interest rate'],['Plazo','Term'],['Carencia','Grace period'],
@@ -75,7 +75,7 @@ export const PAIRS = [
 ['Due Diligence Técnica Idoneidad ubicación','Technical Due Diligence on site suitability'],
 ['Limpieza y drenaje del terreno','Clearing and drainage'],['Nivelación del terreno','Land levelling'],['Subsolado','Subsoiling'],['Chisel/Grada','Chisel/Harrow'],
 ['Método plantación 1. (Espaldera + Protector)','Planting method 1. (Trellis + Protector)'],['Método plantación 2. (Tutor + Protector)','Planting method 2. (Stake + Protector)'],['Corrección del suelo','Soil correction'],['Alomado','Ridging'],['Planta de olivo','Olive plant'],['Accesorios (tutor + protector)','Accessories (Stake + Protector)'],
-['Plantación mecánica','Mechanical planting'],['Plantación manual','Manual planting (all inc.)'],['Sistema de riego','Irrigation system (all inc.)'],
+['Método Plantación 2. (Mecánica)','Planting method 2. (Mechanical)'],['Método Plantación 1. (Manual)','Planting method 1. (Manual)'],['Sistema de riego','Irrigation system (all inc.)'],
 ['Proyecto de riego','Irrigation project'],['Due Diligence (15.000 € / 300 ha)','Due Diligence (15.000 € / 300 ha)'],
 // ---- OPEX
 ['3. OPEX — Costes operativos','3. OPEX — Operating costs'],['Cantidad y coste editables','Editable quantity and cost'],

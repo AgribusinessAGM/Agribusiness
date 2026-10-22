@@ -165,7 +165,12 @@ export function normalizeModel(m) {
       );
     }
     // nombres "Planting method 1./2." en los modelos que ya tenían las dos partidas
-    const PM = { trellis: 'Planting method 1. (Trellis + Protector)', stake: 'Planting method 2. (Stake + Protector)' };
+    const PM = {
+      trellis: 'Planting method 1. (Trellis + Protector)',
+      stake: 'Planting method 2. (Stake + Protector)',
+      manual: 'Planting method 1. (Manual)',
+      mechanical: 'Planting method 2. (Mechanical)',
+    };
     if (capexGroups.some((g) => g.key === 'plant' && g.items.some((it) => PM[it.key] && it.label !== PM[it.key]))) {
       changed = true;
       capexGroups = capexGroups.map((g) =>
@@ -189,7 +194,7 @@ export function normalizeModel(m) {
         if (g.key !== 'plant') return g;
         const items = [...g.items];
         const i = items.findIndex((it) => it.key === 'manual');
-        items.splice(i < 0 ? items.length : i + 1, 0, { key: 'mechanical', label: 'Mechanical planting', v: 0, unit: 'ha' });
+        items.splice(i < 0 ? items.length : i + 1, 0, { key: 'mechanical', label: 'Planting method 2. (Mechanical)', v: 0, unit: 'ha' });
         return { ...g, items };
       });
     }

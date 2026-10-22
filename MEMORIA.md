@@ -833,3 +833,5 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-22: **CAPEX (IAG):** "Accesorios (tutor + protector)" se sustituye por "Espaldera + Protector" (nueva, 0 €/Árbol) y "Tutor + Protector" (conserva el importe: 0,80 / 0,85 €/Árbol). Migración en normalizeModel; guardado en Torrimpietra y Lanuvio.
 - 2026-10-22: **CAPEX:** texto de entrada: "Las partidas en €/Árbol se multiplican por la densidad (…); el resto en €/Ha" (ya no todas las de plantación van por árbol).
 - 2026-10-22: **CAPEX:** etiquetas "Método plantación 1. (Espaldera + Protector)" y "Método plantación 2. (Tutor + Protector)" (EN "Planting method 1./2. …").
+- 2026-10-22: **CAPEX (IAG):** "Método Plantación 1. (Manual)" y "Método Plantación 2. (Mecánica)" (EN "Planting method 1. (Manual)" / "2. (Mechanical)"); guardado en Torrimpietra y Lanuvio.
+- 2026-10-22: **Supuestos (IAG):** "Kg AOVE/Ha · Plena Producción" (EN "Kg EVOO/Ha · Full Production").
