@@ -63,6 +63,7 @@ function initialState() {
 
 function inpId(ds) {
   if (ds.pidx != null) return 'pv:' + ds.pidx;
+  if (ds.schedy != null) return 'os:' + ds.catkey + '.' + ds.itkey + ':' + ds.schedy;
   if (ds.opfld) return 'op:' + ds.opfld + ':' + ds.catkey + '.' + ds.itkey;
   if (ds.gkey) return 'cap:' + ds.gkey + '.' + ds.ikey;
   return 'sup:' + ds.key;
@@ -287,6 +288,39 @@ export function useAppStore() {
     },
     [],
   );
+
+  // Importe €/Ha (sin inflación) de una sub-partida OPEX en el año yIdx+1 de su calendario;
+  // se guarda en la escala del calendario (sched × cant×coste/base = €/Ha)
+  const onOpexSched = useCallback((catkey, itkey, yIdx, raw) => {
+    const v = parseNum(raw);
+    setState((s) => {
+      if (!isActiveEditable(s)) return s;
+      return {
+        ...s,
+        editKey: inpId({ schedy: yIdx, catkey, itkey }),
+        editRaw: raw,
+        models: s.models.map((m) => {
+          if (m.id !== s.activeId) return m;
+          const cats = m.a.opexItems.map((c) =>
+            c.key !== catkey
+              ? c
+              : {
+                  ...c,
+                  items: c.items.map((it) => {
+                    if (it.key !== itkey) return it;
+                    const base = +it.base || 0;
+                    const scale = base > 0 ? ((+it.cant || 0) * (+it.coste || 0)) / base : 1;
+                    const sched = [...it.sched];
+                    sched[yIdx] = scale > 0 ? v / scale : v;
+                    return { ...it, sched };
+                  }),
+                },
+          );
+          return { ...m, a: { ...m.a, opexItems: cats } };
+        }),
+      };
+    });
+  }, []);
 
   // Variación % del precio del año idx+1 (pestaña Precio, modelo IAG)
   const onPriceVar = useCallback((idx, raw) => {
@@ -595,6 +629,7 @@ export function useAppStore() {
       onStatus,
       onCapexField,
       onOpexField,
+      onOpexSched,
       onProjHaField,
       onPriceVar,
       resetPriceVar,
@@ -652,6 +687,7 @@ export function useAppStore() {
       onStatus,
       onCapexField,
       onOpexField,
+      onOpexSched,
       onProjHaField,
       onPriceVar,
       resetPriceVar,

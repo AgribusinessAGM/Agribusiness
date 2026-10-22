@@ -37,7 +37,7 @@ export function buildCapex() {
     },
     {
       key: 'viab',
-      title: 'Viabilidad, Proyecto, Dirección ejecución, Administración',
+      title: 'Viabilidad, Proyecto, Dirección ejecución, Supervisión',
       unit: 'ha',
       items: [
         { key: 'captacion', label: 'Captación de Fincas', v: 693 },

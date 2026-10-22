@@ -140,16 +140,16 @@ function Footer({ page }) {
 
 // Tabla de la hoja CAPEX (partidas del CAPEX y bloques del OPEX): €/Ha, % y total
 function SummaryTable({ first, rows, totalRow }) {
-  const pad = (side) => (side === 'l' ? '8px 0 8px 0.2cm' : side === 'r' ? '8px 0.2cm 8px 0' : '8px 0');
+  const pad = (side) => (side === 'l' ? '5.5px 0 5.5px 0.2cm' : side === 'r' ? '5.5px 0.2cm 5.5px 0' : '5.5px 0');
   return html`
     <table style=${{ width: '100%', borderCollapse: 'collapse' }}>
       <thead>
         <tr style=${{ borderBottom: '2px solid ' + C.green }}>
           ${[
-            [first, 'left', undefined, '8px 0 8px 0.2cm'],
-            ['€/Ha', 'right', 110, '8px 0'],
-            ['%', 'right', 100, '8px 0'],
-            ['Total (k€)', 'right', 110, '8px 0.2cm 8px 0'],
+            [first, 'left', undefined, '6.5px 0 6.5px 0.2cm'],
+            ['€/Ha', 'right', 110, '6.5px 0'],
+            ['%', 'right', 100, '6.5px 0'],
+            ['Total (k€)', 'right', 110, '6.5px 0.2cm 6.5px 0'],
           ].map(
             ([label, align, width, padding]) => html`
               <th key=${label} style=${{ textAlign: align, padding, fontSize: 13, textTransform: 'uppercase', color: C.green, fontWeight: 700, width }}>
@@ -171,10 +171,10 @@ function SummaryTable({ first, rows, totalRow }) {
           `,
         )}
         <tr style=${{ borderTop: '2px solid ' + C.green, background: '#f4f6f2' }}>
-          <td style=${{ padding: '10px 12px 10px 0.2cm', fontWeight: 700, fontSize: 13, color: C.green }}>${totalRow.title}</td>
-          <td className="num" style=${{ padding: '10px 0', textAlign: 'right', fontWeight: 700, fontSize: 13, color: C.green }}>${totalRow.perHa}</td>
+          <td style=${{ padding: '7.5px 12px 7.5px 0.2cm', fontWeight: 700, fontSize: 13, color: C.green }}>${totalRow.title}</td>
+          <td className="num" style=${{ padding: '7.5px 0', textAlign: 'right', fontWeight: 700, fontSize: 13, color: C.green }}>${totalRow.perHa}</td>
           <td></td>
-          <td className="num" style=${{ padding: '10px 0.2cm 10px 0', textAlign: 'right', fontWeight: 700, fontSize: 13, color: C.green }}>${totalRow.total}</td>
+          <td className="num" style=${{ padding: '7.5px 0.2cm 7.5px 0', textAlign: 'right', fontWeight: 700, fontSize: 13, color: C.green }}>${totalRow.total}</td>
         </tr>
       </tbody>
     </table>
@@ -355,11 +355,26 @@ export function Report({ title }) {
   ];
   const grpHa = (g) => g.items.reduce((s, it) => s + capexItemHa(it, g, r.densidad, sup), 0);
   // Resumen del OPEX en plena producción por bloque (sin la fila "Otros"); el % es sobre el OPEX total
+  // La poda y formación va en su propio bloque "OPEX en Formación" (años 1–2), no aquí;
+  // el total de plena producción sigue siendo el OPEX completo del año de referencia
+  const PRUNE_KEYS = ['poda', 'pruning'];
   const opexBlocks = a.opexItems
-    .filter((cat) => cat.key !== 'otros' && cat.key !== 'other')
+    .filter((cat) => cat.key !== 'otros' && cat.key !== 'other' && !PRUNE_KEYS.includes(cat.key))
     .map((cat) => ({ key: cat.key, title: cat.label, ha: cat.items.reduce((s, it) => s + opexItemYear(it, MP, a), 0) }))
     .sort((x, y) => y.ha - x.ha); // de mayor a menor peso
   const opexBlocksHa = r.opexHa; // el total incluye "Otros", aunque no se muestre como bloque
+  // OPEX en formación: media de los años 1 y 2 (con inflación; la mitad de lo que se
+  // capitaliza en el CAPEX), por categoría y de mayor a menor
+  const inflY = (y) => Math.pow(1 + a.inflacion / 100, y - 1);
+  const formBlocks = a.opexItems
+    .map((cat) => ({
+      key: cat.key,
+      title: cat.label,
+      ha: [1, 2].reduce((s, y) => s + cat.items.reduce((t, it) => t + opexItemYear(it, y, a), 0) * inflY(y), 0) / 2, // media de los años 1 y 2
+    }))
+    .filter((b) => b.ha > 0)
+    .sort((x, y) => y.ha - x.ha);
+  const formHa = formBlocks.reduce((s, b) => s + b.ha, 0);
   // Partidas del CAPEX de mayor a menor peso (la capitalización del OPEX va siempre al final)
   // El bloque de plantación se parte en "Plantas" (planta + royalties) y "Plantación" (el resto)
   const PLANT_KEYS = ['olive', 'smarttree', 'royalties'];
@@ -603,9 +618,22 @@ export function Report({ title }) {
               ]}
               totalRow=${{ title: 'Inversión total', perHa: nf(r.capexHa), total: nf(r.totalCapex) + ' k€' }}
             />
-            <div style=${{ height: 15 }} />
+            <div style=${{ height: 8 }} />
             <${SummaryTable}
-              first="OPEX · Plena producción"
+              first="OPEX en Formación*"
+              rows=${formBlocks.map((b) => ({
+                key: b.key,
+                title: b.title,
+                perHa: nf(b.ha),
+                pct: pctR(formHa ? b.ha / formHa : NaN, 0),
+                total: nf((b.ha * sup) / 1000) + ' k€',
+              }))}
+              totalRow=${{ title: 'OPEX en formación', perHa: nf(formHa), total: nf((formHa * sup) / 1000) + ' k€' }}
+            />
+            <div style=${{ fontSize: 10, color: C.muted, padding: '4px 0 0 0.2cm' }}>* Media del OPEX de los años 1 y 2.</div>
+            <div style=${{ height: 8 }} />
+            <${SummaryTable}
+              first="OPEX en Plena producción"
               rows=${opexBlocks.map((b) => ({
                 key: b.key,
                 title: b.title,
@@ -615,9 +643,6 @@ export function Report({ title }) {
               }))}
               totalRow=${{ title: 'OPEX total', perHa: nf(opexBlocksHa), total: nf((opexBlocksHa * sup) / 1000) + ' k€' }}
             />
-          </div>
-          <div style=${{ flex: 1, minHeight: 0, padding: '20px 60px 24px' }}>
-            <img src="assets/foto-plantacion.jpg" alt="" style=${{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', opacity: 0.75, borderRadius: 4 }} />
           </div>
           <${Footer} page=${3} />
         <//>

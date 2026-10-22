@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { html } from '../../lib/html.js';
 import { MP, opexItemYear } from '../../engine/compute.js';
 import { nf, pctShare } from '../../engine/format.js';
@@ -48,7 +49,8 @@ const splitLabel = (label, catKey) =>
     : TWO_LINES[label] || label;
 
 export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' }) {
-  const { state, onOpexField, onProjHaField, canEdit } = useApp();
+  const { state, onOpexField, onOpexSched, onProjHaField, canEdit } = useApp();
+  const [editProj, setEditProj] = useState(false);
 
   const opexDetail = a.opexItems.map((cat) => {
     let catPlena = 0;
@@ -132,6 +134,23 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
     });
     return { label: cat.label, cells, labelStyle: projLabel(false) };
   });
+  // Modo "Editar": una fila por sub-partida con su €/Ha (sin inflación) de cada año; como en
+  // el Excel original, los años se pueden tocar hasta que el calendario se vuelve constante
+  // (desde ahí el importe es el de cantidad × coste unitario).
+  const firstConst = (sched) => {
+    let j = sched.length - 1;
+    while (j > 0 && Math.abs(sched[j - 1] - sched[sched.length - 1]) < 1e-9) j--;
+    // calendario que alterna en los últimos años: todo editable
+    return Math.abs(sched[11] - sched[12]) < 1e-9 ? j : sched.length;
+  };
+  const editRows = a.opexItems.map((cat) => ({
+    key: cat.key,
+    label: cat.label,
+    items: cat.items
+      .filter((it) => !it.perKg && Array.isArray(it.sched))
+      .map((it) => ({ ...it, editUpTo: Math.max(5, firstConst(it.sched)) })), // los 5 primeros años, siempre
+  }));
+
   const opexTotalCells = years.map((y) => {
     let tot = 0;
     for (const cat of a.opexItems) for (const it of cat.items) tot += opexItemYear(it, y, a);
@@ -292,8 +311,30 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
       <div style=${{ display: 'flex', alignItems: 'flex-end', gap: 12, margin: '26px 0 8px', flexWrap: 'wrap' }}>
         <div>
           <h3 style=${{ fontSize: 15, fontWeight: 800, margin: 0 }}>${'Proyección OPEX a ' + horizon + ' años'}</h3>
-          <div style=${{ fontSize: 11, color: 'var(--ink2)', marginTop: 3 }}>€/Ha por año · con inflación</div>
+          <div style=${{ fontSize: 11, color: 'var(--ink2)', marginTop: 3 }}>
+            ${editProj ? '€/Ha por año · sin inflación · editable hasta que el importe es constante' : '€/Ha por año · con inflación'}
+          </div>
         </div>
+        ${canEdit &&
+        html`
+          <button
+            className="lift"
+            onClick=${() => setEditProj(!editProj)}
+            style=${{
+              marginLeft: 12,
+              padding: '6px 14px',
+              borderRadius: 999,
+              border: '1px solid ' + (editProj ? 'var(--brandD)' : 'var(--editableLine)'),
+              background: editProj ? 'var(--brandD)' : 'var(--surface)',
+              color: editProj ? '#fff' : 'var(--brandD)',
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            ${editProj ? 'Listo' : 'Editar'}
+          </button>
+        `}
         <div
           style=${{
             display: 'flex',
@@ -349,7 +390,40 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
               )}
             </tr>
           </thead>
-          <tbody>
+          ${editProj
+            ? html`<tbody>
+                ${editRows.map(
+                  (cat) => html`
+                    <tr key=${'c:' + cat.key} style=${{ background: 'var(--brandL)' }}>
+                      <td style=${projLabel(true)}>${cat.label}</td>
+                      ${years.map((y) => html`<td key=${y} style=${projCell(true)}></td>`)}
+                    </tr>
+                    ${cat.items.map(
+                      (it) => html`
+                        <tr key=${cat.key + '.' + it.key}>
+                          <td style=${{ ...projLabel(false), paddingLeft: 22 }}>${it.label}</td>
+                          ${years.map((y) => {
+                            const v = opexItemYear(it, y, a);
+                            if (y > it.editUpTo) return html`<td key=${y} style=${projCell(false)}>${v > 0 ? nf(v) : '·'}</td>`;
+                            return html`
+                              <td key=${y} style=${{ ...projCell(false), padding: '3px 4px' }}>
+                                <${NumberField}
+                                  id=${'os:' + cat.key + '.' + it.key + ':' + (y - 1)}
+                                  value=${v}
+                                  width=${64}
+                                  style=${{ fontSize: 12, padding: '3px 5px' }}
+                                  onChangeRaw=${(raw) => onOpexSched(cat.key, it.key, y - 1, raw)}
+                                />
+                              </td>
+                            `;
+                          })}
+                        </tr>
+                      `,
+                    )}
+                  `,
+                )}
+              </tbody>`
+            : html`<tbody>
             ${opexProjRows.map(
               (row) => html`
                 <tr key=${row.label}>
@@ -362,7 +436,7 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
               <td style=${projLabel(true)}>Total OPEX</td>
               ${opexTotalCells.map((c, i) => html`<td key=${i} style=${c.style}>${c.v}</td>`)}
             </tr>
-          </tbody>
+          </tbody>`}
         </table>
       </div>
     </div>

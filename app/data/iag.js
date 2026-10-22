@@ -80,7 +80,7 @@ export function buildOpexIAG() {
     },
     {
       key: 'harvest',
-      label: 'Harvesting and marketing',
+      label: 'Harvesting',
       items: [
         I('Straddle harvester', 'Ha', 1, 500, rp([0, 0], 500)),
         I('Internal transport', '€/Kg/Olives', 0, 0, z, true),
@@ -122,13 +122,14 @@ export function buildOpexIAG() {
       key: 'pruning',
       label: 'Pruning and training',
       items: [
-        I('Tying', 'Ha', 1, 100, rp([100], 0)),
-        I('1st training pruning', 'Ha', 1, 150, rp([150], 0)),
-        I('2nd training pruning', 'Ha', 1, 200, rp([0, 200], 0)),
-        I('Skirt pruning', 'Ha', 1, 150, rp([0, 0], 150)),
-        I('Mechanical top pruning', 'Ha', 0, 0, z),
-        I('Mechanical side pruning', 'Ha', 0, 0, z),
-        I('Manual winter pruning', 'Ha', 1, 200, rp([0, 0], 200)),
+        // mismas partidas y calendario que el modelo estándar (tabla de poda de Marc, 22/10/2026)
+        I('Emergency pruning', 'Ha', 5, 14.5, rp([72.5], 0)),
+        I('2nd training pruning', 'Ha', 14, 14.5, rp([203], 0)),
+        I('3rd training pruning', 'Ha', 7.5, 14.5, rp([108.75], 0)),
+        I('Tertiary "U" training pruning', 'Ha', 1, 65, rp([0, 65], 0)),
+        I('Mechanical top pruning', 'Ha', 1, 50, rp([0], 50)),
+        I('Mechanical side pruning', 'Ha', 2, 50, rp([0], 100)),
+        I('Manual winter pruning', 'Ha', 14, 18, rp([0, 0], 252)),
       ],
     },
     {
@@ -145,7 +146,7 @@ export function buildOpexIAG() {
       key: 'health',
       label: 'Plant health',
       items: [
-        I('Plant protection products', 'Ha', 1, 700, rp([210, 350, 490, 700], 458.376)),
+        I('Plant protection products', 'Ha', 1, 700, f(700)), // constante (más inflación) todos los años
         I('Foliar application (alternate rows)', 'Ha', 0, 0, z),
         I('Foliar application (all rows)', 'Ha', 0, 0, z),
       ],

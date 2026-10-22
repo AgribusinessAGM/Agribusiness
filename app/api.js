@@ -1,3 +1,4 @@
+import { buildOpexIAG } from './data/iag.js';
 // Llamadas a la API PHP (api/index.php). Todas devuelven una promesa con el
 // JSON de respuesta, o fallan con el mensaje de error de la API.
 
@@ -109,6 +110,14 @@ export function normalizeModel(m) {
       return { ...it, label, v: Math.round((+it.v || 0) * sup * 100) / 100, total: true };
     }),
   }));
+  // título del bloque de viabilidad en español: "Administración" pasa a "Supervisión"
+  const VIAB_ES_OLD = 'Viabilidad, Proyecto, Dirección ejecución, Administración';
+  if (capexGroups.some((g) => g.key === 'viab' && g.title === VIAB_ES_OLD)) {
+    changed = true;
+    capexGroups = capexGroups.map((g) =>
+      g.key === 'viab' && g.title === VIAB_ES_OLD ? { ...g, title: 'Viabilidad, Proyecto, Dirección ejecución, Supervisión' } : g,
+    );
+  }
   // Modelos IAG: Due Diligence pasa de importe total a 70 €/Ha editable, el proyecto de riego
   // sube al bloque de riego y se añade la plantación mecánica
   if (iag) {
@@ -214,6 +223,40 @@ export function normalizeModel(m) {
   // Torrimpietra: "Roads, facilities, etc." pasa de "Farm maintenance" a "Infrastructure
   // maintenance" y la categoría "farm" desaparece
   let opexItems = m.a.opexItems;
+  // IAG: la protección vegetal (Sanidad vegetal) es constante todos los años (más inflación)
+  if (iag && Array.isArray(opexItems)) {
+    const isPP = (c, it) => c.key === 'health' && it.label === 'Plant protection products';
+    const flat = (it) => Array.isArray(it.sched) && it.sched.every((v) => Math.abs(v - (+it.base || 0)) < 1e-9);
+    if (opexItems.some((c) => (c.items || []).some((it) => isPP(c, it) && !flat(it)))) {
+      changed = true;
+      opexItems = opexItems.map((c) => ({
+        ...c,
+        items: (c.items || []).map((it) => (isPP(c, it) && !flat(it) ? { ...it, sched: Array(13).fill(+it.base || 0) } : it)),
+      }));
+    }
+  }
+  // Poda (22/10/2026): los IAG con la poda antigua (atado, falda…) pasan a las partidas del
+  // modelo estándar; en el estándar, la poda en "U" cambia de nombre
+  if (Array.isArray(opexItems)) {
+    const prune = opexItems.find((c) => c.key === 'pruning' || c.key === 'poda');
+    const U_OLD = 'Poda terciaria en "U"';
+    if (iag && prune && prune.items.some((it) => it.label === 'Tying')) {
+      changed = true;
+      const fresh = buildOpexIAG().find((c) => c.key === 'pruning');
+      opexItems = opexItems.map((c) => (c === prune ? { ...c, items: fresh.items } : c));
+    } else if (prune && prune.items.some((it) => it.label === U_OLD)) {
+      changed = true;
+      opexItems = opexItems.map((c) =>
+        c !== prune ? c : { ...c, items: c.items.map((it) => (it.label === U_OLD ? { ...it, label: 'Poda de formación terciaria en forma de "U"' } : it)) },
+      );
+    }
+  }
+  // categoría de cosecha: "Cosecha y comercialización" pasa a "Cosecha" (EN: Harvesting)
+  const HARV = { 'Cosecha y comercialización': 'Cosecha', 'Harvesting and marketing': 'Harvesting' };
+  if (Array.isArray(opexItems) && opexItems.some((c) => HARV[c.label])) {
+    changed = true;
+    opexItems = opexItems.map((c) => (HARV[c.label] ? { ...c, label: HARV[c.label] } : c));
+  }
   const farm = m.a.engine === 'iag' && Array.isArray(opexItems) ? opexItems.find((c) => c.key === 'farm') : null;
   if (farm && opexItems.some((c) => c.key === 'infra')) {
     changed = true;
