@@ -328,7 +328,7 @@ export function OpexTab({ a, r, photo, photoAlt, photoObjectPosition = 'center' 
         <div>
           <h3 style=${{ fontSize: 15, fontWeight: 800, margin: 0 }}>${'Proyección OPEX a ' + horizon + ' años'}</h3>
           <div style=${{ fontSize: 11, color: 'var(--ink2)', marginTop: 3 }}>
-            ${editProj ? '€/Ha por año · sin inflación · la inflación empieza en el 2º año igual' : '€/Ha por año · con inflación'}
+            ${editProj ? '€/Ha por año · sin inflación · la inflación empieza en el 2º año igual y se consideran los costes de los años 5 a 35 constantes con incremento de la inflación' : '€/Ha por año · con inflación'}
           </div>
         </div>
         ${canEdit &&

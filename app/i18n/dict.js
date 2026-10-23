@@ -152,7 +152,7 @@ export const PAIRS = [
 ['>35a','>35y'],['de la inversión','of the investment'],['VAN por ha (€)','NPV per ha (€)'],
 // ---- usuarios y permisos
 ['Asigna a cada persona el acceso a cada modelo. Haz clic en una celda para cambiar el permiso.','Assign each person access to each model. Click a cell to change the permission.'],
-['+ Invitar persona','+ Invite person'],['Editar','Edit'],['Listo','Done'],['Constante 5–35','Constant 5–35'],['Constante 5–25','Constant 5–25'],['€/Ha por año · sin inflación · la inflación empieza en el 2º año igual','€/Ha per year · without inflation · inflation starts on the 2nd equal year'],['Ver','View'],['Sin acceso','No access'],['Persona','Person'],
+['+ Invitar persona','+ Invite person'],['Editar','Edit'],['Listo','Done'],['Constante 5–35','Constant 5–35'],['Constante 5–25','Constant 5–25'],['€/Ha por año · sin inflación · la inflación empieza en el 2º año igual y se consideran los costes de los años 5 a 35 constantes con incremento de la inflación','€/Ha per year · without inflation · inflation starts on the 2nd equal year and costs for years 5 to 35 are taken as constant, increasing with inflation'],['Ver','View'],['Sin acceso','No access'],['Persona','Person'],
 ['Administrador','Administrator'],['Usuario','User'],['Rol','Role'],['Estado','Status'],['Acciones','Actions'],['Eliminar','Delete'],
 ['Invitada','Invited'],['Pendiente de activar','Pending activation'],['Restablecer contraseña','Reset password'],
 ['administrador','administrator'],['invitación pendiente','invitation pending'],['+ Añadir persona','+ Add person'],['Añadir persona','Add person'],
