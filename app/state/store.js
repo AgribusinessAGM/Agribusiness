@@ -387,6 +387,43 @@ export function useAppStore() {
     [state.users, flash, loadUsers],
   );
 
+  // Acceso en bloque (pestaña Accesos): pairs = [[userId, modelId], …] al mismo nivel
+  const setPermsBulk = useCallback(
+    (pairs, level) => {
+      if (!pairs.length) return;
+      setState((s) => ({
+        ...s,
+        users: s.users.map((u) => {
+          const mine = pairs.filter(([uid]) => uid === u.id);
+          if (!mine.length) return u;
+          const access = { ...u.access };
+          for (const [, mid] of mine) access[mid] = level;
+          return { ...u, access };
+        }),
+      }));
+      Promise.all(pairs.map(([uid, mid]) => api.setAccess(uid, mid, level))).catch(() => {
+        flash('No se pudo actualizar el permiso');
+        loadUsers();
+      });
+    },
+    [flash, loadUsers],
+  );
+
+  // Perfil (pestaña Perfiles): nombre, correo y organización; devuelve la promesa para que
+  // el formulario pueda mostrar el error de la API (p. ej. correo repetido)
+  const updateProfile = useCallback(
+    (userId, profile) =>
+      api.updateProfile(userId, profile).then((res) => {
+        setState((s) => ({
+          ...s,
+          users: s.users.map((u) => (u.id === userId ? { ...u, name: res.name, email: res.email, org: res.org } : u)),
+          currentUser: s.currentUser?.id === userId ? { ...s.currentUser, name: res.name, email: res.email, org: res.org } : s.currentUser,
+        }));
+        flash('Perfil actualizado');
+      }),
+    [flash],
+  );
+
   const openInvite = useCallback(
     () =>
       setState((s) => ({
@@ -637,6 +674,8 @@ export function useAppStore() {
       onPriceVar,
       resetPriceVar,
       cyclePerm,
+      setPermsBulk,
+      updateProfile,
       openInvite,
       closeInvite,
       setInviteMode,
@@ -695,6 +734,8 @@ export function useAppStore() {
       onPriceVar,
       resetPriceVar,
       cyclePerm,
+      setPermsBulk,
+      updateProfile,
       openInvite,
       closeInvite,
       setInviteMode,

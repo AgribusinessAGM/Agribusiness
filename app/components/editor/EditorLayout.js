@@ -59,7 +59,9 @@ function editorKpis(a, r) {
   ];
 }
 
-function TabWithPhoto({ photo, alt, objectPosition = 'center', children }) {
+// objectPosition = encuadre de la foto ("horizontal vertical"): 0% = izquierda/arriba, 100% = derecha/abajo
+// whole: la foto entera a su proporción (sin recortar), arriba de la columna
+function TabWithPhoto({ photo, alt, objectPosition = 'center', whole = false, children }) {
   return html`
     <div style=${{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 20 }}>
       <div style=${{ gridColumn: '1 / 4' }}>${children}</div>
@@ -69,7 +71,8 @@ function TabWithPhoto({ photo, alt, objectPosition = 'center', children }) {
         style=${{
           gridColumn: '4 / 5',
           width: '100%',
-          height: '100%',
+          height: whole ? 'auto' : '100%',
+          alignSelf: whole ? 'start' : undefined,
           objectFit: 'cover',
           objectPosition,
           borderRadius: 'var(--radius)',
@@ -369,8 +372,9 @@ export function EditorLayout() {
           ${etab === 'fin' &&
           html`
             <${TabWithPhoto}
-              photo=${model.crop === 'almendro' ? 'assets/supuestos-almendro-detalle.webp' : 'assets/foto-olivar.jpg'}
-              alt=${model.crop === 'almendro' ? 'Detalle de almendras' : 'Olivar en seto'}
+              photo=${model.crop === 'almendro' ? 'assets/supuestos-almendro-detalle.webp' : 'assets/financiera-detalle.webp'}
+              whole=${model.crop !== 'almendro'}
+              alt=${model.crop === 'almendro' ? 'Detalle de almendras' : 'Manos con aceitunas recién cosechadas'}
             >
               <${FinancieraTab} a=${a} r=${r} />
             <//>

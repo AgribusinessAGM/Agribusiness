@@ -74,6 +74,10 @@ export function setUserRole(userId, role) {
   return request(`/users/${userId}/role`, { method: 'POST', body: JSON.stringify({ role }) });
 }
 
+export function updateProfile(userId, profile) {
+  return request(`/users/${userId}/profile`, { method: 'POST', body: JSON.stringify(profile) });
+}
+
 export function deleteUser(userId) {
   return request(`/users/${userId}`, { method: 'DELETE' });
 }

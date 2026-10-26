@@ -248,6 +248,23 @@ function route_set_role(int $userId): void
     respond(['ok' => true, 'role' => $role]);
 }
 
+// Editar el perfil (nombre, correo, organización) desde la pestaña Perfiles
+function route_update_profile(int $userId): void
+{
+    require_admin();
+    find_user($userId);
+    $b = body();
+    $name = str_field($b, 'name');
+    $email = mb_strtolower(str_field($b, 'email'));
+    $org = str_field($b, 'org');
+    if ($name === '' || $email === '') throw new HttpError(400, 'Nombre y correo son obligatorios.');
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) throw new HttpError(400, 'El correo no es válido.');
+    $other = find_user_by_email($email);
+    if ($other && (int) $other['id'] !== $userId) throw new HttpError(409, 'Ya existe otra persona con ese correo.');
+    db()->prepare('UPDATE users SET name = ?, email = ?, org = ? WHERE id = ?')->execute([$name, $email, $org, $userId]);
+    respond(['ok' => true, 'name' => $name, 'email' => $email, 'org' => $org]);
+}
+
 function route_delete_user(int $userId): void
 {
     require_admin();
@@ -443,6 +460,7 @@ $routes = [
     ['POST', '#^/users/invite$#', 'route_invite'],
     ['POST', '#^/users$#', 'route_create_user'],
     ['POST', '#^/users/(\d+)/role$#', 'route_set_role'],
+    ['POST', '#^/users/(\d+)/profile$#', 'route_update_profile'],
     ['DELETE', '#^/users/(\d+)$#', 'route_delete_user'],
     ['POST', '#^/users/(\d+)/password$#', 'route_reset_password'],
     ['GET', '#^/invites/([\w-]+)$#', 'route_get_invite'],
