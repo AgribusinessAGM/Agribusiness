@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { html } from '../lib/html.js';
 import { useApp } from '../state/store.js';
 import { InviteModal } from './InviteModal.js';
-import { ResetPasswordModal } from './ResetPasswordModal.js';
 
 const roleMap = {
   edit: { label: 'Editar', bg: 'var(--brand)', fg: '#fff' },
@@ -105,14 +104,13 @@ export function Admin() {
       ${section === 'accesos' && html`<${AccessMatrix} />`}
 
       <${InviteModal} />
-      <${ResetPasswordModal} />
     </main>
   `;
 }
 
 // Pestaña "Gestión de perfiles": una fila por persona, con edición en línea de nombre, correo y organización
 function Profiles() {
-  const { state, openInvite, openResetPassword, deleteUser, updateProfile } = useApp();
+  const { state, openInvite, sendAccess, deleteUser, updateProfile } = useApp();
   const [editId, setEditId] = useState(null);
   const [draft, setDraft] = useState({ name: '', email: '', org: '' });
   const [error, setError] = useState(null);
@@ -143,14 +141,15 @@ function Profiles() {
       </button>
     </div>
     <div style=${{ ...card, overflow: 'auto' }}>
-      <table style=${{ borderCollapse: 'collapse', width: '100%', minWidth: 820 }}>
+      <table style=${{ borderCollapse: 'collapse', width: '100%', minWidth: 820, tableLayout: 'fixed' }}>
         <thead>
           <tr>
-            <th style=${th}>Persona</th>
+            <th style=${th}>Usuario</th>
+            <th style=${th}>Contacto</th>
             <th style=${th}>Organización</th>
             <th style=${th}>Rol</th>
             <th style=${th}>Estado</th>
-            <th style=${{ ...th, textAlign: 'right' }}>Acciones</th>
+            <th style=${th}>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -161,16 +160,13 @@ function Profiles() {
               <tr key=${u.id} style=${{ borderTop: '1px solid var(--line)' }}>
                 <td style=${td}>
                   ${editing
-                    ? html`
-                        <div style=${{ display: 'grid', gap: 6, minWidth: 220 }}>
-                          <input style=${input} value=${draft.name} placeholder="Nombre" onInput=${(e) => setDraft({ ...draft, name: e.target.value })} />
-                          <input style=${input} type="email" value=${draft.email} placeholder="Correo" onInput=${(e) => setDraft({ ...draft, email: e.target.value })} />
-                        </div>
-                      `
-                    : html`
-                        <div style=${{ fontWeight: 600, fontSize: 14 }}>${u.name}</div>
-                        <div style=${{ fontSize: 12, color: 'var(--ink2)' }}>${u.email}</div>
-                      `}
+                    ? html`<input style=${{ ...input, minWidth: 160 }} value=${draft.name} placeholder="Nombre" onInput=${(e) => setDraft({ ...draft, name: e.target.value })} />`
+                    : html`<div style=${{ fontWeight: 600, fontSize: 14 }}>${u.name}</div>`}
+                </td>
+                <td style=${td}>
+                  ${editing
+                    ? html`<input style=${{ ...input, minWidth: 200 }} type="email" value=${draft.email} placeholder="Correo" onInput=${(e) => setDraft({ ...draft, email: e.target.value })} />`
+                    : html`<span style=${{ color: 'var(--ink2)' }}>${u.email}</span>`}
                 </td>
                 <td style=${td}>
                   ${editing
@@ -179,29 +175,30 @@ function Profiles() {
                 </td>
                 <td style=${td}>
                   ${u.role === 'admin'
-                    ? html`<${Pill} bg="var(--brandD)" fg="#fff">administrador<//>`
-                    : html`<${Pill} bg="var(--bg)" fg="var(--ink2)" border="1px solid var(--line)">usuario<//>`}
+                    ? html`<${Pill} bg="var(--brandD)" fg="#fff">Administrador<//>`
+                    : html`<${Pill} bg="var(--bg)" fg="var(--ink2)" border="1px solid var(--line)">Usuario<//>`}
                 </td>
                 <td style=${td}>
                   ${u.status === 'invited'
                     ? html`<${Pill} bg="var(--brandL)" fg="var(--accent)" border="1px solid var(--editableLine)">invitación pendiente<//>`
                     : html`<span style=${{ color: 'var(--ink2)' }}>Activa</span>`}
                 </td>
-                <td style=${{ ...td, textAlign: 'right' }}>
+                <td style=${td}>
                   ${editing
                     ? html`
-                        <div style=${{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+                        <div style=${{ display: 'flex', gap: 12, justifyContent: 'flex-start' }}>
                           <button onClick=${save} disabled=${saving} style=${linkBtn()}>Guardar</button>
                           <button onClick=${() => setEditId(null)} style=${linkBtn('var(--ink2)')}>Cancelar</button>
                         </div>
                         ${error && html`<div style=${{ color: '#c0392b', fontSize: 12, marginTop: 4 }}>${error}</div>`}
                       `
                     : html`
-                        <div style=${{ display: 'flex', gap: 12, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                        <div style=${{ display: 'flex', gap: 12, justifyContent: 'flex-start', flexWrap: 'wrap' }}>
                           <button onClick=${() => startEdit(u)} style=${linkBtn()}>Editar perfil</button>
-                          <button onClick=${() => openResetPassword(u.id)} style=${linkBtn()}>
-                            ${u.status === 'invited' ? 'Definir contraseña' : 'Cambiar contraseña'}
-                          </button>
+                          ${!me &&
+                          html`<button onClick=${() => sendAccess(u.id)} style=${linkBtn()}>
+                            ${u.status === 'invited' ? 'Reenviar invitación' : 'Enviar enlace de contraseña'}
+                          </button>`}
                           ${!me &&
                           html`
                             <button onClick=${() => deleteUser(u.id)} style=${linkBtn('#c0392b')}>Eliminar</button>

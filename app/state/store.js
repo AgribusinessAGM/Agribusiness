@@ -40,17 +40,14 @@ function initialState() {
     newHa: 100,
     newTemplate: 'olivo',
     showInvite: false,
-    inviteMode: 'direct', // 'email' | 'direct'
     inviteName: '',
     inviteEmail: '',
     inviteOrg: '',
-    invitePassword: '',
     inviteRole: 'user',
     inviteError: null,
     inviteDevLink: null,
     invitePending: false,
-    resetUserId: null,
-    resetPassword: '',
+    showChangePassword: false, // ventana "Cambiar mi contraseña"
     resetError: null,
     resetPending: false,
     scenario: null,
@@ -432,7 +429,6 @@ export function useAppStore() {
         inviteName: '',
         inviteEmail: '',
         inviteOrg: '',
-        invitePassword: '',
         inviteRole: 'user',
         inviteError: null,
         inviteDevLink: null,
@@ -440,24 +436,17 @@ export function useAppStore() {
     [],
   );
   const closeInvite = useCallback(() => setState((s) => ({ ...s, showInvite: false })), []);
-  const setInviteMode = useCallback(
-    (m) => setState((s) => ({ ...s, inviteMode: m, inviteError: null })),
-    [],
-  );
   const setInviteName = useCallback((v) => setState((s) => ({ ...s, inviteName: v })), []);
   const setInviteEmail = useCallback((v) => setState((s) => ({ ...s, inviteEmail: v })), []);
   const setInviteOrg = useCallback((v) => setState((s) => ({ ...s, inviteOrg: v })), []);
-  const setInvitePassword = useCallback((v) => setState((s) => ({ ...s, invitePassword: v })), []);
   const setInviteRole = useCallback((r) => setState((s) => ({ ...s, inviteRole: r })), []);
 
+  // Alta: la persona recibe por correo un enlace de un solo uso (72 h) para crear su
+  // contraseña; el administrador nunca la ve ni la escribe
   const submitInvite = useCallback(() => {
-    const { inviteMode, inviteName, inviteEmail, inviteOrg, invitePassword, inviteRole } = state;
+    const { inviteName, inviteEmail, inviteOrg, inviteRole } = state;
     if (!inviteName.trim() || !inviteEmail.trim()) {
       setState((s) => ({ ...s, inviteError: 'Nombre y correo son obligatorios.' }));
-      return;
-    }
-    if (inviteMode === 'direct' && invitePassword.length < 8) {
-      setState((s) => ({ ...s, inviteError: 'La contraseña debe tener al menos 8 caracteres.' }));
       return;
     }
     setState((s) => ({ ...s, invitePending: true, inviteError: null }));
@@ -469,33 +458,38 @@ export function useAppStore() {
         : s.users.concat([user]),
     });
 
-    if (inviteMode === 'direct') {
+    api
+      .inviteUser({ name: inviteName, email: inviteEmail, org: inviteOrg, role: inviteRole })
+      .then(({ user, devLink }) => {
+        setState((s) => ({
+          ...addOrReplaceUser(user)(s),
+          invitePending: false,
+          inviteDevLink: devLink || null,
+          showInvite: devLink ? s.showInvite : false,
+        }));
+        flash(devLink ? 'Invitación creada (modo de pruebas, sin correo)' : 'Invitación enviada por correo');
+      })
+      .catch((e) => {
+        setState((s) => ({ ...s, invitePending: false, inviteError: e.message }));
+      });
+  }, [state.inviteName, state.inviteEmail, state.inviteOrg, state.inviteRole, flash]);
+
+  // Administrador: reenvía a la persona un enlace para crear o cambiar su contraseña
+  const sendAccess = useCallback(
+    (userId) => {
+      const target = state.users.find((u) => u.id === userId);
+      if (!target) return;
+      if (!window.confirm(tr(`¿Enviar a ${target.name} un enlace para ${target.status === 'invited' ? 'crear' : 'cambiar'} su contraseña?`))) return;
       api
-        .createUser({ name: inviteName, email: inviteEmail, org: inviteOrg, password: invitePassword, role: inviteRole })
-        .then(({ user }) => {
-          setState((s) => ({ ...addOrReplaceUser(user)(s), invitePending: false, showInvite: false }));
-          flash('Usuario creado');
+        .sendAccess(userId)
+        .then(({ devLink }) => {
+          if (devLink) window.prompt(tr('Modo de pruebas, sin correo. Enlace de acceso:'), devLink);
+          else flash('Enlace de acceso enviado por correo');
         })
-        .catch((e) => {
-          setState((s) => ({ ...s, invitePending: false, inviteError: e.message }));
-        });
-    } else {
-      api
-        .inviteUser({ name: inviteName, email: inviteEmail, org: inviteOrg, role: inviteRole })
-        .then(({ user, devLink }) => {
-          setState((s) => ({
-            ...addOrReplaceUser(user)(s),
-            invitePending: false,
-            inviteDevLink: devLink || null,
-            showInvite: devLink ? s.showInvite : false,
-          }));
-          flash(devLink ? 'Invitación creada (sin proveedor de email real configurado)' : 'Invitación enviada por correo');
-        })
-        .catch((e) => {
-          setState((s) => ({ ...s, invitePending: false, inviteError: e.message }));
-        });
-    }
-  }, [state.inviteMode, state.inviteName, state.inviteEmail, state.inviteOrg, state.invitePassword, state.inviteRole, flash]);
+        .catch((e) => flash(e.message || 'No se pudo enviar el enlace'));
+    },
+    [state.users, flash],
+  );
 
   const setUserRole = useCallback(
     (userId, role) => {
@@ -525,37 +519,33 @@ export function useAppStore() {
     [state.users, flash, loadUsers],
   );
 
-  const openResetPassword = useCallback(
-    (userId) =>
-      setState((s) => ({ ...s, resetUserId: userId, resetPassword: '', resetError: null })),
+  // Cambiar la contraseña propia (menú de usuario): ventana con la actual y la nueva
+  const openChangePassword = useCallback(
+    () => setState((s) => ({ ...s, showChangePassword: true, resetError: null, resetPending: false })),
     [],
   );
-  const closeResetPassword = useCallback(() => setState((s) => ({ ...s, resetUserId: null })), []);
-  const setResetPassword = useCallback((v) => setState((s) => ({ ...s, resetPassword: v })), []);
-
-  const submitResetPassword = useCallback(() => {
-    const { resetUserId, resetPassword } = state;
-    if (resetUserId == null) return;
-    if (resetPassword.length < 8) {
-      setState((s) => ({ ...s, resetError: 'La contraseña debe tener al menos 8 caracteres.' }));
-      return;
-    }
-    setState((s) => ({ ...s, resetPending: true, resetError: null }));
-    api
-      .resetPassword(resetUserId, resetPassword)
-      .then(() => {
-        setState((s) => ({
-          ...s,
-          resetPending: false,
-          resetUserId: null,
-          users: s.users.map((u) => (u.id === resetUserId ? { ...u, status: 'active' } : u)),
-        }));
-        flash('Contraseña actualizada');
-      })
-      .catch((e) => {
-        setState((s) => ({ ...s, resetPending: false, resetError: e.message }));
-      });
-  }, [state.resetUserId, state.resetPassword, flash]);
+  const closeChangePassword = useCallback(() => setState((s) => ({ ...s, showChangePassword: false })), []);
+  const submitChangePassword = useCallback(
+    (current, password, repeat) => {
+      if (password.length < 8) {
+        setState((s) => ({ ...s, resetError: 'La contraseña debe tener al menos 8 caracteres.' }));
+        return;
+      }
+      if (password !== repeat) {
+        setState((s) => ({ ...s, resetError: 'Las contraseñas no coinciden.' }));
+        return;
+      }
+      setState((s) => ({ ...s, resetPending: true, resetError: null }));
+      api
+        .changeOwnPassword(current, password)
+        .then(() => {
+          setState((s) => ({ ...s, resetPending: false, showChangePassword: false }));
+          flash('Contraseña actualizada');
+        })
+        .catch((e) => setState((s) => ({ ...s, resetPending: false, resetError: e.message })));
+    },
+    [flash],
+  );
 
   const save = useCallback(() => {
     const m = active();
@@ -678,19 +668,17 @@ export function useAppStore() {
       updateProfile,
       openInvite,
       closeInvite,
-      setInviteMode,
       setInviteName,
       setInviteEmail,
       setInviteOrg,
-      setInvitePassword,
       setInviteRole,
       submitInvite,
       setUserRole,
       deleteUser,
-      openResetPassword,
-      closeResetPassword,
-      setResetPassword,
-      submitResetPassword,
+      sendAccess,
+      openChangePassword,
+      closeChangePassword,
+      submitChangePassword,
       save,
       exportXlsx,
       exportPdf,
@@ -738,19 +726,17 @@ export function useAppStore() {
       updateProfile,
       openInvite,
       closeInvite,
-      setInviteMode,
       setInviteName,
       setInviteEmail,
       setInviteOrg,
-      setInvitePassword,
       setInviteRole,
       submitInvite,
       setUserRole,
       deleteUser,
-      openResetPassword,
-      closeResetPassword,
-      setResetPassword,
-      submitResetPassword,
+      sendAccess,
+      openChangePassword,
+      closeChangePassword,
+      submitChangePassword,
       save,
       exportXlsx,
       exportPdf,

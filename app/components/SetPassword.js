@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { html } from '../lib/html.js';
 import { acceptInvite, getInvite } from '../api.js';
 import { useApp } from '../state/store.js';
+import { PasswordInput } from './PasswordInput.js';
 
 const inputStyle = {
   width: '100%',
@@ -14,7 +15,7 @@ const inputStyle = {
   color: 'var(--ink)',
 };
 
-// Pantalla "Crear contraseña" a la que lleva el enlace de invitación (?token=…).
+// Pantalla "Crear contraseña" a la que llevan los enlaces de alta y de "He olvidado mi contraseña" (?token=…).
 export function SetPassword({ token, onDone }) {
   const { setLoginEmail } = useApp();
   const [status, setStatus] = useState('loading'); // 'loading' | 'ready' | 'invalid' | 'success'
@@ -66,7 +67,7 @@ export function SetPassword({ token, onDone }) {
         html`
           <h1 style=${{ fontSize: 22, fontWeight: 800, margin: '0 0 8px' }}>Enlace no disponible</h1>
           <p style=${{ color: 'var(--ink2)', fontSize: 14, lineHeight: 1.55, margin: '0 0 20px' }}>
-            ${invalidReason || 'Este enlace de invitación no es válido.'} Pide a quien te invitó que te envíe una nueva invitación.
+            ${invalidReason || 'Este enlace no es válido.'} Si ya tenías cuenta, usa "He olvidado mi contraseña" en la pantalla de acceso; si no, pide a tu gestor que te reenvíe la invitación.
           </p>
           <button
             onClick=${() => onDone('')}
@@ -81,19 +82,17 @@ export function SetPassword({ token, onDone }) {
         html`
           <h1 style=${{ fontSize: 22, fontWeight: 800, margin: '0 0 8px' }}>Hola, ${invite.name}</h1>
           <p style=${{ color: 'var(--ink2)', fontSize: 14, lineHeight: 1.55, margin: '0 0 22px' }}>
-            Crea una contraseña para <strong>${invite.email}</strong> y accede a la plataforma de modelos financieros.
+            Elige una contraseña para <strong>${invite.email}</strong> y accede a la plataforma de modelos financieros. Solo tú la conocerás.
           </p>
           <label style=${{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Contraseña</label>
-          <input
-            type="password"
+          <${PasswordInput}
             value=${password}
             onChange=${(e) => setPassword(e.target.value)}
             autoComplete="new-password"
             style=${inputStyle}
           />
           <label style=${{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Confirmar contraseña</label>
-          <input
-            type="password"
+          <${PasswordInput}
             value=${confirm}
             onChange=${(e) => setConfirm(e.target.value)}
             autoComplete="new-password"
@@ -118,14 +117,14 @@ export function SetPassword({ token, onDone }) {
               boxShadow: 'var(--shadow)',
             }}
           >
-            ${submitting ? 'Creando…' : 'Crear contraseña'}
+            ${submitting ? 'Guardando…' : 'Guardar contraseña'}
           </button>
         `}
 
         ${status === 'success' &&
         invite &&
         html`
-          <h1 style=${{ fontSize: 22, fontWeight: 800, margin: '0 0 8px' }}>Contraseña creada</h1>
+          <h1 style=${{ fontSize: 22, fontWeight: 800, margin: '0 0 8px' }}>Contraseña guardada</h1>
           <p style=${{ color: 'var(--ink2)', fontSize: 14, lineHeight: 1.55, margin: '0 0 20px' }}>
             Ya puedes entrar con <strong>${invite.email}</strong> y tu nueva contraseña.
           </p>

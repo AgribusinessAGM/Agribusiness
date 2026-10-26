@@ -65,10 +65,6 @@ export function inviteUser(input) {
   return request('/users/invite', { method: 'POST', body: JSON.stringify(input) });
 }
 
-// input: { name, email, org, password, role }
-export function createUser(input) {
-  return request('/users', { method: 'POST', body: JSON.stringify(input) });
-}
 
 export function setUserRole(userId, role) {
   return request(`/users/${userId}/role`, { method: 'POST', body: JSON.stringify({ role }) });
@@ -94,8 +90,17 @@ export function setAccess(userId, modelId, level) {
   return request('/access', { method: 'POST', body: JSON.stringify({ userId, modelId, level }) });
 }
 
-export function resetPassword(userId, password) {
-  return request(`/users/${userId}/password`, { method: 'POST', body: JSON.stringify({ password }) });
+// Las contraseñas solo las pone cada persona: el administrador puede reenviarle un enlace
+export function sendAccess(userId) {
+  return request(`/users/${userId}/send-access`, { method: 'POST' });
+}
+
+export function forgotPassword(email) {
+  return request('/password/forgot', { method: 'POST', body: JSON.stringify({ email }) });
+}
+
+export function changeOwnPassword(current, password) {
+  return request('/me/password', { method: 'POST', body: JSON.stringify({ current, password }) });
 }
 
 // La Due Diligence se guarda como importe total de la finca (it.total). Los modelos

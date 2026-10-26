@@ -1,8 +1,9 @@
 import { html } from '../lib/html.js';
 import { useApp } from '../state/store.js';
+import { ChangePasswordModal } from './ChangePasswordModal.js';
 
 export function TopBar() {
-  const { state, gotoDash, gotoAdmin, logout, setLang } = useApp();
+  const { state, gotoDash, gotoAdmin, logout, setLang, openChangePassword } = useApp();
   const isAdmin = state.currentUser?.role === 'admin';
   const initials = (state.currentUser?.name || '?')
     .split(' ')
@@ -96,6 +97,20 @@ export function TopBar() {
           ${initials}
         </div>
         <button
+          onClick=${openChangePassword}
+          title="Cambiar mi contraseña"
+          style=${{
+            background: 'none',
+            border: 'none',
+            color: 'var(--ink2)',
+            cursor: 'pointer',
+            fontSize: 13,
+            fontWeight: 600,
+          }}
+        >
+          Contraseña
+        </button>
+        <button
           onClick=${logout}
           style=${{
             background: 'none',
@@ -109,6 +124,7 @@ export function TopBar() {
           Salir
         </button>
       </div>
+      <${ChangePasswordModal} />
     </header>
   `;
 }

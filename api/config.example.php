@@ -22,12 +22,17 @@ return [
     // Debe apuntar a la carpeta donde está index.html, sin barra final.
     'app_url' => 'http://localhost/Agribusiness',
 
-    // ---------- Correo de invitaciones (SMTP, ej. Microsoft 365) ----------
-    // Si smtp_user o smtp_pass están vacíos, no se envían correos reales: el
-    // enlace de invitación se muestra en la pantalla de administración.
+    // ---------- Correo de acceso (SMTP, ej. Microsoft 365) ----------
+    // Las contraseñas solo las crea y cambia cada persona, con enlaces de un solo uso
+    // que llegan por correo (alta y "He olvidado mi contraseña"). Sin smtp_user/smtp_pass
+    // no se puede dar de alta a nadie ni recuperar contraseñas.
     'smtp_host' => 'smtp.office365.com',
     'smtp_port' => 587,
     'smtp_user' => '',
     'smtp_pass' => '', // contraseña de APLICACIÓN, no la normal de la cuenta
     'from_email' => '', // por defecto, el mismo que smtp_user
+
+    // Solo para pruebas en local, sin correo: muestra el enlace en pantalla al
+    // administrador. En producción debe quedarse en false.
+    'dev_show_links' => false,
 ];

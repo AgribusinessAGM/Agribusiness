@@ -3,10 +3,18 @@
 // Equivale a server/mailer.js. Cliente SMTP mínimo, sin dependencias, para
 // que funcione igual en XAMPP y en Plesk sin instalar nada.
 
-function invite_email_html(string $name, string $link): string
+// $kind: 'invite' (alta o reenvío de acceso, 72 h) | 'reset' (He olvidado mi contraseña, 1 h)
+function invite_email_html(string $name, string $link, string $kind = 'invite'): string
 {
     $name = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
     $link = htmlspecialchars($link, ENT_QUOTES, 'UTF-8');
+    $intro = $kind === 'reset'
+        ? 'Hemos recibido una solicitud para cambiar tu contraseña de la <strong>Plataforma AGRIBUSINESS</strong>. Pulsa el botón para elegir una nueva.'
+        : 'Te han dado acceso a la <strong>Plataforma AGRIBUSINESS</strong> de Agromillora. Crea tu contraseña para entrar y consultar los modelos compartidos contigo.';
+    $button = $kind === 'reset' ? 'Elegir nueva contraseña' : 'Crear mi contraseña';
+    $foot = $kind === 'reset'
+        ? 'Este enlace caduca en 1 hora y solo sirve una vez. Si no lo has pedido tú, ignora este correo: tu contraseña no cambia.'
+        : 'Este enlace caduca en 72 horas y solo sirve una vez. Si no esperabas esta invitación, puedes ignorar este correo.';
     return <<<HTML
   <div style="font-family:'Public Sans',Arial,sans-serif;background:#f3f5f1;padding:32px">
     <div style="max-width:480px;margin:0 auto;background:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #dde3d8">
@@ -16,13 +24,12 @@ function invite_email_html(string $name, string $link): string
       <div style="padding:28px">
         <h1 style="font-size:19px;margin:0 0 12px;color:#182015">Hola {$name},</h1>
         <p style="font-size:14px;line-height:1.6;color:#606b58;margin:0 0 20px">
-          Te han dado acceso a la <strong>Plataforma AGRIBUSINESS</strong> de Agromillora.
-          Crea tu contraseña para entrar y consultar los modelos compartidos contigo.
+          {$intro}
         </p>
         <a href="{$link}" style="display:inline-block;background:#2e6b34;color:#ffffff;text-decoration:none;
-          font-weight:700;font-size:14px;padding:12px 22px;border-radius:6px">Crear mi contraseña</a>
+          font-weight:700;font-size:14px;padding:12px 22px;border-radius:6px">{$button}</a>
         <p style="font-size:12px;line-height:1.6;color:#606b58;margin:24px 0 0">
-          Este enlace caduca en 7 días. Si no esperabas esta invitación, puedes ignorar este correo.
+          {$foot}
         </p>
       </div>
     </div>
@@ -31,22 +38,23 @@ HTML;
 }
 
 /**
- * Devuelve ['sent' => bool]. Sin SMTP configurado no envía nada (sent=false) y
- * la API devuelve el enlace para mostrarlo en pantalla.
+ * Devuelve ['sent' => bool]. Sin SMTP configurado no envía nada (sent=false); la API decide
+ * qué hacer (error, o el enlace en pantalla solo con dev_show_links en local).
  */
-function send_invite_email(string $to, string $name, string $link): array
+function send_invite_email(string $to, string $name, string $link, string $kind = 'invite'): array
 {
     $c = config();
     if ($c['smtp_user'] === '' || $c['smtp_pass'] === '') {
-        error_log("[mailer] (simulado) Invitación para $to: $link");
         return ['sent' => false];
     }
 
     $from = $c['from_email'] !== '' ? $c['from_email'] : $c['smtp_user'];
-    $subject = 'Crea tu contraseña — Plataforma AGRIBUSINESS';
+    $subject = $kind === 'reset'
+        ? 'Cambia tu contraseña — Plataforma AGRIBUSINESS'
+        : 'Crea tu contraseña — Plataforma AGRIBUSINESS';
     try {
         smtp_send($c['smtp_host'], (int) $c['smtp_port'], $c['smtp_user'], $c['smtp_pass'], $from, $to, $subject,
-            invite_email_html($name, $link));
+            invite_email_html($name, $link, $kind));
     } catch (RuntimeException $e) {
         error_log('[mailer] Error enviando email por SMTP: ' . $e->getMessage());
         throw new RuntimeException(

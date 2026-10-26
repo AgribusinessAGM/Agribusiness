@@ -8,7 +8,8 @@
 require __DIR__ . '/lib/db.php';
 require __DIR__ . '/lib/mailer.php';
 
-const INVITE_TTL = 7 * 24 * 3600;
+const INVITE_TTL = 72 * 3600; // alta y reenvío de acceso
+const RESET_TTL = 3600; // He olvidado mi contraseña
 const SESSION_TTL = 30 * 24 * 3600;
 
 header('Content-Type: application/json; charset=utf-8');
@@ -195,48 +196,74 @@ function route_invite(): void
         $userId = (int) db()->lastInsertId();
     }
 
-    $token = new_token();
-    db()->prepare('INSERT INTO invites (token, user_id, expires_at) VALUES (?, ?, ?)')
-        ->execute([$token, $userId, now_utc(INVITE_TTL)]);
-
-    $link = rtrim(config()['app_url'], '/') . '/?token=' . $token;
-    try {
-        $mail = send_invite_email($email, $name, $link);
-    } catch (RuntimeException $e) {
-        throw new HttpError(502, $e->getMessage());
-    }
-
     $out = ['ok' => true, 'user' => public_user(find_user($userId)) + ['access' => (object) []]];
-    // Solo cuando no hay correo real configurado: así se puede probar el flujo sin bandeja de entrada.
-    if (!$mail['sent']) $out['devLink'] = $link;
+    $devLink = send_access_link($userId, 'invite');
+    if ($devLink) $out['devLink'] = $devLink;
     respond($out);
 }
 
-function route_create_user(): void
+// Crea un enlace de un solo uso para que la persona ponga su contraseña y se lo envía por
+// correo. Nadie más ve la contraseña ni el enlace: sin correo configurado es un error, salvo
+// en local con dev_show_links (entonces devuelve el enlace para mostrarlo en pantalla).
+function send_access_link(int $userId, string $kind): ?string
+{
+    $user = find_user($userId);
+    $token = new_token();
+    db()->prepare('INSERT INTO invites (token, user_id, expires_at) VALUES (?, ?, ?)')
+        ->execute([$token, $userId, now_utc($kind === 'reset' ? RESET_TTL : INVITE_TTL)]);
+    $link = rtrim(config()['app_url'], '/') . '/?token=' . $token;
+    try {
+        $mail = send_invite_email($user['email'], $user['name'], $link, $kind);
+    } catch (RuntimeException $e) {
+        throw new HttpError(502, $e->getMessage());
+    }
+    if ($mail['sent']) return null;
+    if (!empty(config()['dev_show_links'])) return $link;
+    throw new HttpError(503, 'El envío de correo no está configurado: no se puede enviar el enlace de acceso.');
+}
+
+// Administrador: vuelve a enviar a una persona un enlace para crear (o cambiar) su contraseña
+function route_send_access(int $userId): void
 {
     require_admin();
-    $b = body();
-    $name = str_field($b, 'name');
-    $email = mb_strtolower(str_field($b, 'email'));
-    $org = str_field($b, 'org');
-    $role = normalize_role($b['role'] ?? null);
-    if ($name === '' || $email === '') throw new HttpError(400, 'Nombre y correo son obligatorios.');
-    $hash = password_hash(require_password($b), PASSWORD_DEFAULT);
+    $user = find_user($userId);
+    $devLink = send_access_link($userId, $user['status'] === 'invited' ? 'invite' : 'reset');
+    respond($devLink ? ['ok' => true, 'devLink' => $devLink] : ['ok' => true]);
+}
 
-    $existing = find_user_by_email($email);
-    if ($existing && $existing['status'] === 'active') {
-        throw new HttpError(409, 'Ya existe una cuenta activa con ese correo.');
+// "He olvidado mi contraseña": responde siempre lo mismo, exista o no el correo, para no
+// revelar quién tiene cuenta. Como mucho 3 enlaces por persona y hora.
+function route_forgot_password(): void
+{
+    $user = find_user_by_email(mb_strtolower(str_field(body(), 'email')));
+    if ($user && $user['status'] === 'active') {
+        $stmt = db()->prepare('SELECT COUNT(*) FROM invites WHERE user_id = ? AND expires_at > ?');
+        $stmt->execute([$user['id'], now_utc(RESET_TTL - 3600)]);
+        if ((int) $stmt->fetchColumn() < 3) {
+            try {
+                send_access_link((int) $user['id'], 'reset');
+            } catch (HttpError $e) {
+                error_log('[forgot] ' . $e->getMessage());
+            }
+        }
     }
-    if ($existing) {
-        $userId = (int) $existing['id'];
-        db()->prepare("UPDATE users SET name = ?, org = ?, password_hash = ?, status = 'active', role = ? WHERE id = ?")
-            ->execute([$name, $org, $hash, $role, $userId]);
-    } else {
-        db()->prepare('INSERT INTO users (name, email, org, password_hash, status, role, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
-            ->execute([$name, $email, $org, $hash, 'active', $role, now_utc()]);
-        $userId = (int) db()->lastInsertId();
+    respond(['ok' => true]);
+}
+
+// Cada persona cambia su propia contraseña (con la actual); se cierran sus otras sesiones
+function route_change_own_password(): void
+{
+    $user = require_auth();
+    $b = body();
+    $current = isset($b['current']) && is_string($b['current']) ? $b['current'] : '';
+    if (!$user['password_hash'] || !password_verify($current, $user['password_hash'])) {
+        throw new HttpError(400, 'La contraseña actual no es correcta.');
     }
-    respond(['ok' => true, 'user' => public_user(find_user($userId)) + ['access' => (object) []]]);
+    $password = require_password($b);
+    db()->prepare('UPDATE users SET password_hash = ? WHERE id = ?')
+        ->execute([password_hash($password, PASSWORD_DEFAULT), $user['id']]);
+    db()->prepare('DELETE FROM sessions WHERE user_id = ? AND token <> ?')->execute([$user['id'], auth_token()]);
+    respond(['ok' => true]);
 }
 
 function route_set_role(int $userId): void
@@ -274,16 +301,6 @@ function route_delete_user(int $userId): void
     respond(['ok' => true]);
 }
 
-function route_reset_password(int $userId): void
-{
-    require_admin();
-    $password = require_password(body());
-    find_user($userId);
-    db()->prepare("UPDATE users SET password_hash = ?, status = 'active' WHERE id = ?")
-        ->execute([password_hash($password, PASSWORD_DEFAULT), $userId]);
-    respond(['ok' => true]);
-}
-
 function valid_invite(string $token): array
 {
     $stmt = db()->prepare('SELECT * FROM invites WHERE token = ?');
@@ -307,7 +324,10 @@ function route_accept_invite(string $token): void
     $invite = valid_invite($token);
     db()->prepare("UPDATE users SET password_hash = ?, status = 'active' WHERE id = ?")
         ->execute([password_hash($password, PASSWORD_DEFAULT), $invite['user_id']]);
-    db()->prepare('UPDATE invites SET used_at = ? WHERE token = ?')->execute([now_utc(), $token]);
+    // este enlace y cualquier otro pendiente de la misma persona dejan de valer, y se
+    // cierran sus sesiones abiertas (la contraseña ha cambiado)
+    db()->prepare('UPDATE invites SET used_at = ? WHERE user_id = ? AND used_at IS NULL')->execute([now_utc(), $invite['user_id']]);
+    db()->prepare('DELETE FROM sessions WHERE user_id = ?')->execute([$invite['user_id']]);
     respond(['ok' => true]);
 }
 
@@ -458,11 +478,12 @@ $routes = [
     ['GET', '#^/me$#', 'route_me'],
     ['GET', '#^/users$#', 'route_list_users'],
     ['POST', '#^/users/invite$#', 'route_invite'],
-    ['POST', '#^/users$#', 'route_create_user'],
     ['POST', '#^/users/(\d+)/role$#', 'route_set_role'],
     ['POST', '#^/users/(\d+)/profile$#', 'route_update_profile'],
     ['DELETE', '#^/users/(\d+)$#', 'route_delete_user'],
-    ['POST', '#^/users/(\d+)/password$#', 'route_reset_password'],
+    ['POST', '#^/users/(\d+)/send-access$#', 'route_send_access'],
+    ['POST', '#^/password/forgot$#', 'route_forgot_password'],
+    ['POST', '#^/me/password$#', 'route_change_own_password'],
     ['GET', '#^/invites/([\w-]+)$#', 'route_get_invite'],
     ['POST', '#^/invites/([\w-]+)/accept$#', 'route_accept_invite'],
     ['POST', '#^/login$#', 'route_login'],

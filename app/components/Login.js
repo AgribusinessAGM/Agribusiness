@@ -1,8 +1,70 @@
+import { useState } from 'react';
 import { html } from '../lib/html.js';
 import { useApp } from '../state/store.js';
+import { PasswordInput } from './PasswordInput.js';
+import { forgotPassword } from '../api.js';
+
+// "He olvidado mi contraseña": pide el correo y el servidor envía un enlace de un solo uso
+// (1 h). El mensaje es el mismo exista o no la cuenta, para no revelar quién está dado de alta.
+function ForgotPassword({ initialEmail, onBack }) {
+  const [email, setEmail] = useState(initialEmail || '');
+  const [sent, setSent] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState(null);
+  const submit = (e) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setPending(true);
+    setError(null);
+    forgotPassword(email.trim())
+      .then(() => setSent(true))
+      .catch((err) => setError(err.message))
+      .finally(() => setPending(false));
+  };
+  const back = html`
+    <div style=${{ textAlign: 'center', marginTop: 14 }}>
+      <button type="button" onClick=${onBack} style=${{ background: 'none', border: 'none', color: 'var(--brand)', fontWeight: 600, fontSize: 13, cursor: 'pointer', padding: 0 }}>
+        ← Volver a iniciar sesión
+      </button>
+    </div>
+  `;
+  if (sent)
+    return html`
+      <div style=${{ background: 'var(--brandL)', border: '1px solid var(--editableLine)', borderRadius: 'var(--radius)', padding: 16, fontSize: 14, lineHeight: 1.55 }}>
+        Si el correo está dado de alta, en unos minutos recibirás un enlace para elegir una nueva contraseña. El enlace caduca en 1 hora.
+      </div>
+      ${back}
+    `;
+  return html`
+    <form onSubmit=${submit}>
+      <p style=${{ color: 'var(--ink2)', fontSize: 14, margin: '0 0 16px', lineHeight: 1.55 }}>
+        Escribe tu correo y te enviaremos un enlace para elegir una nueva contraseña.
+      </p>
+      <label style=${{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Correo electrónico</label>
+      <input
+        type="email"
+        value=${email}
+        onInput=${(e) => setEmail(e.target.value)}
+        autoComplete="email"
+        style=${{ width: '100%', padding: '12px 14px', border: '1px solid var(--line)', borderRadius: 'var(--radius)', fontSize: 15, marginBottom: error ? 8 : 24, background: 'var(--surface)', color: 'var(--ink)' }}
+      />
+      ${error && html`<div style=${{ color: '#c0392b', fontSize: 13, marginBottom: 16 }}>${error}</div>`}
+      <button
+        type="submit"
+        disabled=${pending}
+        className="lift"
+        style=${{ width: '100%', background: 'var(--brand)', color: '#fff', border: 'none', borderRadius: 'var(--radius)', padding: 13, fontSize: 15, fontWeight: 700, cursor: pending ? 'default' : 'pointer', opacity: pending ? 0.7 : 1, boxShadow: 'var(--shadow)' }}
+      >
+        ${pending ? 'Enviando…' : 'Enviar enlace'}
+      </button>
+      ${back}
+    </form>
+  `;
+}
 
 export function Login() {
   const { state, setLoginEmail, setLoginPassword, login } = useApp();
+  const [forgot, setForgot] = useState(false);
   const onSubmit = (e) => {
     e.preventDefault();
     if (!state.loginPending) login();
@@ -41,7 +103,9 @@ export function Login() {
           <p style=${{ color: 'var(--ink2)', margin: '0 0 30px', fontSize: 15, lineHeight: 1.55 }}>
             Accede a tu modelo, ajusta las variables de tu proyecto y consulta la rentabilidad en tiempo real.
           </p>
-          <form onSubmit=${onSubmit}>
+          ${forgot
+            ? html`<${ForgotPassword} initialEmail=${state.loginEmail} onBack=${() => setForgot(false)} />`
+            : html`<form onSubmit=${onSubmit}>
             <label style=${{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
               Correo electrónico
             </label>
@@ -64,8 +128,7 @@ export function Login() {
             <label style=${{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
               Contraseña
             </label>
-            <input
-              type="password"
+            <${PasswordInput}
               value=${state.loginPassword}
               onChange=${(e) => setLoginPassword(e.target.value)}
               autoComplete="current-password"
@@ -102,7 +165,16 @@ export function Login() {
             >
               ${state.loginPending ? 'Entrando…' : 'Entrar'}
             </button>
-          </form>
+            <div style=${{ textAlign: 'center', marginTop: 14 }}>
+              <button
+                type="button"
+                onClick=${() => setForgot(true)}
+                style=${{ background: 'none', border: 'none', color: 'var(--brand)', fontWeight: 600, fontSize: 13, cursor: 'pointer', padding: 0 }}
+              >
+                He olvidado mi contraseña
+              </button>
+            </div>
+          </form>`}
           <div style=${{ textAlign: 'center', marginTop: 18, fontSize: 13, color: 'var(--ink2)' }}>
             ¿Problemas para acceder?${' '}<span style=${{ color: 'var(--brand)', fontWeight: 600 }}>Contacta con tu gestor</span>
           </div>

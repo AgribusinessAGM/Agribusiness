@@ -2,17 +2,7 @@ import { html } from '../lib/html.js';
 import { useApp } from '../state/store.js';
 
 export function InviteModal() {
-  const {
-    state,
-    closeInvite,
-    setInviteMode,
-    setInviteName,
-    setInviteEmail,
-    setInviteOrg,
-    setInvitePassword,
-    setInviteRole,
-    submitInvite,
-  } = useApp();
+  const { state, closeInvite, setInviteName, setInviteEmail, setInviteOrg, setInviteRole, submitInvite } = useApp();
   if (!state.showInvite) return null;
 
   const inputStyle = {
@@ -37,8 +27,6 @@ export function InviteModal() {
     fontSize: 13,
     cursor: 'pointer',
   });
-
-  const isDirect = state.inviteMode === 'direct';
 
   return html`
     <div
@@ -69,19 +57,9 @@ export function InviteModal() {
 
         ${!state.inviteDevLink &&
         html`
-          <p style=${{ color: 'var(--ink2)', fontSize: 13, margin: '0 0 16px' }}>
-            ${isDirect
-              ? 'Creas la cuenta y le dices tú la contraseña directamente — no se envía ningún correo.'
-              : 'Le enviaremos un correo para que cree su propia contraseña.'}${' '}Podrás asignarle acceso a cada modelo después, desde la tabla de permisos.
+          <p style=${{ color: 'var(--ink2)', fontSize: 13, margin: '0 0 20px' }}>
+            Le enviaremos un correo con un enlace (válido 72 h) para que cree su propia contraseña; nadie más la ve. Podrás asignarle acceso a cada modelo después, en Acceso a modelos.
           </p>
-          <div style=${{ display: 'flex', gap: 8, marginBottom: 20 }}>
-            <button style=${tabStyle(isDirect)} onClick=${() => setInviteMode('direct')}>
-              Crear con contraseña
-            </button>
-            <button style=${tabStyle(!isDirect)} onClick=${() => setInviteMode('email')}>
-              Invitar por correo
-            </button>
-          </div>
         `}
 
         ${state.inviteDevLink
@@ -98,7 +76,7 @@ export function InviteModal() {
                     color: 'var(--ink)',
                   }}
                 >
-                  <strong>No hay proveedor de email configurado.</strong> Copia este enlace y compártelo manualmente con la persona invitada — caduca en 7 días.
+                  <strong>Modo de pruebas, sin correo.</strong> Copia este enlace y ábrelo como la persona invitada — caduca en 72 horas.
                   <div
                     style=${{
                       marginTop: 10,
@@ -162,17 +140,6 @@ export function InviteModal() {
                   Administrador
                 </button>
               </div>
-              ${isDirect &&
-              html`
-                <label style=${{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Contraseña</label>
-                <input
-                  type="text"
-                  value=${state.invitePassword}
-                  onChange=${(e) => setInvitePassword(e.target.value)}
-                  placeholder="Mínimo 8 caracteres"
-                  style=${{ ...inputStyle, fontFamily: 'var(--num)', marginBottom: state.inviteError ? 8 : 24 }}
-                />
-              `}
               ${state.inviteError &&
               html`<div style=${{ color: '#c0392b', fontSize: 13, marginBottom: 16 }}>${state.inviteError}</div>`}
               <div style=${{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
@@ -196,7 +163,7 @@ export function InviteModal() {
                     opacity: state.invitePending ? 0.7 : 1,
                   }}
                 >
-                  ${state.invitePending ? 'Guardando…' : isDirect ? 'Crear usuario' : 'Enviar invitación'}
+                  ${state.invitePending ? 'Enviando…' : 'Enviar invitación'}
                 </button>
               </div>
             `}
