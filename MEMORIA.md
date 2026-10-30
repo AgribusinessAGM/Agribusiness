@@ -157,8 +157,15 @@ Navegador ──► index.html → app/main.js   (interfaz React, módulos JS si
 - **Autenticación:** token de sesión de 30 días en la tabla `sessions`. El
   frontend lo guarda en `localStorage` (`om_token`) y lo envía en
   `Authorization: Bearer` **y** en `X-Auth-Token`, porque PHP en FastCGI (Plesk)
-  suele perder `Authorization`.
+  suele perder `Authorization`. "Salir" llama a POST `/logout`, que borra la
+  sesión en el servidor.
 - **Contraseñas:** `password_hash` / `password_verify` de PHP (bcrypt).
+- **Límite de login:** como mucho 5 fallos por correo y 20 por IP cada 15
+  minutos (tabla `login_attempts`); después, error 429.
+- **Errores:** un error 500 responde solo "Error interno del servidor."; el
+  detalle va al log de PHP (`error_log`).
+- **Cabeceras:** el `.htaccess` de la raíz pone `X-Frame-Options`,
+  `X-Content-Type-Options` y `Referrer-Policy`; la API quita `X-Powered-By`.
 
 ### Configuración
 
@@ -166,22 +173,33 @@ Navegador ──► index.html → app/main.js   (interfaz React, módulos JS si
 contraseña, base de datos `agribusiness` autocreada,
 `app_url = http://localhost/Agribusiness`). Para cambiarlos se crea
 `api/config.php`, que **no se sube a git**, con solo las claves que cambian:
-`db_*`, `app_url`, `smtp_host`, `smtp_port`, `smtp_user`, `smtp_pass`,
-`from_email`.
+`db_*`, `app_url`, `admin_email`, `demo_users`, `smtp_host`, `smtp_port`,
+`smtp_user`, `smtp_pass`, `from_email`, `dev_show_links`.
 
 - En el XAMPP de Marc existe `api/config.php` (no versionado) con solo
-  `app_url => http://localhost/Agribusiness`.
-- Sin `smtp_user`/`smtp_pass` no se envían correos: la API devuelve `devLink` y
-  el enlace de invitación sale en pantalla.
+  `app_url => http://localhost/Agribusiness`. Su base de datos ya tiene los
+  usuarios de ejemplo; para una base nueva en local hay que añadir
+  `demo_users => true` y `dev_show_links => true` (ver README).
+- `demo_users` (por defecto `false`): crea los usuarios de ejemplo, con
+  contraseña pública, al crear la base de datos. **Solo en local.**
+- `admin_email`: mientras no hay ninguna cuenta, se crea un administrador
+  invitado con ese correo; entra con "He olvidado mi contraseña".
+- Sin `smtp_user`/`smtp_pass` no se envían correos: la API da error 503, salvo
+  con `dev_show_links` (local), que devuelve `devLink` y lo muestra en pantalla.
 - En Plesk: `db_autocreate => false`, crear la base de datos desde el panel y
-  poner sus credenciales y el `app_url` del dominio.
+  poner sus credenciales, el `app_url` del dominio y `admin_email`. Pasos y
+  directivas de nginx en el README ("Publicar en Plesk").
 
 ### Base de datos (MySQL, utf8mb4, InnoDB, fechas en UTC)
 
 - `users` (id, name, email único, org, password_hash, status `invited|active`,
   role `admin|user`, created_at)
-- `invites` (token, user_id, expires_at, used_at). Caducan a los 7 días.
-- `sessions` (token, user_id, created_at, expires_at)
+- `invites` (token, user_id, expires_at, used_at). Caducan a las 72 h (alta) o
+  1 h (contraseña); se borran una semana después de caducar.
+- `sessions` (token, user_id, created_at, expires_at). Las caducadas se borran
+  en cada login correcto.
+- `login_attempts` (email, ip, attempted_at): fallos de login de los últimos
+  15 minutos. Se crea también en bases de datos ya existentes.
 - `models` (id, name, crop `olivo|almendro`, region, status, created_by,
   updated_at, **assumptions** = JSON con todos los supuestos)
 - `access` (user_id, model_id, level `view|edit`). Sin fila equivale a "sin
@@ -195,14 +213,16 @@ recargar.
 
 | Método y ruta | Quién | Qué hace |
 | --- | --- | --- |
-| POST `/login` | público | `{email,password}` → `{token,user}` |
+| POST `/login` | público | `{email,password}` → `{token,user}`; 429 tras demasiados fallos |
+| POST `/logout` | sesión | borra la sesión en el servidor |
 | GET `/me` | sesión | usuario actual |
+| POST `/me/password` | sesión | cambia la propia contraseña (con la actual) y cierra las demás sesiones |
+| POST `/password/forgot` | público | envía el enlace de contraseña (o reenvía la invitación); responde siempre igual |
 | GET `/users` | admin | usuarios con `access` `{modelId: level}` |
 | POST `/users/invite` | admin | crea o actualiza un usuario invitado y envía el correo (o devuelve `devLink`) |
-| POST `/users` | admin | crea un usuario con contraseña directa |
-| POST `/users/{id}/role` | admin | cambia el rol |
-| POST `/users/{id}/password` | admin | fija la contraseña |
-| DELETE `/users/{id}` | admin | borra (con sus permisos e invitaciones, en cascada) |
+| POST `/users/{id}/profile` | admin | cambia nombre, correo y organización |
+| POST `/users/{id}/send-access` | admin | reenvía el enlace de alta o de contraseña |
+| DELETE `/users/{id}` | admin | borra (con sus permisos e invitaciones, en cascada); no a uno mismo |
 | GET `/invites/{token}` | público | nombre y correo de la invitación |
 | POST `/invites/{token}/accept` | público | crea la contraseña (mínimo 8 caracteres) |
 | POST `/access` | admin | `{userId,modelId,level}`; `none` elimina el permiso |
@@ -213,7 +233,7 @@ recargar.
 El enlace de invitación es `app_url + "/?token=…"`: la app detecta `?token=` y
 muestra la pantalla "Crear contraseña".
 
-### Usuarios de ejemplo (contraseña `agromillora2026`)
+### Usuarios de ejemplo (contraseña `agromillora2026`, solo con `demo_users`)
 
 | Correo | Rol | Permisos (modelo 1 / 2 / 3) |
 | --- | --- | --- |
@@ -365,12 +385,16 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - **Correo real:** el cliente SMTP de PHP no se ha probado contra Microsoft 365
   (sí el caso de error). Requiere una contraseña de aplicación y el "SMTP
   autenticado" activado en el buzón.
-- **Despliegue en Plesk:** sin hacer. Requiere PHP 8.0+ con `pdo_mysql`, crear
-  la base de datos en el panel, `api/config.php` con credenciales y `app_url`,
-  y subir solo `index.html`, `.htaccess`, `app/`, `assets/` y `api/` de la
-  raíz del repo (no hace falta `chats/`, `project/` ni los `.md`). Comprobar
-  que el servidor sirve los `.js` como `text/javascript` (los módulos ES lo
-  exigen).
+- **Despliegue en Plesk:** sin hacer. Pasos en el README ("Publicar en
+  Plesk"): PHP 8.0+ con `pdo_mysql`, `mbstring` y `openssl`; base de datos
+  creada en el panel; `api/config.php` con credenciales, `app_url`,
+  `admin_email` y SMTP; subir solo `index.html`, `.htaccess`, `app/`, `assets/`
+  y `api/`; y las directivas de nginx, porque nginx sirve los estáticos sin
+  leer los `.htaccess`. Comprobar que los `.js` salen como `text/javascript`.
+- **Crear modelos:** cualquier usuario con sesión puede crear modelos (también
+  los de solo lectura). Pendiente de decidir si debe ser solo el admin.
+- **Repositorio público** en GitHub, con un Excel de cliente en
+  `project/uploads/`. Pendiente de decidir si se hace privado.
 - **Datos de producción en Railway** (versión Node.js, etiqueta
   `archive/node-main`): no se han migrado a MySQL.
   Las contraseñas de allí (scrypt de Node) no valen en PHP: habría que volver a
@@ -924,3 +948,4 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-26: **Contraseñas solo de cada persona:** el administrador ya no puede escribir contraseñas (quitadas las rutas POST /users y POST /users/{id}/password, el modo "Crear con contraseña" y la ventana de cambiar contraseña de otro). Alta = correo con enlace de un solo uso (72 h, INVITE_TTL). Nuevas rutas: POST /users/{id}/send-access (admin reenvía enlace: "Reenviar invitación" / "Enviar enlace de contraseña"), POST /password/forgot (login "He olvidado mi contraseña", enlace 1 h RESET_TTL, respuesta siempre igual, máx. 3 por hora), POST /me/password (botón "Contraseña" en la barra: actual + nueva; cierra las demás sesiones). Al usar un enlace se invalidan los demás pendientes y se cierran las sesiones. Sin SMTP la API da error 503; solo con 'dev_show_links' => true en api/config.php (pruebas en local) devuelve el enlace en pantalla. ResetPasswordModal.js pasa a ChangePasswordModal.js. Correo con dos textos (invite/reset) en mailer.php.
 - 2026-10-26: **Campo de contraseña con ojo** (PasswordInput.js): muestra u oculta lo que se escribe en el login, la página del enlace y "Cambiar mi contraseña". Las contraseñas guardadas siguen sin poder leerse (hash).
 - 2026-10-30: **Una sola rama, `main`.** `main` avanza (fast-forward) hasta `php`, así que pasa a ser la versión PHP + MySQL, y se borran las ramas `php` y `plesk-test`. Lo que solo estaba en ellas se conserva en etiquetas: `archive/node-main` (`bface9e`, la versión Node.js que publicaba Railway) y `archive/plesk-test` (`5f2a850`, página estática y `test.php` de prueba de Plesk). README, `CLAUDE.md` y `AGENTS.md` dicen ahora que se trabaja en `main`.
+- 2026-10-30: **Revisión de seguridad y limpieza** (antes de publicar en Plesk). Seguridad: los usuarios de ejemplo (contraseña pública) solo se crean con `demo_users` en config.php; primer administrador de producción con `admin_email` (entra con "He olvidado mi contraseña", que ahora también reenvía la invitación a quien aún no tiene contraseña); el login ya no muestra las credenciales de ejemplo, ni "Hola Marc!", ni trae el correo relleno; límite de intentos de login (tabla `login_attempts`); POST `/logout` borra la sesión en el servidor; los errores 500 ya no muestran el SQL; el alta valida el correo; `/access` comprueba que existen la persona y el modelo; un admin no puede borrarse a sí mismo; limpieza de sesiones y enlaces caducados; cabeceras de seguridad en `.htaccess` y `<meta name="referrer">`; `.claude/` y `.codex/` bloqueados. Limpieza: fuera `app/devTextEdit.js` (botón temporal "Edición de texto"), la ruta `/users/{id}/role` y `setUserRole` (sin botón desde el 26-10), `baseIAG`/`buildCapexIAG` (el IAG viene de la base de datos), `mkHead`, un import sin uso, el resto de `set-password` de la versión Node, los comentarios "Equivale a server/…", `assets/foto-plantacion.jpg` (sin uso); `portada-olivar.png` (2,8 MB) pasa a `portada-olivar.webp` (250 KB, misma resolución). README con los pasos para publicar en Plesk (incluidas directivas de nginx).

@@ -23,13 +23,24 @@ tal cual (ver "Modificar la interfaz").
 1. Arranca **Apache** y **MySQL** desde el panel de XAMPP.
 2. Clona este repositorio (rama `main`) dentro de la carpeta `htdocs` de tu
    XAMPP, de forma que quede `C:\xampp_marc\htdocs\Agribusiness\index.html`.
-3. Abre http://localhost/Agribusiness/
+3. Crea `api/config.php` para pruebas en local:
+
+   ```php
+   <?php
+   return [
+       'demo_users' => true,     // usuarios de ejemplo (solo en local)
+       'dev_show_links' => true, // enlaces de alta en pantalla, sin correo
+   ];
+   ```
+
+4. Abre http://localhost/Agribusiness/
 
 La primera vez, la app crea sola la base de datos `agribusiness` con sus tablas
 y los datos de ejemplo. Usa la configuración por defecto de XAMPP (usuario
 `root` sin contraseña).
 
-Usuarios de ejemplo, todos con la contraseña `agromillora2026`:
+Usuarios de ejemplo (solo con `demo_users`), todos con la contraseña
+`agromillora2026`:
 
 | Correo | Rol |
 | --- | --- |
@@ -48,8 +59,9 @@ Los valores por defecto están en `api/config.example.php`. Para cambiar algo
 `api/config.php` y edita solo lo necesario. `config.php` no se sube a git
 porque contiene contraseñas.
 
-Sin SMTP configurado no se envían correos de invitación: el enlace para crear
-la contraseña se muestra en la pantalla de administración.
+Sin SMTP configurado no se envían correos de invitación. Solo con
+`dev_show_links` (en local) el enlace para crear la contraseña se muestra en la
+pantalla de administración.
 
 ## Estructura
 
@@ -73,11 +85,46 @@ La raíz del repositorio es la app:
 - `project/`, `chats/` — diseño original y transcripciones (referencia)
 
 El `.htaccess` de la raíz impide abrir desde el navegador `project/`,
-`chats/`, `.git` y los `.md`, y hace que el navegador no use copias antiguas
-de los `.js` y `.css`.
+`chats/`, `.git`, `.claude/`, `.codex/` y los `.md`, añade cabeceras de
+seguridad y hace que el navegador no use copias antiguas de los `.js` y `.css`.
 
-Para publicar en Plesk basta con subir `index.html`, `.htaccess`, `app/`,
-`assets/` y `api/` (con su `config.php`).
+## Publicar en Plesk
+
+1. Requisitos: PHP 8.0 o superior con `pdo_mysql`, `mbstring` y `openssl`.
+2. Crea la base de datos y su usuario desde el panel.
+3. Sube **solo** `index.html`, `.htaccess`, `app/`, `assets/` y `api/`. No
+   subas `project/` (tiene Excel de clientes), `chats/` ni los `.md`.
+4. Crea `api/config.php` con, al menos:
+
+   ```php
+   <?php
+   return [
+       'db_name' => '...', 'db_user' => '...', 'db_pass' => '...',
+       'db_autocreate' => false,
+       'app_url' => 'https://tu-dominio',
+       'admin_email' => 'tu-correo@agromillora.com',
+       'smtp_user' => '...', 'smtp_pass' => '...',
+   ];
+   ```
+
+   **Nunca** pongas `demo_users` ni `dev_show_links` a `true` en producción.
+5. Abre la app y pulsa "He olvidado mi contraseña" con el correo de
+   `admin_email`: llega el enlace para crear la contraseña del primer
+   administrador. Desde ahí se invita al resto.
+
+Plesk sirve los archivos estáticos con nginx, que **no lee los `.htaccess`**.
+En *Configuración de Apache y nginx → Directivas adicionales de nginx* añade:
+
+```nginx
+location ~ ^/(chats|project|\.git|\.claude|\.codex|api/lib|api/data)(/|$) { deny all; }
+location ~ \.md$ { deny all; }
+add_header X-Frame-Options "SAMEORIGIN" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header Referrer-Policy "same-origin" always;
+```
+
+Comprueba también que los `.js` se sirven como `text/javascript` (los módulos
+del navegador lo exigen).
 
 ## Modificar la interfaz
 
