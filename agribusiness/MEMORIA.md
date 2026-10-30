@@ -53,6 +53,27 @@ solo a sus modelos.
    navegador la alineación de cuadros con sus cabeceras, columnas uniformes,
    textos que se pisan, tipografías y las reglas de texto. Corregir lo que
    marque antes de dar el cambio por terminado.
+8. **Antes de cada push, mirar si alguien ha subido algo.** En el repositorio
+   trabaja más de una persona (Marc y Xavi), así que nunca se sube sin
+   comprobarlo:
+   1. `git fetch origin` y `git log --oneline HEAD..origin/main`: lista los
+      commits de GitHub que aún no están en local.
+   2. Si no sale nada, se puede subir.
+   3. Si salen commits, se integran antes de subir con
+      `git pull --rebase origin main` (los commits locales se reaplican encima
+      de los de GitHub). Leer qué ha cambiado (`git log -p HEAD@{1}..HEAD` o el
+      diff de esos commits) y, si tocan algo de lo que se ha hecho en local,
+      decírselo a quien pidió el push.
+   4. **Conflictos:** resolverlos a mano conservando el trabajo de las dos
+      partes. En esta memoria, en el "Registro de evolución" se quedan las
+      entradas de los dos, por orden de fecha. Si un conflicto no está claro
+      (las dos partes cambian lo mismo de forma distinta), parar y preguntar en
+      lugar de elegir una versión.
+   5. Después de integrar, volver a probar en local (la app carga, login y lo
+      que se haya cambiado) y solo entonces hacer el push.
+   6. **Nunca** `git push --force` ni borrar commits de otra persona.
+   Al empezar una sesión también conviene hacer `git pull` para partir de lo
+   último.
 
 ## 3. Dónde está todo
 
@@ -420,7 +441,8 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 ## 7. Cómo trabajar en una sesión nueva
 
 1. Leer esta memoria.
-2. Clonar el repositorio (rama `main`, la única).
+2. Clonar el repositorio (rama `main`, la única), o `git pull` si ya está
+   clonado, para partir de lo último que haya en GitHub.
 3. Para cambios de **interfaz**: editar el `.js` correspondiente de `app/` y
    recargar el navegador. No hay compilación (ver sección 4).
 4. Para cambios de **API o base de datos**: editar `api/`. Si
@@ -432,7 +454,8 @@ superficie, y con la estructura completa de CAPEX y OPEX.
    repo, así que
    cualquier cambio se valida recargando, sin copiar nada.
 6. Si se trabaja fuera de su equipo, entregar el repositorio (ZIP con `.git`).
-7. Commit local. **Push solo con su orden explícita.**
+7. Commit local. **Push solo con su orden explícita**, y antes de subir,
+   comprobar e integrar lo que otros hayan subido (regla 8 de la sección 2).
 8. Actualizar esta memoria (sección 8 y lo que haya cambiado).
 
 ## 8. Registro de evolución
@@ -965,3 +988,4 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-30: **Revisión de seguridad y limpieza** (antes de publicar en Plesk). Seguridad: los usuarios de ejemplo (contraseña pública) solo se crean con `demo_users` en config.php; primer administrador de producción con `admin_email` (entra con "He olvidado mi contraseña", que ahora también reenvía la invitación a quien aún no tiene contraseña); el login ya no muestra las credenciales de ejemplo, ni "Hola Marc!", ni trae el correo relleno; límite de intentos de login (tabla `login_attempts`); POST `/logout` borra la sesión en el servidor; los errores 500 ya no muestran el SQL; el alta valida el correo; `/access` comprueba que existen la persona y el modelo; un admin no puede borrarse a sí mismo; limpieza de sesiones y enlaces caducados; cabeceras de seguridad en `.htaccess` y `<meta name="referrer">`; `.claude/` y `.codex/` bloqueados. Limpieza: fuera `app/devTextEdit.js` (botón temporal "Edición de texto"), la ruta `/users/{id}/role` y `setUserRole` (sin botón desde el 26-10), `baseIAG`/`buildCapexIAG` (el IAG viene de la base de datos), `mkHead`, un import sin uso, el resto de `set-password` de la versión Node, los comentarios "Equivale a server/…", `assets/foto-plantacion.jpg` (sin uso); `portada-olivar.png` (2,8 MB) pasa a `portada-olivar.webp` (250 KB, misma resolución). README con los pasos para publicar en Plesk (incluidas directivas de nginx).
 - 2026-10-30: **Repositorio de apps con catálogo.** La app entera (con `project/`, `chats/`, esta memoria y su README) pasa a la carpeta `agribusiness/`. En la raíz queda un catálogo: `index.php` muestra un cuadro por cada carpeta con `app.json` (`name`, `description`, `icon`), ordenado por nombre; la app trae `app.json` e `icon.svg` (cuadro verde con barras y rama de olivo). Raíz: `.htaccess` (DirectoryIndex index.php, bloquea `.git`, `.claude`, `.codex`, `.md`, cabeceras de seguridad), `assets/agromillora-logo.png`, README del repositorio y `CLAUDE.md`/`AGENTS.md` que apuntan a esta memoria. `.gitignore` limpio de restos de Node (`**/api/config.php`). `app_url` por defecto: http://localhost/Agribusiness/agribusiness. Directivas de nginx de Plesk sin anclar a la raíz.
 - 2026-10-30: **La carpeta raíz del repositorio en local se llama `apps`** (antes `Agribusiness`), para distinguir el catálogo de la carpeta `agribusiness/` de la app: catálogo en http://localhost/apps/ y app en http://localhost/apps/agribusiness/. `app_url` por defecto pasa a http://localhost/apps/agribusiness; el README de la raíz indica clonar con `git clone … apps`. Si alguien mantiene otro nombre de carpeta, debe poner su `app_url` en `agribusiness/api/config.php`. El repositorio de GitHub sigue llamándose `Agribusiness`.
+- 2026-10-30: **Nueva regla de trabajo (sección 2, regla 8):** antes de cada push, `git fetch` y mirar si hay commits nuevos en GitHub; si los hay, integrarlos con `git pull --rebase`, resolver conflictos conservando el trabajo de los dos (en el registro de la memoria, las dos entradas por fecha), volver a probar en local y solo entonces subir. Nunca `--force`. Recogida también en `CLAUDE.md`/`AGENTS.md` de la raíz.
