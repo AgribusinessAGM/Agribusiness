@@ -14,6 +14,8 @@ const SESSION_TTL = 30 * 24 * 3600;
 const LOGIN_WINDOW = 15 * 60;
 const LOGIN_MAX_PER_EMAIL = 5;
 const LOGIN_MAX_PER_IP = 20;
+// "He olvidado mi contraseña": como mucho 10 solicitudes por IP y hora
+const FORGOT_MAX_PER_IP = 10;
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -240,8 +242,18 @@ function route_send_access(int $userId): void
 // "He olvidado mi contraseña": responde siempre lo mismo, exista o no el correo, para no
 // revelar quién tiene cuenta. Como mucho 3 enlaces por persona y hora. A quien aún no ha
 // creado su contraseña (invitado, o el primer administrador) se le reenvía la invitación.
+// Además, como mucho FORGOT_MAX_PER_IP solicitudes por IP y hora, existan o no los correos:
+// así nadie puede mandar enlaces a muchas personas ni tantear qué correos tienen cuenta.
 function route_forgot_password(): void
 {
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+    $stmt = db()->prepare('SELECT COUNT(*) FROM forgot_requests WHERE ip = ? AND requested_at > ?');
+    $stmt->execute([$ip, now_utc(-3600)]);
+    if ((int) $stmt->fetchColumn() >= FORGOT_MAX_PER_IP) {
+        throw new HttpError(429, 'Demasiadas solicitudes. Espera una hora y vuelve a probar.');
+    }
+    db()->prepare('INSERT INTO forgot_requests (ip, requested_at) VALUES (?, ?)')->execute([$ip, now_utc()]);
+
     $user = find_user_by_email(mb_strtolower(str_field(body(), 'email')));
     if ($user) {
         $stmt = db()->prepare('SELECT COUNT(*) FROM invites WHERE user_id = ? AND expires_at > ?');
@@ -349,7 +361,11 @@ function route_login(): void
 
     $user = find_user_by_email($email);
     $password = isset($b['password']) && is_string($b['password']) ? $b['password'] : '';
-    if (!$user || !$user['password_hash'] || !password_verify($password, $user['password_hash'])) {
+    $hash = $user['password_hash'] ?? null;
+    // Sin cuenta (o sin contraseña todavía) se comprueba igualmente contra un hash real, para
+    // que el tiempo de respuesta no revele qué correos están dados de alta.
+    $valid = password_verify($password, $hash ?: timing_hash());
+    if (!$user || !$hash || !$valid) {
         db()->prepare('INSERT INTO login_attempts (email, ip, attempted_at) VALUES (?, ?, ?)')
             ->execute([mb_substr($email, 0, 190), $ip, now_utc()]);
         throw new HttpError(401, 'Correo o contraseña incorrectos.');
@@ -360,6 +376,14 @@ function route_login(): void
     respond(['ok' => true, 'token' => create_session((int) $user['id']), 'user' => public_user($user)]);
 }
 
+// Hash de contraseña de alguna cuenta (mismo coste que los reales), solo para gastar el mismo
+// tiempo en un login fallido. Si aún no hay ninguna contraseña, un hash no válido.
+function timing_hash(): string
+{
+    $hash = db()->query('SELECT password_hash FROM users WHERE password_hash IS NOT NULL LIMIT 1')->fetchColumn();
+    return $hash ?: '$2y$10$' . str_repeat('.', 53);
+}
+
 // Cierra la sesión también en el servidor: el token deja de valer aunque alguien lo tenga
 function route_logout(): void
 {
@@ -368,11 +392,13 @@ function route_logout(): void
     respond(['ok' => true]);
 }
 
-// Limpieza al iniciar sesión: sesiones caducadas y enlaces caducados hace más de una semana
+// Limpieza al iniciar sesión: sesiones caducadas, enlaces caducados hace más de una semana y
+// solicitudes de contraseña de hace más de una hora
 function purge_expired(): void
 {
     db()->prepare('DELETE FROM sessions WHERE expires_at < ?')->execute([now_utc()]);
     db()->prepare('DELETE FROM invites WHERE expires_at < ?')->execute([now_utc(-7 * 86400)]);
+    db()->prepare('DELETE FROM forgot_requests WHERE requested_at < ?')->execute([now_utc(-3600)]);
 }
 
 function upsert_access(int $userId, int $modelId, string $level): void

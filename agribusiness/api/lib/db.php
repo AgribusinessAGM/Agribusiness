@@ -56,14 +56,15 @@ function ensure_schema(PDO $pdo): void
         $adminId = !empty(config()['demo_users']) ? seed_users($pdo) : null;
         if ($adminId) $pdo->prepare('UPDATE models SET created_by = ?')->execute([$adminId]);
     }
-    ensure_login_attempts($pdo);
+    ensure_rate_limit_tables($pdo);
     ensure_first_admin($pdo);
     ensure_iag_model($pdo);
 }
 
-// Tabla de intentos de login fallidos (límite contra la fuerza bruta). Se añadió
-// después del esquema inicial, así que también se crea en bases de datos que ya existían.
-function ensure_login_attempts(PDO $pdo): void
+// Tablas de los límites contra abusos: intentos de login fallidos y solicitudes de
+// "He olvidado mi contraseña". Se añadieron después del esquema inicial, así que también
+// se crean en bases de datos que ya existían.
+function ensure_rate_limit_tables(PDO $pdo): void
 {
     $pdo->exec(
         'CREATE TABLE IF NOT EXISTS login_attempts (
@@ -73,6 +74,14 @@ function ensure_login_attempts(PDO $pdo): void
           attempted_at DATETIME NOT NULL,
           KEY (email, attempted_at),
           KEY (ip, attempted_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+    );
+    $pdo->exec(
+        'CREATE TABLE IF NOT EXISTS forgot_requests (
+          id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+          ip VARCHAR(45) NOT NULL,
+          requested_at DATETIME NOT NULL,
+          KEY (ip, requested_at)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
     );
 }

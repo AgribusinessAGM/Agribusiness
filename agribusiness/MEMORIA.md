@@ -191,7 +191,14 @@ Navegador ──► index.html → app/main.js   (interfaz React, módulos JS si
   sesión en el servidor.
 - **Contraseñas:** `password_hash` / `password_verify` de PHP (bcrypt).
 - **Límite de login:** como mucho 5 fallos por correo y 20 por IP cada 15
-  minutos (tabla `login_attempts`); después, error 429.
+  minutos (tabla `login_attempts`); después, error 429. Un login fallido tarda
+  lo mismo exista o no el correo (`timing_hash()`: se comprueba la contraseña
+  contra el hash de otra cuenta), para no revelar quién está dado de alta.
+- **Límite de "He olvidado mi contraseña":** 10 solicitudes por IP y hora
+  (tabla `forgot_requests`), además de 3 enlaces por persona y hora; después,
+  error 429. Queda una pista de tiempo: si el correo existe se envía el correo
+  SMTP antes de responder, así que esa respuesta tarda más; el límite por IP
+  lo frena.
 - **Errores:** un error 500 responde solo "Error interno del servidor."; el
   detalle va al log de PHP (`error_log`).
 - **Cabeceras:** el `.htaccess` de la raíz pone `X-Frame-Options`,
@@ -233,6 +240,9 @@ contraseña, base de datos `agribusiness` autocreada,
   en cada login correcto.
 - `login_attempts` (email, ip, attempted_at): fallos de login de los últimos
   15 minutos. Se crea también en bases de datos ya existentes.
+- `forgot_requests` (ip, requested_at): solicitudes de "He olvidado mi
+  contraseña" de la última hora. También se crea en bases de datos existentes
+  (`ensure_rate_limit_tables` en `api/lib/db.php`).
 - `models` (id, name, crop `olivo|almendro`, region, status, created_by,
   updated_at, **assumptions** = JSON con todos los supuestos)
 - `access` (user_id, model_id, level `view|edit`). Sin fila equivale a "sin
@@ -250,7 +260,7 @@ recargar.
 | POST `/logout` | sesión | borra la sesión en el servidor |
 | GET `/me` | sesión | usuario actual |
 | POST `/me/password` | sesión | cambia la propia contraseña (con la actual) y cierra las demás sesiones |
-| POST `/password/forgot` | público | envía el enlace de contraseña (o reenvía la invitación); responde siempre igual |
+| POST `/password/forgot` | público | envía el enlace de contraseña (o reenvía la invitación); responde siempre igual; 429 tras 10 por IP y hora |
 | GET `/users` | admin | usuarios con `access` `{modelId: level}` |
 | POST `/users/invite` | admin | crea o actualiza un usuario invitado y envía el correo (o devuelve `devLink`) |
 | POST `/users/{id}/profile` | admin | cambia nombre, correo y organización |
@@ -989,3 +999,4 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-30: **Repositorio de apps con catálogo.** La app entera (con `project/`, `chats/`, esta memoria y su README) pasa a la carpeta `agribusiness/`. En la raíz queda un catálogo: `index.php` muestra un cuadro por cada carpeta con `app.json` (`name`, `description`, `icon`), ordenado por nombre; la app trae `app.json` e `icon.svg` (cuadro verde con barras y rama de olivo). Raíz: `.htaccess` (DirectoryIndex index.php, bloquea `.git`, `.claude`, `.codex`, `.md`, cabeceras de seguridad), `assets/agromillora-logo.png`, README del repositorio y `CLAUDE.md`/`AGENTS.md` que apuntan a esta memoria. `.gitignore` limpio de restos de Node (`**/api/config.php`). `app_url` por defecto: http://localhost/Agribusiness/agribusiness. Directivas de nginx de Plesk sin anclar a la raíz.
 - 2026-10-30: **La carpeta raíz del repositorio en local se llama `apps`** (antes `Agribusiness`), para distinguir el catálogo de la carpeta `agribusiness/` de la app: catálogo en http://localhost/apps/ y app en http://localhost/apps/agribusiness/. `app_url` por defecto pasa a http://localhost/apps/agribusiness; el README de la raíz indica clonar con `git clone … apps`. Si alguien mantiene otro nombre de carpeta, debe poner su `app_url` en `agribusiness/api/config.php`. El repositorio de GitHub sigue llamándose `Agribusiness`.
 - 2026-10-30: **Nueva regla de trabajo (sección 2, regla 8):** antes de cada push, `git fetch` y mirar si hay commits nuevos en GitHub; si los hay, integrarlos con `git pull --rebase`, resolver conflictos conservando el trabajo de los dos (en el registro de la memoria, las dos entradas por fecha), volver a probar en local y solo entonces subir. Nunca `--force`. Recogida también en `CLAUDE.md`/`AGENTS.md` de la raíz.
+- 2026-10-30: **Revisión de login y usuarios** (probado en local con un usuario de prueba: alta, enlace de un solo uso, permisos ver/editar/sin acceso, rutas de admin con 403, cambio de contraseña, edición y borrado). Dos arreglos: el login fallido tarda lo mismo exista o no el correo (`timing_hash()`; antes 0,37 s frente a 0,045 s, ahora ~0,37 s en los dos casos) y "He olvidado mi contraseña" admite como mucho 10 solicitudes por IP y hora (tabla `forgot_requests`, error 429). Pendiente de decidir: cambiar el rol de un usuario existente (ahora hay que borrarlo e invitarlo de nuevo) y quién puede crear modelos.
