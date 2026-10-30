@@ -4,9 +4,9 @@ Plataforma para crear, ajustar y compartir modelos financieros agrícolas
 (CAPEX, OPEX, rentabilidad por capas — Agrícola / SPV / Fondo — y estructura
 financiera), con gestión de usuarios y permisos por modelo.
 
-Esta rama (`php`) es la versión para **PHP + MySQL/MariaDB**, pensada para
-XAMPP en local y Plesk en producción. La rama `main` es la versión anterior en
-Node.js.
+Es la versión para **PHP + MySQL/MariaDB**, pensada para XAMPP en local y
+Plesk en producción. Se trabaja solo en la rama `main`. La versión anterior en
+Node.js se conserva en la etiqueta `archive/node-main`.
 
 ## Qué se necesita
 
@@ -21,7 +21,7 @@ tal cual (ver "Modificar la interfaz").
 ## Instalar en XAMPP (local)
 
 1. Arranca **Apache** y **MySQL** desde el panel de XAMPP.
-2. Clona este repositorio (rama `php`) dentro de la carpeta `htdocs` de tu
+2. Clona este repositorio (rama `main`) dentro de la carpeta `htdocs` de tu
    XAMPP, de forma que quede `C:\xampp_marc\htdocs\Agribusiness\index.html`.
 3. Abre http://localhost/Agribusiness/
 

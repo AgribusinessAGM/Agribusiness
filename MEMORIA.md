@@ -9,7 +9,7 @@
 > `C:\xampp_marc\htdocs\Agribusiness\MEMORIA.md`. El `.htaccess` de la raíz
 > impide abrirlo desde el navegador.
 
-Última actualización: 2026-10-19
+Última actualización: 2026-10-30
 
 ---
 
@@ -56,17 +56,18 @@ solo a sus modelos.
 | Qué | Dónde |
 | --- | --- |
 | Repositorio | https://github.com/AgribusinessAGM/Agribusiness |
-| Rama actual (PHP + MySQL) | `php` |
-| Rama antigua (Node.js) | `main`, publicada en Railway |
-| Repo y app en local | `C:\xampp_marc\htdocs\Agribusiness` (clon completo, rama `php`) → http://localhost/Agribusiness/ |
+| Rama de trabajo (PHP + MySQL) | `main` (la única desde 2026-10-30) |
+| Versión antigua (Node.js) | etiqueta `archive/node-main` (era `main`, publicada en Railway) |
+| Prueba de Plesk | etiqueta `archive/plesk-test` (era la rama `plesk-test`) |
+| Repo y app en local | `C:\xampp_marc\htdocs\Agribusiness` (clon completo, rama `main`) → http://localhost/Agribusiness/ |
 | Código de la interfaz | `app/` (JavaScript sin compilar; React en `assets/vendor/`) |
 | Producción prevista | Plesk (dominio propio de Marc), aún sin desplegar |
 | Diseño original | `project/Plataforma Modelos.dc.html` (prototipo de Claude Design) |
 | Diseño nuevo (2026-10-19) | `project/design-nuevo/` — paquete de Claude Design (zip y su contenido): `Plataforma Modelos.dc.html`, `Informe PDF*.dc.html`, `RentTable.dc.html`, `i18n-dict.js`, Excels en `uploads/` |
 | Transcripciones del diseño | `chats/chat1.md` … `chat5.md` |
 
-**Estado de la rama `php`:** publicada en GitHub (por orden de Marc) y con
-seguimiento de `origin/php`. Lo que está subido y lo que solo está en local se
+**Estado de la rama `main`:** publicada en GitHub y con seguimiento de
+`origin/main`. Lo que está subido y lo que solo está en local se
 comprueba con `git status -sb` (aquí no se apuntan hashes: cada apunte sería un
 commit nuevo pendiente de subir).
 
@@ -83,7 +84,7 @@ Design. Marc exporta el paquete ("handoff" en zip) y lo deja en `project/`.
 - **Node.js no está instalado** y no hace falta (ver sección 4).
 - `winget` no está disponible.
 
-## 4. Arquitectura (rama `php`)
+## 4. Arquitectura (rama `main`)
 
 ```
 Navegador ──► index.html → app/main.js   (interfaz React, módulos JS sin compilar)
@@ -370,7 +371,8 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   raíz del repo (no hace falta `chats/`, `project/` ni los `.md`). Comprobar
   que el servidor sirve los `.js` como `text/javascript` (los módulos ES lo
   exigen).
-- **Datos de producción en Railway** (rama `main`): no se han migrado a MySQL.
+- **Datos de producción en Railway** (versión Node.js, etiqueta
+  `archive/node-main`): no se han migrado a MySQL.
   Las contraseñas de allí (scrypt de Node) no valen en PHP: habría que volver a
   invitar a los usuarios.
 - La URL pública de Railway no está documentada en el código (está en la
@@ -381,7 +383,7 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 ## 7. Cómo trabajar en una sesión nueva
 
 1. Leer esta memoria.
-2. Clonar el repositorio y cambiar a la rama `php`.
+2. Clonar el repositorio (rama `main`, la única).
 3. Para cambios de **interfaz**: editar el `.js` correspondiente de `app/` y
    recargar el navegador. No hay compilación (ver sección 4).
 4. Para cambios de **API o base de datos**: editar `api/`. Si
@@ -921,3 +923,4 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-26: **Gestión de perfiles:** las 6 columnas con el mismo ancho (table-layout fixed).
 - 2026-10-26: **Contraseñas solo de cada persona:** el administrador ya no puede escribir contraseñas (quitadas las rutas POST /users y POST /users/{id}/password, el modo "Crear con contraseña" y la ventana de cambiar contraseña de otro). Alta = correo con enlace de un solo uso (72 h, INVITE_TTL). Nuevas rutas: POST /users/{id}/send-access (admin reenvía enlace: "Reenviar invitación" / "Enviar enlace de contraseña"), POST /password/forgot (login "He olvidado mi contraseña", enlace 1 h RESET_TTL, respuesta siempre igual, máx. 3 por hora), POST /me/password (botón "Contraseña" en la barra: actual + nueva; cierra las demás sesiones). Al usar un enlace se invalidan los demás pendientes y se cierran las sesiones. Sin SMTP la API da error 503; solo con 'dev_show_links' => true en api/config.php (pruebas en local) devuelve el enlace en pantalla. ResetPasswordModal.js pasa a ChangePasswordModal.js. Correo con dos textos (invite/reset) en mailer.php.
 - 2026-10-26: **Campo de contraseña con ojo** (PasswordInput.js): muestra u oculta lo que se escribe en el login, la página del enlace y "Cambiar mi contraseña". Las contraseñas guardadas siguen sin poder leerse (hash).
+- 2026-10-30: **Una sola rama, `main`.** `main` avanza (fast-forward) hasta `php`, así que pasa a ser la versión PHP + MySQL, y se borran las ramas `php` y `plesk-test`. Lo que solo estaba en ellas se conserva en etiquetas: `archive/node-main` (`bface9e`, la versión Node.js que publicaba Railway) y `archive/plesk-test` (`5f2a850`, página estática y `test.php` de prueba de Plesk). README, `CLAUDE.md` y `AGENTS.md` dicen ahora que se trabaja en `main`.
