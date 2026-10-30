@@ -122,7 +122,8 @@ use copias antiguas de los `.js` y `.css`. El `.htaccess` de la raíz protege
 
 Plesk sirve los archivos estáticos con nginx, que **no lee los `.htaccess`**:
 añade las directivas de nginx del [README de la raíz](../README.md#publicar-en-plesk)
-(bloquean `chats/`, `project/`, `api/lib/`, `api/data/` y los `.md`).
+(bloquean `chats/`, `project/`, `api/lib/`, `api/data/`, `api/config.php` y
+los `.md`).
 
 Comprueba también que los `.js` se sirven como `text/javascript` (los módulos
 del navegador lo exigen).

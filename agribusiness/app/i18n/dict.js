@@ -182,7 +182,7 @@ export const PAIRS = [
 ['Este enlace no es válido.','This link is not valid.'],['Este enlace ya se ha utilizado.','This link has already been used.'],['Este enlace ha caducado.','This link has expired.'],
 ['No tienes permiso de edición sobre este modelo.','You do not have edit permission on this model.'],['No existe ese modelo.','That model does not exist.'],
 ['No existe esa persona.','That person does not exist.'],['Demasiadas solicitudes. Espera una hora y vuelve a probar.','Too many requests. Wait an hour and try again.'],
-['Demasiados intentos fallidos. Espera 15 minutos y vuelve a probar.','Too many failed attempts. Wait 15 minutes and try again.'],['No puedes eliminar tu propia cuenta.','You cannot delete your own account.'],['Error interno del servidor.','Internal server error.'],
+['Demasiados intentos fallidos. Espera 15 minutos y vuelve a probar.','Too many failed attempts. Wait 15 minutes and try again.'],['No puedes eliminar tu propia cuenta.','You cannot delete your own account.'],['No puedes cambiar tu propio rol.','You cannot change your own role.'],['Error interno del servidor.','Internal server error.'],
 // ---- nuevo modelo / avisos
 ['Nuevo modelo','New model'],['Crea un modelo a partir de una plantilla. Podrás ajustar todas las variables después.','Create a model from a template. You can adjust all variables afterwards.'],
 ['Nombre del modelo','Model name'],['Plantilla','Template'],['Superficie (Ha)','Surface area (Ha)'],['Cancelar','Cancel'],['Crear modelo','Create model'],

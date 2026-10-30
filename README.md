@@ -52,6 +52,7 @@ Plesk sirve los archivos estáticos con nginx, que **no lee los `.htaccess`**. E
 
 ```nginx
 location ~ /(\.git|\.claude|\.codex|chats|project|api/lib|api/data)(/|$) { deny all; }
+location ~ /api/config(\.example)?\.php$ { deny all; }
 location ~ \.md$ { deny all; }
 add_header X-Frame-Options "SAMEORIGIN" always;
 add_header X-Content-Type-Options "nosniff" always;

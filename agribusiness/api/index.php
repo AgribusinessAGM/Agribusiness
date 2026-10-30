@@ -288,8 +288,8 @@ function route_change_own_password(): void
 // Editar el perfil (nombre, correo, organización) desde la pestaña Perfiles
 function route_update_profile(int $userId): void
 {
-    require_admin();
-    find_user($userId);
+    $admin = require_admin();
+    $user = find_user($userId);
     $b = body();
     $name = str_field($b, 'name');
     $email = mb_strtolower(str_field($b, 'email'));
@@ -298,8 +298,13 @@ function route_update_profile(int $userId): void
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) throw new HttpError(400, 'El correo no es válido.');
     $other = find_user_by_email($email);
     if ($other && (int) $other['id'] !== $userId) throw new HttpError(409, 'Ya existe otra persona con ese correo.');
-    db()->prepare('UPDATE users SET name = ?, email = ?, org = ? WHERE id = ?')->execute([$name, $email, $org, $userId]);
-    respond(['ok' => true, 'name' => $name, 'email' => $email, 'org' => $org]);
+    // El rol es opcional. Nadie puede cambiarse el suyo: así siempre queda un administrador.
+    $current = normalize_role($user['role']);
+    $role = array_key_exists('role', $b) ? normalize_role($b['role']) : $current;
+    if ((int) $admin['id'] === $userId && $role !== $current) throw new HttpError(400, 'No puedes cambiar tu propio rol.');
+    db()->prepare('UPDATE users SET name = ?, email = ?, org = ?, role = ? WHERE id = ?')
+        ->execute([$name, $email, $org, $role, $userId]);
+    respond(['ok' => true, 'name' => $name, 'email' => $email, 'org' => $org, 'role' => $role]);
 }
 
 function route_delete_user(int $userId): void

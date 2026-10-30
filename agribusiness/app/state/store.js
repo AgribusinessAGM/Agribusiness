@@ -415,7 +415,7 @@ export function useAppStore() {
       api.updateProfile(userId, profile).then((res) => {
         setState((s) => ({
           ...s,
-          users: s.users.map((u) => (u.id === userId ? { ...u, name: res.name, email: res.email, org: res.org } : u)),
+          users: s.users.map((u) => (u.id === userId ? { ...u, name: res.name, email: res.email, org: res.org, role: res.role } : u)),
           currentUser: s.currentUser?.id === userId ? { ...s.currentUser, name: res.name, email: res.email, org: res.org } : s.currentUser,
         }));
         flash('Perfil actualizado');

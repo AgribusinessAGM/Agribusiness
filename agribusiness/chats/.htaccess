@@ -1,0 +1,3 @@
+# Material de diseño y transcripciones (project/ tiene Excel de clientes): nunca
+# desde el navegador. Refuerza la regla del .htaccess de agribusiness/.
+Require all denied

@@ -1,0 +1,5 @@
+# Los archivos de configuración (contraseñas de MySQL y SMTP) nunca se sirven, ni
+# siquiera si PHP dejara de funcionar en el servidor. index.php los lee del disco.
+<Files ~ "^config(\.example)?\.php$">
+  Require all denied
+</Files>

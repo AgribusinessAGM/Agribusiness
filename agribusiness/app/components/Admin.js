@@ -27,7 +27,8 @@ const linkBtn = (color = 'var(--brand)') => ({
   padding: 0,
   whiteSpace: 'nowrap',
 });
-const input = { fontFamily: 'inherit', fontSize: 13, padding: '6px 8px', border: '1px solid var(--editableLine)', borderRadius: 6, width: '100%', boxSizing: 'border-box' };
+// Altura fija: así los inputs y el desplegable de rol de una fila miden lo mismo
+const input = { fontFamily: 'inherit', fontSize: 13, padding: '6px 8px', border: '1px solid var(--editableLine)', borderRadius: 6, width: '100%', height: 30, boxSizing: 'border-box' };
 
 // Iconos de línea de las dos tarjetas de entrada
 const ICONS = {
@@ -108,17 +109,18 @@ export function Admin() {
   `;
 }
 
-// Pestaña "Gestión de perfiles": una fila por persona, con edición en línea de nombre, correo y organización
+// Pestaña "Gestión de perfiles": una fila por persona, con edición en línea de nombre, correo,
+// organización y rol (el rol propio no se puede cambiar)
 function Profiles() {
   const { state, openInvite, sendAccess, deleteUser, updateProfile } = useApp();
   const [editId, setEditId] = useState(null);
-  const [draft, setDraft] = useState({ name: '', email: '', org: '' });
+  const [draft, setDraft] = useState({ name: '', email: '', org: '', role: 'user' });
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
 
   const startEdit = (u) => {
     setEditId(u.id);
-    setDraft({ name: u.name, email: u.email, org: u.org || '' });
+    setDraft({ name: u.name, email: u.email, org: u.org || '', role: u.role });
     setError(null);
   };
   const save = () => {
@@ -165,7 +167,7 @@ function Profiles() {
                 </td>
                 <td style=${td}>
                   ${editing
-                    ? html`<input style=${{ ...input, minWidth: 200 }} type="email" value=${draft.email} placeholder="Correo" onInput=${(e) => setDraft({ ...draft, email: e.target.value })} />`
+                    ? html`<input style=${input} type="email" value=${draft.email} placeholder="Correo" onInput=${(e) => setDraft({ ...draft, email: e.target.value })} />`
                     : html`<span style=${{ color: 'var(--ink2)' }}>${u.email}</span>`}
                 </td>
                 <td style=${td}>
@@ -174,9 +176,16 @@ function Profiles() {
                     : html`<span style=${{ color: 'var(--ink2)' }}>${u.org || '—'}</span>`}
                 </td>
                 <td style=${td}>
-                  ${u.role === 'admin'
-                    ? html`<${Pill} bg="var(--brandD)" fg="#fff">Administrador<//>`
-                    : html`<${Pill} bg="var(--bg)" fg="var(--ink2)" border="1px solid var(--line)">Usuario<//>`}
+                  ${editing && !me
+                    ? html`
+                        <select style=${input} value=${draft.role} onChange=${(e) => setDraft({ ...draft, role: e.target.value })}>
+                          <option value="admin">Administrador</option>
+                          <option value="user">Usuario</option>
+                        </select>
+                      `
+                    : u.role === 'admin'
+                      ? html`<${Pill} bg="var(--brandD)" fg="#fff">Administrador<//>`
+                      : html`<${Pill} bg="var(--bg)" fg="var(--ink2)" border="1px solid var(--line)">Usuario<//>`}
                 </td>
                 <td style=${td}>
                   ${u.status === 'invited'

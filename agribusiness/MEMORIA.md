@@ -180,7 +180,10 @@ Navegador ──► index.html → app/main.js   (interfaz React, módulos JS si
     porque la app no la usaba: ahora el JSON es la única fuente). `ensure_iag_model()` lo crea también en bases de datos ya
     existentes si no hay ningún modelo con `"engine":"iag"`, con acceso de
     edición para los administradores.
-  - `api/.htaccess` en `lib/` y `data/` bloquea el acceso web a esas carpetas.
+  - Un `.htaccess` con `Require all denied` en `api/lib/`, `api/data/`,
+    `project/` y `chats/` bloquea esas carpetas (no depende de `mod_rewrite`).
+    `api/.htaccess` bloquea `config.php` y `config.example.php`, para que las
+    contraseñas no se sirvan como texto ni aunque PHP fallara en el servidor.
 - **Rutas relativas:** la app funciona en cualquier carpeta (subcarpeta en
   XAMPP o raíz en Plesk). La API se llama como `api/index.php/login`
   (PATH_INFO), con alternativa `api/index.php?r=/login`.
@@ -189,7 +192,24 @@ Navegador ──► index.html → app/main.js   (interfaz React, módulos JS si
   `Authorization: Bearer` **y** en `X-Auth-Token`, porque PHP en FastCGI (Plesk)
   suele perder `Authorization`. "Salir" llama a POST `/logout`, que borra la
   sesión en el servidor.
-- **Contraseñas:** `password_hash` / `password_verify` de PHP (bcrypt).
+- **Contraseñas:**
+  - Se guardan con `password_hash` (bcrypt, `PASSWORD_DEFAULT`) y se comprueban
+    con `password_verify`. Nadie puede leerlas, ni el administrador.
+  - Mínimo 8 caracteres (`require_password`).
+  - **Solo las pone cada persona**: el administrador no puede escribir ni ver
+    contraseñas; solo envía enlaces de un solo uso (alta 72 h, cambio 1 h)
+    por correo. Al usar un enlace se invalidan los demás pendientes y se
+    cierran todas las sesiones de esa persona.
+  - "Cambiar mi contraseña" pide la actual y cierra las demás sesiones.
+  - Tokens de sesión y de enlace: 32 bytes aleatorios (`random_bytes`).
+- **Roles:** `admin` o `user`. El rol se elige al invitar y se cambia en
+  "Gestión de perfiles" → "Editar perfil" (POST `/users/{id}/profile` con
+  `role`). Nadie puede cambiar su propio rol ni borrarse a sí mismo, así que
+  siempre queda al menos un administrador. El rol se lee de la base de datos
+  en cada petición: un cambio vale al instante, sin volver a entrar.
+- **Crear modelos:** cualquier usuario con sesión puede crear modelos (también
+  duplicar los que ve) y recibe permiso de edición sobre ellos. Decidido así el
+  2026-10-30.
 - **Límite de login:** como mucho 5 fallos por correo y 20 por IP cada 15
   minutos (tabla `login_attempts`); después, error 429. Un login fallido tarda
   lo mismo exista o no el correo (`timing_hash()`: se comprueba la contraseña
@@ -201,8 +221,11 @@ Navegador ──► index.html → app/main.js   (interfaz React, módulos JS si
   lo frena.
 - **Errores:** un error 500 responde solo "Error interno del servidor."; el
   detalle va al log de PHP (`error_log`).
-- **Cabeceras:** el `.htaccess` de la raíz pone `X-Frame-Options`,
-  `X-Content-Type-Options` y `Referrer-Policy`; la API quita `X-Powered-By`.
+- **Cabeceras:** los `.htaccess` de la raíz del repositorio y de
+  `agribusiness/` ponen `X-Frame-Options`, `X-Content-Type-Options` y
+  `Referrer-Policy`; la API y el catálogo quitan `X-Powered-By`.
+- **nginx (Plesk):** no lee los `.htaccess`; las reglas equivalentes están en
+  el README de la raíz ("Publicar en Plesk") y hay que ponerlas en el panel.
 
 ### Configuración
 
@@ -263,7 +286,7 @@ recargar.
 | POST `/password/forgot` | público | envía el enlace de contraseña (o reenvía la invitación); responde siempre igual; 429 tras 10 por IP y hora |
 | GET `/users` | admin | usuarios con `access` `{modelId: level}` |
 | POST `/users/invite` | admin | crea o actualiza un usuario invitado y envía el correo (o devuelve `devLink`) |
-| POST `/users/{id}/profile` | admin | cambia nombre, correo y organización |
+| POST `/users/{id}/profile` | admin | cambia nombre, correo, organización y (opcional) `role`; el propio rol no |
 | POST `/users/{id}/send-access` | admin | reenvía el enlace de alta o de contraseña |
 | DELETE `/users/{id}` | admin | borra (con sus permisos e invitaciones, en cascada); no a uno mismo |
 | GET `/invites/{token}` | público | nombre y correo de la invitación |
@@ -435,8 +458,6 @@ superficie, y con la estructura completa de CAPEX y OPEX.
   solo `index.html`, `.htaccess`, `app.json`, `icon.svg`, `app/`, `assets/` y
   `api/`; y las directivas de nginx (en el README de la raíz), porque nginx sirve los estáticos sin
   leer los `.htaccess`. Comprobar que los `.js` salen como `text/javascript`.
-- **Crear modelos:** cualquier usuario con sesión puede crear modelos (también
-  los de solo lectura). Pendiente de decidir si debe ser solo el admin.
 - **Repositorio público** en GitHub, con un Excel de cliente en
   `project/uploads/`. Pendiente de decidir si se hace privado.
 - **Datos de producción en Railway** (versión Node.js, etiqueta
@@ -1000,3 +1021,4 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-30: **La carpeta raíz del repositorio en local se llama `apps`** (antes `Agribusiness`), para distinguir el catálogo de la carpeta `agribusiness/` de la app: catálogo en http://localhost/apps/ y app en http://localhost/apps/agribusiness/. `app_url` por defecto pasa a http://localhost/apps/agribusiness; el README de la raíz indica clonar con `git clone … apps`. Si alguien mantiene otro nombre de carpeta, debe poner su `app_url` en `agribusiness/api/config.php`. El repositorio de GitHub sigue llamándose `Agribusiness`.
 - 2026-10-30: **Nueva regla de trabajo (sección 2, regla 8):** antes de cada push, `git fetch` y mirar si hay commits nuevos en GitHub; si los hay, integrarlos con `git pull --rebase`, resolver conflictos conservando el trabajo de los dos (en el registro de la memoria, las dos entradas por fecha), volver a probar en local y solo entonces subir. Nunca `--force`. Recogida también en `CLAUDE.md`/`AGENTS.md` de la raíz.
 - 2026-10-30: **Revisión de login y usuarios** (probado en local con un usuario de prueba: alta, enlace de un solo uso, permisos ver/editar/sin acceso, rutas de admin con 403, cambio de contraseña, edición y borrado). Dos arreglos: el login fallido tarda lo mismo exista o no el correo (`timing_hash()`; antes 0,37 s frente a 0,045 s, ahora ~0,37 s en los dos casos) y "He olvidado mi contraseña" admite como mucho 10 solicitudes por IP y hora (tabla `forgot_requests`, error 429). Pendiente de decidir: cambiar el rol de un usuario existente (ahora hay que borrarlo e invitarlo de nuevo) y quién puede crear modelos.
+- 2026-10-30: **Cambio de rol y decisiones.** "Editar perfil" en Gestión de perfiles muestra un desplegable Administrador/Usuario en la columna Rol (no en la fila propia); se guarda con POST `/users/{id}/profile` (`role` opcional; 400 "No puedes cambiar tu propio rol."). Decidido: cualquier usuario puede crear modelos (se quita de pendientes). `.htaccess` reforzados: `api/.htaccess` bloquea `config.php`/`config.example.php` y `project/` y `chats/` tienen su propio `Require all denied` (sin depender de `mod_rewrite`); la directiva de nginx del README también bloquea `api/config.php`. Sección 4 con el resumen de contraseñas, roles y creación de modelos.
