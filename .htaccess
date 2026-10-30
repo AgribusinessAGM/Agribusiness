@@ -1,30 +1,23 @@
-# La raíz del repositorio es también la raíz de la app. Desde el navegador solo
-# deben verse index.html, assets/ y api/ (que tiene sus propios .htaccess).
+# Raíz del repositorio: catálogo de apps (index.php). Cada app vive en su propia
+# carpeta, con su propio .htaccess.
+DirectoryIndex index.php index.html
 
-# La memoria del proyecto y cualquier .md, y los archivos ocultos (.gitignore…).
+# Cualquier .md (memorias, README) y los archivos ocultos (.gitignore…), en
+# cualquier carpeta.
 <FilesMatch "(\.md$|^\.)">
   Require all denied
 </FilesMatch>
 
-# Diseño, transcripciones, el propio repositorio git y la configuración de los
-# agentes de IA.
+# El propio repositorio git y la configuración de los agentes de IA.
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteRule ^(chats|project|\.git|\.claude|\.codex)(/|$) - [F,L]
+  RewriteRule ^(\.git|\.claude|\.codex)(/|$) - [F,L]
 </IfModule>
 
-# Cabeceras de seguridad: la app no se puede incrustar en otra web, el navegador
-# no adivina tipos de archivo y el enlace con ?token= no se envía a otros sitios.
+# Cabeceras de seguridad: nada se puede incrustar en otra web, el navegador no
+# adivina tipos de archivo y las direcciones no se envían a otros sitios.
 <IfModule mod_headers.c>
   Header always set X-Frame-Options "SAMEORIGIN"
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "same-origin"
-</IfModule>
-
-# La interfaz (app/*.js) se edita sin compilar: que el navegador compruebe
-# siempre si hay una versión nueva en lugar de usar la copia de su caché.
-<IfModule mod_headers.c>
-  <FilesMatch "\.(html|js|css)$">
-    Header set Cache-Control "no-cache"
-  </FilesMatch>
 </IfModule>

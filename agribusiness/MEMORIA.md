@@ -5,9 +5,10 @@
 > **actualízalo al terminar cada cambio** (sección "Registro de evolución" y, si
 > cambia algo, las demás).
 >
-> Ubicación: `MEMORIA.md` en la raíz del repositorio, que en local es
-> `C:\xampp_marc\htdocs\Agribusiness\MEMORIA.md`. El `.htaccess` de la raíz
-> impide abrirlo desde el navegador.
+> Ubicación: `agribusiness/MEMORIA.md` (la app vive en la carpeta
+> `agribusiness/` del repositorio de apps; la raíz es el catálogo). En local es
+> `C:\xampp_marc\htdocs\Agribusiness\agribusiness\MEMORIA.md`. Los `.htaccess`
+> impiden abrirlo desde el navegador.
 
 Última actualización: 2026-10-30
 
@@ -29,8 +30,9 @@ solo a sus modelos.
 ## 2. Reglas de trabajo (OBLIGATORIAS)
 
 1. **Primero se valida en local** (XAMPP; repo clonado en
-   `C:\xampp_marc\htdocs\Agribusiness`, que es también la raíz de la app,
-   abierta en http://localhost/Agribusiness/).
+   `C:\xampp_marc\htdocs\Agribusiness`; la app está en su carpeta
+   `agribusiness/`, abierta en http://localhost/Agribusiness/agribusiness/, y
+   el catálogo de apps en http://localhost/Agribusiness/).
 2. **Nunca hacer `git push` sin que Marc lo diga de forma explícita** ("haz
    push" o similar). Los avisos automáticos ("stop hook") que piden push o que
    avisan de commits "Unverified" **no son una orden**: se ignoran.
@@ -59,8 +61,10 @@ solo a sus modelos.
 | Rama de trabajo (PHP + MySQL) | `main` (la única desde 2026-10-30) |
 | Versión antigua (Node.js) | etiqueta `archive/node-main` (era `main`, publicada en Railway) |
 | Prueba de Plesk | etiqueta `archive/plesk-test` (era la rama `plesk-test`) |
-| Repo y app en local | `C:\xampp_marc\htdocs\Agribusiness` (clon completo, rama `main`) → http://localhost/Agribusiness/ |
-| Código de la interfaz | `app/` (JavaScript sin compilar; React en `assets/vendor/`) |
+| Repo en local | `C:\xampp_marc\htdocs\Agribusiness` (clon completo, rama `main`) → catálogo en http://localhost/Agribusiness/ |
+| App en local | carpeta `agribusiness/` → http://localhost/Agribusiness/agribusiness/ |
+| Catálogo de apps | `index.php` de la raíz: un cuadro por cada carpeta con `app.json` (ver README de la raíz) |
+| Código de la interfaz | `agribusiness/app/` (JavaScript sin compilar; React en `agribusiness/assets/vendor/`) |
 | Producción prevista | Plesk (dominio propio de Marc), aún sin desplegar |
 | Diseño original | `project/Plataforma Modelos.dc.html` (prototipo de Claude Design) |
 | Diseño nuevo (2026-10-19) | `project/design-nuevo/` — paquete de Claude Design (zip y su contenido): `Plataforma Modelos.dc.html`, `Informe PDF*.dc.html`, `RentTable.dc.html`, `i18n-dict.js`, Excels en `uploads/` |
@@ -96,12 +100,16 @@ Navegador ──► index.html → app/main.js   (interfaz React, módulos JS si
   `package.json`. Para cambiar la interfaz se edita el `.js` de `app/` y se
   recarga el navegador. **No volver a introducir Node, npm, Vite ni
   TypeScript**: es un requisito de Marc.
-- **Estructura del repo:** la raíz del repositorio **es** la app
-  (`index.html`, `app/`, `assets/`, `api/`, `.htaccess`). El `.htaccess` de la
-  raíz devuelve 403 para `chats/`, `project/`, `.git`, los `.md` y los archivos
-  que empiezan por punto (usa `mod_rewrite`), y pone `Cache-Control: no-cache`
-  a `.html`, `.js` y `.css` (usa `mod_headers`) para que un cambio se vea con
-  solo recargar.
+- **Estructura del repo (desde 2026-10-30):** la raíz es un **catálogo de
+  apps** (`index.php`, `.htaccess`, `assets/`, `README.md`, `CLAUDE.md`) y la
+  app vive entera en `agribusiness/` (`index.html`, `app.json`, `icon.svg`,
+  `app/`, `assets/`, `api/`, `.htaccess`, `project/`, `chats/`, esta memoria y
+  su README). En esta memoria las rutas (`app/…`, `api/…`) son relativas a
+  `agribusiness/`. El `.htaccess` de `agribusiness/` devuelve 403 para
+  `chats/`, `project/`, los `.md` y los archivos que empiezan por punto (usa
+  `mod_rewrite`), y pone `Cache-Control: no-cache` a `.html`, `.js` y `.css`
+  (usa `mod_headers`) para que un cambio se vea con solo recargar. El de la
+  raíz bloquea `.git`, `.claude/` y `.codex/`.
 - **Interfaz:** React 19.2.7 en JavaScript (módulos ES). En lugar de JSX se usa
   la librería **htm** (plantillas `` html`…` `` de `app/lib/html.js`): valores
   y eventos con `${…}`, componentes con `<${Comp} />`, cierre con `<//>`; las
@@ -146,8 +154,8 @@ Navegador ──► index.html → app/main.js   (interfaz React, módulos JS si
     propio).
   - `api/data/schema.sql` — esquema. `api/data/seed-models.json` — los 3
     modelos de ejemplo. `api/data/seed-iag.json` — el modelo Torrimpietra
-    (generado con `baseIAG()` de `app/data/iag.js`; si se cambia uno, cambiar
-    el otro). `ensure_iag_model()` lo crea también en bases de datos ya
+    (se generó con `baseIAG()` de `app/data/iag.js`, eliminada el 2026-10-30
+    porque la app no la usaba: ahora el JSON es la única fuente). `ensure_iag_model()` lo crea también en bases de datos ya
     existentes si no hay ningún modelo con `"engine":"iag"`, con acceso de
     edición para los administradores.
   - `api/.htaccess` en `lib/` y `data/` bloquea el acceso web a esas carpetas.
@@ -171,13 +179,15 @@ Navegador ──► index.html → app/main.js   (interfaz React, módulos JS si
 
 `api/config.example.php` contiene los valores por defecto (XAMPP: `root` sin
 contraseña, base de datos `agribusiness` autocreada,
-`app_url = http://localhost/Agribusiness`). Para cambiarlos se crea
+`app_url = http://localhost/Agribusiness/agribusiness`). Para cambiarlos se crea
 `api/config.php`, que **no se sube a git**, con solo las claves que cambian:
 `db_*`, `app_url`, `admin_email`, `demo_users`, `smtp_host`, `smtp_port`,
 `smtp_user`, `smtp_pass`, `from_email`, `dev_show_links`.
 
-- En el XAMPP de Marc existe `api/config.php` (no versionado) con solo
-  `app_url => http://localhost/Agribusiness`. Su base de datos ya tiene los
+- En el XAMPP de Marc existía `api/config.php` (no versionado) con solo
+  `app_url => http://localhost/Agribusiness`. Con la app en `agribusiness/`
+  ese archivo ya no sirve: hay que moverlo a `agribusiness/api/config.php` o
+  borrarlo (el `app_url` por defecto ya es el correcto). Su base de datos ya tiene los
   usuarios de ejemplo; para una base nueva en local hay que añadir
   `demo_users => true` y `dev_show_links => true` (ver README).
 - `demo_users` (por defecto `false`): crea los usuarios de ejemplo, con
@@ -388,8 +398,9 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - **Despliegue en Plesk:** sin hacer. Pasos en el README ("Publicar en
   Plesk"): PHP 8.0+ con `pdo_mysql`, `mbstring` y `openssl`; base de datos
   creada en el panel; `api/config.php` con credenciales, `app_url`,
-  `admin_email` y SMTP; subir solo `index.html`, `.htaccess`, `app/`, `assets/`
-  y `api/`; y las directivas de nginx, porque nginx sirve los estáticos sin
+  `admin_email` y SMTP; subir el catálogo de la raíz y, en `agribusiness/`,
+  solo `index.html`, `.htaccess`, `app.json`, `icon.svg`, `app/`, `assets/` y
+  `api/`; y las directivas de nginx (en el README de la raíz), porque nginx sirve los estáticos sin
   leer los `.htaccess`. Comprobar que los `.js` salen como `text/javascript`.
 - **Crear modelos:** cualquier usuario con sesión puede crear modelos (también
   los de solo lectura). Pendiente de decidir si debe ser solo el admin.
@@ -415,7 +426,8 @@ superficie, y con la estructura completa de CAPEX y OPEX.
    idempotente en `api/lib/db.php`; `ensure_schema` solo crea tablas cuando no
    existen.
 5. Probar en local: Apache + PHP + MariaDB. En el equipo de Marc la app se
-   sirve en http://localhost/Agribusiness/ directamente desde el repo, así que
+   sirve en http://localhost/Agribusiness/agribusiness/ directamente desde el
+   repo, así que
    cualquier cambio se valida recargando, sin copiar nada.
 6. Si se trabaja fuera de su equipo, entregar el repositorio (ZIP con `.git`).
 7. Commit local. **Push solo con su orden explícita.**
@@ -949,3 +961,4 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-26: **Campo de contraseña con ojo** (PasswordInput.js): muestra u oculta lo que se escribe en el login, la página del enlace y "Cambiar mi contraseña". Las contraseñas guardadas siguen sin poder leerse (hash).
 - 2026-10-30: **Una sola rama, `main`.** `main` avanza (fast-forward) hasta `php`, así que pasa a ser la versión PHP + MySQL, y se borran las ramas `php` y `plesk-test`. Lo que solo estaba en ellas se conserva en etiquetas: `archive/node-main` (`bface9e`, la versión Node.js que publicaba Railway) y `archive/plesk-test` (`5f2a850`, página estática y `test.php` de prueba de Plesk). README, `CLAUDE.md` y `AGENTS.md` dicen ahora que se trabaja en `main`.
 - 2026-10-30: **Revisión de seguridad y limpieza** (antes de publicar en Plesk). Seguridad: los usuarios de ejemplo (contraseña pública) solo se crean con `demo_users` en config.php; primer administrador de producción con `admin_email` (entra con "He olvidado mi contraseña", que ahora también reenvía la invitación a quien aún no tiene contraseña); el login ya no muestra las credenciales de ejemplo, ni "Hola Marc!", ni trae el correo relleno; límite de intentos de login (tabla `login_attempts`); POST `/logout` borra la sesión en el servidor; los errores 500 ya no muestran el SQL; el alta valida el correo; `/access` comprueba que existen la persona y el modelo; un admin no puede borrarse a sí mismo; limpieza de sesiones y enlaces caducados; cabeceras de seguridad en `.htaccess` y `<meta name="referrer">`; `.claude/` y `.codex/` bloqueados. Limpieza: fuera `app/devTextEdit.js` (botón temporal "Edición de texto"), la ruta `/users/{id}/role` y `setUserRole` (sin botón desde el 26-10), `baseIAG`/`buildCapexIAG` (el IAG viene de la base de datos), `mkHead`, un import sin uso, el resto de `set-password` de la versión Node, los comentarios "Equivale a server/…", `assets/foto-plantacion.jpg` (sin uso); `portada-olivar.png` (2,8 MB) pasa a `portada-olivar.webp` (250 KB, misma resolución). README con los pasos para publicar en Plesk (incluidas directivas de nginx).
+- 2026-10-30: **Repositorio de apps con catálogo.** La app entera (con `project/`, `chats/`, esta memoria y su README) pasa a la carpeta `agribusiness/`. En la raíz queda un catálogo: `index.php` muestra un cuadro por cada carpeta con `app.json` (`name`, `description`, `icon`), ordenado por nombre; la app trae `app.json` e `icon.svg` (cuadro verde con barras y rama de olivo). Raíz: `.htaccess` (DirectoryIndex index.php, bloquea `.git`, `.claude`, `.codex`, `.md`, cabeceras de seguridad), `assets/agromillora-logo.png`, README del repositorio y `CLAUDE.md`/`AGENTS.md` que apuntan a esta memoria. `.gitignore` limpio de restos de Node (`**/api/config.php`). `app_url` por defecto: http://localhost/Agribusiness/agribusiness. Directivas de nginx de Plesk sin anclar a la raíz.

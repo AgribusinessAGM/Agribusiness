@@ -29,7 +29,7 @@ return [
     // ---------- URL pública de la app ----------
     // Se usa para construir el enlace "crea tu contraseña" de las invitaciones.
     // Debe apuntar a la carpeta donde está index.html, sin barra final.
-    'app_url' => 'http://localhost/Agribusiness',
+    'app_url' => 'http://localhost/Agribusiness/agribusiness',
 
     // ---------- Correo de acceso (SMTP, ej. Microsoft 365) ----------
     // Las contraseñas solo las crea y cambia cada persona, con enlaces de un solo uso
