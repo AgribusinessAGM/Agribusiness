@@ -111,14 +111,15 @@ function find_user(int $id): array
 
 function auth_token(): ?string
 {
-    // Algunos servidores (PHP como FastCGI, habitual en Plesk) no pasan la
-    // cabecera Authorization a PHP; por eso el frontend envía también X-Auth-Token.
-    $header = $_SERVER['HTTP_X_AUTH_TOKEN']
-        ?? $_SERVER['HTTP_AUTHORIZATION']
-        ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION']
-        ?? '';
-    if (str_starts_with($header, 'Bearer ')) $header = substr($header, 7);
-    return $header !== '' ? $header : null;
+    // El frontend envía el token en X-Auth-Token: Authorization lleva el usuario y la
+    // contraseña del .htaccess ("Basic …"). Por compatibilidad se acepta también
+    // "Authorization: Bearer …", pero nunca se toma un "Basic …" como token.
+    $token = $_SERVER['HTTP_X_AUTH_TOKEN'] ?? '';
+    if ($token === '') {
+        $header = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+        if (str_starts_with($header, 'Bearer ')) $token = substr($header, 7);
+    }
+    return $token !== '' ? $token : null;
 }
 
 function require_auth(): array

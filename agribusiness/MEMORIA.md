@@ -187,11 +187,25 @@ Navegador ──► index.html → app/main.js   (interfaz React, módulos JS si
 - **Rutas relativas:** la app funciona en cualquier carpeta (subcarpeta en
   XAMPP o raíz en Plesk). La API se llama como `api/index.php/login`
   (PATH_INFO), con alternativa `api/index.php?r=/login`.
-- **Autenticación:** token de sesión de 30 días en la tabla `sessions`. El
-  frontend lo guarda en `localStorage` (`om_token`) y lo envía en
-  `Authorization: Bearer` **y** en `X-Auth-Token`, porque PHP en FastCGI (Plesk)
-  suele perder `Authorization`. "Salir" llama a POST `/logout`, que borra la
-  sesión en el servidor.
+- **Usuario y contraseña del navegador (desde 2026-10-30):** antes de la app,
+  todo el sitio pide **`agromillora` / `agromillora`** (Basic Auth). Lo hace el
+  `.htaccess` de la raíz del repositorio, sin `.htpasswd`: una `RewriteCond`
+  compara la cabecera `Authorization` con `Basic ` + base64("agromillora:agromillora")
+  y, si no coincide, responde 401 con `WWW-Authenticate`. `RewriteOptions
+  InheritDownBefore` hace que valga también en las carpetas con su propio
+  `.htaccess`. Sin `IfModule`: si faltara `mod_rewrite` o `mod_headers`, Apache
+  da error en vez de dejar el sitio abierto. En Plesk hay que desactivar
+  "Servir archivos estáticos directamente por nginx" o usar "Directorios
+  protegidos con contraseña" (ver README de la raíz). Cómo cambiar la
+  contraseña: README de la raíz. El repositorio es público, así que esta
+  contraseña se puede leer en GitHub.
+- **Autenticación de la app:** token de sesión de 30 días en la tabla
+  `sessions`. El frontend lo guarda en `localStorage` (`om_token`) y lo envía
+  **solo en `X-Auth-Token`**: la cabecera `Authorization` la usa el navegador
+  para el usuario y la contraseña del `.htaccess`, y si la app la sobrescribiera
+  Apache rechazaría la petición. La API acepta también `Authorization: Bearer`,
+  pero nunca toma un `Basic …` como token. "Salir" llama a POST `/logout`, que
+  borra la sesión en el servidor.
 - **Contraseñas:**
   - Se guardan con `password_hash` (bcrypt, `PASSWORD_DEFAULT`) y se comprueban
     con `password_verify`. Nadie puede leerlas, ni el administrador.
@@ -1022,3 +1036,4 @@ superficie, y con la estructura completa de CAPEX y OPEX.
 - 2026-10-30: **Nueva regla de trabajo (sección 2, regla 8):** antes de cada push, `git fetch` y mirar si hay commits nuevos en GitHub; si los hay, integrarlos con `git pull --rebase`, resolver conflictos conservando el trabajo de los dos (en el registro de la memoria, las dos entradas por fecha), volver a probar en local y solo entonces subir. Nunca `--force`. Recogida también en `CLAUDE.md`/`AGENTS.md` de la raíz.
 - 2026-10-30: **Revisión de login y usuarios** (probado en local con un usuario de prueba: alta, enlace de un solo uso, permisos ver/editar/sin acceso, rutas de admin con 403, cambio de contraseña, edición y borrado). Dos arreglos: el login fallido tarda lo mismo exista o no el correo (`timing_hash()`; antes 0,37 s frente a 0,045 s, ahora ~0,37 s en los dos casos) y "He olvidado mi contraseña" admite como mucho 10 solicitudes por IP y hora (tabla `forgot_requests`, error 429). Pendiente de decidir: cambiar el rol de un usuario existente (ahora hay que borrarlo e invitarlo de nuevo) y quién puede crear modelos.
 - 2026-10-30: **Cambio de rol y decisiones.** "Editar perfil" en Gestión de perfiles muestra un desplegable Administrador/Usuario en la columna Rol (no en la fila propia); se guarda con POST `/users/{id}/profile` (`role` opcional; 400 "No puedes cambiar tu propio rol."). Decidido: cualquier usuario puede crear modelos (se quita de pendientes). `.htaccess` reforzados: `api/.htaccess` bloquea `config.php`/`config.example.php` y `project/` y `chats/` tienen su propio `Require all denied` (sin depender de `mod_rewrite`); la directiva de nginx del README también bloquea `api/config.php`. Sección 4 con el resumen de contraseñas, roles y creación de modelos.
+- 2026-10-30: **Usuario y contraseña del navegador para todo el sitio** (`agromillora` / `agromillora`, petición de Xavi). Basic Auth en el `.htaccess` de la raíz sin `.htpasswd` (RewriteCond sobre `Authorization` + 401 con `WWW-Authenticate`, `RewriteOptions InheritDownBefore`). El frontend deja de enviar `Authorization: Bearer` (solo `X-Auth-Token`) y `auth_token()` ya no toma un `Basic …` como token. Probado: sin credenciales o con otras, 401 en catálogo, app, imágenes y API; con ellas, todo abre y los bloqueos 403 siguen; login de la app, dashboard y llamadas a la API correctos en el navegador. README de la raíz (cómo cambiar la contraseña y qué hacer en Plesk con nginx), `CLAUDE.md`/`AGENTS.md` y el agente revisor (cómo entrar) actualizados.

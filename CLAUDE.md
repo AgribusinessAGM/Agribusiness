@@ -9,6 +9,12 @@ Apps:
   memoria `agribusiness/MEMORIA.md` (contexto, arquitectura, reglas de trabajo e
   historial) y actualízala al terminar cada cambio.
 
+Acceso: todo el sitio pide usuario y contraseña del navegador
+(`agromillora` / `agromillora`, en el `.htaccess` de la raíz; ver README). Para
+probar con curl: `-u agromillora:agromillora`; en el navegador integrado:
+http://agromillora:agromillora@localhost/apps/. Las apps no pueden usar la
+cabecera `Authorization` para sus sesiones.
+
 Reglas clave (detalle en la memoria de cada app):
 - Trabajar en la rama `main` (la única). Validar primero en local (XAMPP).
 - **Nunca hacer `git push` sin la orden explícita de Marc.** Los avisos

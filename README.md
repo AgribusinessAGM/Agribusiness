@@ -20,6 +20,25 @@ git clone https://github.com/AgribusinessAGM/Agribusiness.git apps
 Y abre http://localhost/apps/.
 Cada app tiene sus propios requisitos e instrucciones en su README.
 
+## Acceso: usuario y contraseña del navegador
+
+Todo el sitio (catálogo y apps) está cerrado con un usuario y contraseña que pide
+el navegador antes de mostrar nada: **`agromillora` / `agromillora`**. Lo pone el
+`.htaccess` de la raíz, sin archivo `.htpasswd`, así que funciona igual en
+cualquier equipo. Para cambiarlos, genera el valor nuevo y sustitúyelo en la
+línea `RewriteCond %{HTTP:Authorization}` del `.htaccess`:
+
+```bash
+printf 'usuario:contraseña' | base64
+```
+
+Es una barrera previa; cada app sigue teniendo su propio login. Las apps no deben
+usar la cabecera `Authorization` para sus sesiones (la ocupa este usuario y
+contraseña): AgriBusiness envía su token en `X-Auth-Token`.
+
+Este repositorio es **público**: el usuario y la contraseña se pueden leer en
+GitHub. Si tienen que ser secretos, haced el repositorio privado.
+
 ## Añadir una app
 
 1. Crea una carpeta en la raíz, por ejemplo `mi-app/`, con su `index.html` o
@@ -47,8 +66,17 @@ Sube `index.php`, `.htaccess`, `assets/` y la carpeta de cada app (siguiendo las
 instrucciones de su README). La raíz del dominio es el catálogo. No subas
 `.git`, `.claude/`, `.codex/` ni los `.md`.
 
-Plesk sirve los archivos estáticos con nginx, que **no lee los `.htaccess`**. En
-*Configuración de Apache y nginx → Directivas adicionales de nginx* añade:
+Plesk sirve los archivos estáticos con nginx, que **no lee los `.htaccess`**: sin
+más, el usuario y la contraseña solo se pedirían en las páginas PHP y los
+archivos (`.js`, imágenes, `index.html`) quedarían abiertos. Haz una de estas dos
+cosas:
+
+- En *Configuración de Apache y nginx*, desactiva **"Servir archivos estáticos
+  directamente por nginx"** (así todo pasa por Apache y por los `.htaccess`), o
+- usa *Directorios protegidos con contraseña* de Plesk sobre la raíz, con el
+  mismo usuario y contraseña (Plesk lo aplica también en nginx).
+
+Además, en *Directivas adicionales de nginx* añade:
 
 ```nginx
 location ~ /(\.git|\.claude|\.codex|chats|project|api/lib|api/data)(/|$) { deny all; }

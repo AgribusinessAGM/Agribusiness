@@ -35,9 +35,10 @@ async function request(path, init) {
     ...init,
     headers: {
       'Content-Type': 'application/json',
-      // X-Auth-Token además de Authorization: algunos servidores PHP (FastCGI) no
-      // pasan Authorization a PHP.
-      ...(token ? { Authorization: `Bearer ${token}`, 'X-Auth-Token': token } : {}),
+      // El token va solo en X-Auth-Token. La cabecera Authorization la usa el navegador
+      // para el usuario y la contraseña del .htaccess: si la app la sobrescribiera, Apache
+      // rechazaría la petición. (Además, PHP en FastCGI a menudo no recibe Authorization.)
+      ...(token ? { 'X-Auth-Token': token } : {}),
       ...(init?.headers || {}),
     },
   });

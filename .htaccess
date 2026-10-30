@@ -2,6 +2,21 @@
 # carpeta, con su propio .htaccess.
 DirectoryIndex index.php index.html
 
+# ---------- Acceso con usuario y contraseña: agromillora / agromillora ----------
+# Todo el sitio (catálogo y apps) pide usuario y contraseña al navegador antes de
+# mostrar nada. Se comprueba aquí mismo, sin archivo .htpasswd, para que funcione
+# igual en cualquier carpeta y servidor (XAMPP, Laragon, Plesk). El valor es
+# "Basic " + base64("usuario:contraseña"); para cambiarlos, genera el nuevo con
+#   printf 'usuario:contraseña' | base64
+# Sin IfModule a propósito: si faltara mod_rewrite o mod_headers, Apache da error en
+# lugar de dejar el sitio abierto.
+RewriteEngine On
+# Las carpetas con su propio .htaccess (y sus propias reglas) aplican esta antes que las suyas
+RewriteOptions InheritDownBefore
+RewriteCond %{HTTP:Authorization} !^Basic\ YWdyb21pbGxvcmE6YWdyb21pbGxvcmE=$
+RewriteRule ^ - [R=401,L]
+Header always set WWW-Authenticate "Basic realm=\"Agromillora\", charset=\"UTF-8\"" "expr=%{REQUEST_STATUS} == 401"
+
 # Cualquier .md (memorias, README) y los archivos ocultos (.gitignore…), en
 # cualquier carpeta.
 <FilesMatch "(\.md$|^\.)">
@@ -9,10 +24,7 @@ DirectoryIndex index.php index.html
 </FilesMatch>
 
 # El propio repositorio git y la configuración de los agentes de IA.
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  RewriteRule ^(\.git|\.claude|\.codex)(/|$) - [F,L]
-</IfModule>
+RewriteRule ^(\.git|\.claude|\.codex)(/|$) - [F,L]
 
 # Cabeceras de seguridad: nada se puede incrustar en otra web, el navegador no
 # adivina tipos de archivo y las direcciones no se envían a otros sitios.
