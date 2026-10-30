@@ -24,8 +24,8 @@ tal cual (ver "Modificar la interfaz").
 
 1. Arranca **Apache** y **MySQL** desde el panel de XAMPP.
 2. Clona este repositorio (rama `main`) dentro de la carpeta `htdocs` de tu
-   XAMPP, de forma que quede
-   `C:\xampp_marc\htdocs\Agribusiness\agribusiness\index.html`.
+   XAMPP con el nombre `apps` (ver el README de la raíz), de forma que quede
+   `C:\xampp_marc\htdocs\apps\agribusiness\index.html`.
 3. Crea `agribusiness/api/config.php` para pruebas en local:
 
    ```php
@@ -36,8 +36,8 @@ tal cual (ver "Modificar la interfaz").
    ];
    ```
 
-4. Abre http://localhost/Agribusiness/agribusiness/ (o el catálogo,
-   http://localhost/Agribusiness/, y pulsa el cuadro de AgriBusiness).
+4. Abre http://localhost/apps/agribusiness/ (o el catálogo,
+   http://localhost/apps/, y pulsa el cuadro de AgriBusiness).
 
 La primera vez, la app crea sola la base de datos `agribusiness` con sus tablas
 y los datos de ejemplo. Usa la configuración por defecto de XAMPP (usuario

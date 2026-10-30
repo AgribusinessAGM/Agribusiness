@@ -10,8 +10,14 @@ app y, al pulsarlo, la abre.
 
 ## Ejecutar en local
 
-Clona el repositorio dentro de `htdocs` (XAMPP) o `www` (Laragon), por ejemplo
-como `C:\xampp_marc\htdocs\Agribusiness`, y abre http://localhost/Agribusiness/.
+Clona el repositorio dentro de `htdocs` (XAMPP) o `www` (Laragon) con el nombre
+`apps`, para no confundir la raíz (el catálogo) con la carpeta de cada app:
+
+```bash
+git clone https://github.com/AgribusinessAGM/Agribusiness.git apps
+```
+
+Y abre http://localhost/apps/.
 Cada app tiene sus propios requisitos e instrucciones en su README.
 
 ## Añadir una app
