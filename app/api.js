@@ -56,6 +56,10 @@ export function login(email, password) {
   return request('/login', { method: 'POST', body: JSON.stringify({ email, password }) });
 }
 
+export function logout() {
+  return request('/logout', { method: 'POST' });
+}
+
 export function getMe() {
   return request('/me');
 }
@@ -63,11 +67,6 @@ export function getMe() {
 // input: { name, email, org, role }
 export function inviteUser(input) {
   return request('/users/invite', { method: 'POST', body: JSON.stringify(input) });
-}
-
-
-export function setUserRole(userId, role) {
-  return request(`/users/${userId}/role`, { method: 'POST', body: JSON.stringify({ role }) });
 }
 
 export function updateProfile(userId, profile) {

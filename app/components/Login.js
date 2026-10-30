@@ -178,12 +178,6 @@ export function Login() {
           <div style=${{ textAlign: 'center', marginTop: 18, fontSize: 13, color: 'var(--ink2)' }}>
             ¿Problemas para acceder?${' '}<span style=${{ color: 'var(--brand)', fontWeight: 600 }}>Contacta con tu gestor</span>
           </div>
-          <div style=${{ textAlign: 'center', marginTop: 8, fontSize: 12, color: 'var(--ink2)' }}>
-            Demo: usa m.ferrer@iberocrops.com con la contraseña agromillora2026
-          </div>
-          <div style=${{ textAlign: 'center', marginTop: 18, fontSize: 15, fontWeight: 700, color: 'var(--brand)' }}>
-            Hola Marc!
-          </div>
         </div>
       </div>
       <div
@@ -214,7 +208,7 @@ export function Login() {
             }}
           >
             <img
-              src="assets/portada-olivar.png"
+              src="assets/portada-olivar.webp"
               alt="Olivar en cosecha"
               style=${{
                 display: 'block',

@@ -98,27 +98,6 @@ export function buildPnlLayers(r, a) {
     return { label, kind: 'p', vals, num: numArr.slice(1, nc + 1), den: ingresos.slice(1, nc + 1), cells, labelStyle: pctLabelStyle };
   }
 
-  function mkHead(label) {
-    const cells = [];
-    for (let y = 1; y <= nc; y++) cells.push({ v: '', style: { borderTop: '1px solid var(--line)' } });
-    return {
-      label,
-      kind: 'h',
-      vals: [],
-      cells,
-      rowBg: 'var(--brandL)',
-      labelStyle: {
-        textAlign: 'left',
-        padding: '8px 14px',
-        position: 'sticky',
-        left: 0,
-        background: 'var(--brandL)',
-        fontWeight: 800,
-        whiteSpace: 'nowrap',
-      },
-    };
-  }
-
   const netOp = [];
   for (let y = 0; y <= nc; y++) netOp[y] = (r.ebit[y] || 0) + (r.tax[y] || 0);
 

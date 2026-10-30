@@ -31,7 +31,7 @@ function initialState() {
     models: [],
     users: [],
     currentUser: null,
-    loginEmail: 'm.ferrer@iberocrops.com',
+    loginEmail: '',
     loginPassword: '',
     loginError: null,
     loginPending: false,
@@ -173,6 +173,8 @@ export function useAppStore() {
   }, [state.loginEmail, state.loginPassword, bootstrapAfterAuth]);
 
   const logout = useCallback(() => {
+    // La petición coge el token antes de que se borre; si falla, la sesión caduca sola
+    api.logout().catch(() => {});
     api.clearToken();
     setState((s) => ({ ...s, screen: 'login', currentUser: null, loginPassword: '', models: [], users: [] }));
   }, []);
@@ -491,19 +493,6 @@ export function useAppStore() {
     [state.users, flash],
   );
 
-  const setUserRole = useCallback(
-    (userId, role) => {
-      setState((s) => ({
-        ...s,
-        users: s.users.map((u) => (u.id === userId ? { ...u, role } : u)),
-      }));
-      api.setUserRole(userId, role).catch(() => {
-        flash('No se pudo actualizar el rol');
-        loadUsers();
-      });
-    },
-    [flash, loadUsers],
-  );
 
   const deleteUser = useCallback(
     (userId) => {
@@ -511,8 +500,8 @@ export function useAppStore() {
       if (!target) return;
       if (!window.confirm(tr(`¿Eliminar a ${target.name}? Perderá el acceso a todos los modelos.`))) return;
       setState((s) => ({ ...s, users: s.users.filter((u) => u.id !== userId) }));
-      api.deleteUser(userId).catch(() => {
-        flash('No se pudo eliminar la persona');
+      api.deleteUser(userId).catch((e) => {
+        flash(e.message || 'No se pudo eliminar la persona');
         loadUsers();
       });
     },
@@ -673,7 +662,6 @@ export function useAppStore() {
       setInviteOrg,
       setInviteRole,
       submitInvite,
-      setUserRole,
       deleteUser,
       sendAccess,
       openChangePassword,
@@ -731,7 +719,6 @@ export function useAppStore() {
       setInviteOrg,
       setInviteRole,
       submitInvite,
-      setUserRole,
       deleteUser,
       sendAccess,
       openChangePassword,

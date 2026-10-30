@@ -1,7 +1,7 @@
 <?php
 // Envío del correo de invitación por SMTP con STARTTLS (ej. Microsoft 365).
-// Equivale a server/mailer.js. Cliente SMTP mínimo, sin dependencias, para
-// que funcione igual en XAMPP y en Plesk sin instalar nada.
+// Cliente SMTP mínimo, sin dependencias, para que funcione igual en XAMPP y
+// en Plesk sin instalar nada.
 
 // $kind: 'invite' (alta o reenvío de acceso, 72 h) | 'reset' (He olvidado mi contraseña, 1 h)
 function invite_email_html(string $name, string $link, string $kind = 'invite'): string

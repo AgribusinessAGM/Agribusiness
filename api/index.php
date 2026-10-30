@@ -1,6 +1,5 @@
 <?php
-// API de la Plataforma AGRIBUSINESS. Equivale a server/index.js de la versión
-// Node: mismas rutas y mismas respuestas JSON, para que el frontend no cambie.
+// API de la Plataforma AGRIBUSINESS: rutas que devuelven JSON a la interfaz.
 //
 // La ruta llega como PATH_INFO (api/index.php/login) o, si el servidor no lo
 // soporta, como parámetro (api/index.php?r=/login).
@@ -11,9 +10,15 @@ require __DIR__ . '/lib/mailer.php';
 const INVITE_TTL = 72 * 3600; // alta y reenvío de acceso
 const RESET_TTL = 3600; // He olvidado mi contraseña
 const SESSION_TTL = 30 * 24 * 3600;
+// Login: como mucho 5 fallos por correo y 20 por IP cada 15 minutos
+const LOGIN_WINDOW = 15 * 60;
+const LOGIN_MAX_PER_EMAIL = 5;
+const LOGIN_MAX_PER_IP = 20;
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
+header('X-Content-Type-Options: nosniff');
+header_remove('X-Powered-By');
 
 // ---------- Utilidades ----------
 
@@ -184,6 +189,7 @@ function route_invite(): void
     $org = str_field($b, 'org');
     $role = normalize_role($b['role'] ?? null);
     if ($name === '' || $email === '') throw new HttpError(400, 'Nombre y correo son obligatorios.');
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) throw new HttpError(400, 'El correo no es válido.');
 
     $existing = find_user_by_email($email);
     if ($existing) {
@@ -232,16 +238,17 @@ function route_send_access(int $userId): void
 }
 
 // "He olvidado mi contraseña": responde siempre lo mismo, exista o no el correo, para no
-// revelar quién tiene cuenta. Como mucho 3 enlaces por persona y hora.
+// revelar quién tiene cuenta. Como mucho 3 enlaces por persona y hora. A quien aún no ha
+// creado su contraseña (invitado, o el primer administrador) se le reenvía la invitación.
 function route_forgot_password(): void
 {
     $user = find_user_by_email(mb_strtolower(str_field(body(), 'email')));
-    if ($user && $user['status'] === 'active') {
+    if ($user) {
         $stmt = db()->prepare('SELECT COUNT(*) FROM invites WHERE user_id = ? AND expires_at > ?');
         $stmt->execute([$user['id'], now_utc(RESET_TTL - 3600)]);
         if ((int) $stmt->fetchColumn() < 3) {
             try {
-                send_access_link((int) $user['id'], 'reset');
+                send_access_link((int) $user['id'], $user['status'] === 'invited' ? 'invite' : 'reset');
             } catch (HttpError $e) {
                 error_log('[forgot] ' . $e->getMessage());
             }
@@ -266,15 +273,6 @@ function route_change_own_password(): void
     respond(['ok' => true]);
 }
 
-function route_set_role(int $userId): void
-{
-    require_admin();
-    find_user($userId);
-    $role = normalize_role(body()['role'] ?? null);
-    db()->prepare('UPDATE users SET role = ? WHERE id = ?')->execute([$role, $userId]);
-    respond(['ok' => true, 'role' => $role]);
-}
-
 // Editar el perfil (nombre, correo, organización) desde la pestaña Perfiles
 function route_update_profile(int $userId): void
 {
@@ -294,8 +292,10 @@ function route_update_profile(int $userId): void
 
 function route_delete_user(int $userId): void
 {
-    require_admin();
+    $admin = require_admin();
     find_user($userId);
+    // Así siempre queda al menos un administrador: el que borra.
+    if ((int) $admin['id'] === $userId) throw new HttpError(400, 'No puedes eliminar tu propia cuenta.');
     // access, invites y sessions se borran en cascada.
     db()->prepare('DELETE FROM users WHERE id = ?')->execute([$userId]);
     respond(['ok' => true]);
@@ -334,12 +334,45 @@ function route_accept_invite(string $token): void
 function route_login(): void
 {
     $b = body();
-    $user = find_user_by_email(mb_strtolower(str_field($b, 'email')));
+    $email = mb_strtolower(str_field($b, 'email'));
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+    $since = now_utc(-LOGIN_WINDOW);
+
+    $stmt = db()->prepare(
+        'SELECT COALESCE(SUM(email = ?), 0), COALESCE(SUM(ip = ?), 0) FROM login_attempts WHERE attempted_at > ? AND (email = ? OR ip = ?)'
+    );
+    $stmt->execute([$email, $ip, $since, $email, $ip]);
+    [$byEmail, $byIp] = array_map('intval', $stmt->fetch(PDO::FETCH_NUM));
+    if ($byEmail >= LOGIN_MAX_PER_EMAIL || $byIp >= LOGIN_MAX_PER_IP) {
+        throw new HttpError(429, 'Demasiados intentos fallidos. Espera 15 minutos y vuelve a probar.');
+    }
+
+    $user = find_user_by_email($email);
     $password = isset($b['password']) && is_string($b['password']) ? $b['password'] : '';
     if (!$user || !$user['password_hash'] || !password_verify($password, $user['password_hash'])) {
+        db()->prepare('INSERT INTO login_attempts (email, ip, attempted_at) VALUES (?, ?, ?)')
+            ->execute([mb_substr($email, 0, 190), $ip, now_utc()]);
         throw new HttpError(401, 'Correo o contraseña incorrectos.');
     }
+
+    db()->prepare('DELETE FROM login_attempts WHERE email = ? OR attempted_at < ?')->execute([$email, $since]);
+    purge_expired();
     respond(['ok' => true, 'token' => create_session((int) $user['id']), 'user' => public_user($user)]);
+}
+
+// Cierra la sesión también en el servidor: el token deja de valer aunque alguien lo tenga
+function route_logout(): void
+{
+    $token = auth_token();
+    if ($token) db()->prepare('DELETE FROM sessions WHERE token = ?')->execute([$token]);
+    respond(['ok' => true]);
+}
+
+// Limpieza al iniciar sesión: sesiones caducadas y enlaces caducados hace más de una semana
+function purge_expired(): void
+{
+    db()->prepare('DELETE FROM sessions WHERE expires_at < ?')->execute([now_utc()]);
+    db()->prepare('DELETE FROM invites WHERE expires_at < ?')->execute([now_utc(-7 * 86400)]);
 }
 
 function upsert_access(int $userId, int $modelId, string $level): void
@@ -358,6 +391,8 @@ function route_set_access(): void
     $level = str_field($b, 'level');
     if (!$userId || !$modelId || $level === '') throw new HttpError(400, 'Faltan datos.');
     if (!in_array($level, ['none', 'view', 'edit'], true)) throw new HttpError(400, 'Nivel de acceso no válido.');
+    find_user($userId);
+    find_model($modelId);
 
     if ($level === 'none') {
         db()->prepare('DELETE FROM access WHERE user_id = ? AND model_id = ?')->execute([$userId, $modelId]);
@@ -478,7 +513,6 @@ $routes = [
     ['GET', '#^/me$#', 'route_me'],
     ['GET', '#^/users$#', 'route_list_users'],
     ['POST', '#^/users/invite$#', 'route_invite'],
-    ['POST', '#^/users/(\d+)/role$#', 'route_set_role'],
     ['POST', '#^/users/(\d+)/profile$#', 'route_update_profile'],
     ['DELETE', '#^/users/(\d+)$#', 'route_delete_user'],
     ['POST', '#^/users/(\d+)/send-access$#', 'route_send_access'],
@@ -487,6 +521,7 @@ $routes = [
     ['GET', '#^/invites/([\w-]+)$#', 'route_get_invite'],
     ['POST', '#^/invites/([\w-]+)/accept$#', 'route_accept_invite'],
     ['POST', '#^/login$#', 'route_login'],
+    ['POST', '#^/logout$#', 'route_logout'],
     ['POST', '#^/access$#', 'route_set_access'],
     ['GET', '#^/models$#', 'route_list_models'],
     ['POST', '#^/models$#', 'route_create_model'],
@@ -503,6 +538,7 @@ try {
 } catch (HttpError $e) {
     respond(['error' => $e->getMessage()], $e->status);
 } catch (Throwable $e) {
+    // El detalle (SQL, rutas) solo va al log del servidor, nunca a la respuesta.
     error_log('[api] ' . $e);
-    respond(['error' => 'Error interno del servidor: ' . $e->getMessage()], 500);
+    respond(['error' => 'Error interno del servidor.'], 500);
 }

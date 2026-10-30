@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="assets/agromillora-logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- El enlace de alta o de contraseña (?token=) no se envía a otros sitios (fuentes de Google) -->
+    <meta name="referrer" content="same-origin" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -22,8 +24,6 @@
       }
     </script>
     <script type="module" src="app/main.js"></script>
-    <!-- TEMPORAL: edición de texto en pantalla -->
-    <script type="module" src="app/devTextEdit.js"></script>
   </head>
   <body>
     <div id="root"></div>

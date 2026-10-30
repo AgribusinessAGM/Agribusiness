@@ -39,7 +39,7 @@ function AppShell() {
       : {};
 
   const closeSetPassword = () => {
-    window.history.replaceState(null, '', window.location.pathname.replace(/set-password\/?$/, ''));
+    window.history.replaceState(null, '', window.location.pathname);
     setRouteToken(null);
   };
 

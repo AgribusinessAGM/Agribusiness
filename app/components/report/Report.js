@@ -482,7 +482,7 @@ export function Report({ title }) {
         <!-- 1 · Portada -->
         <section className="report-page">
           <div style=${{ width: '100%', height: '100%', background: '#0f2a17', position: 'relative', overflow: 'hidden', color: '#fff' }}>
-            <img src="assets/portada-olivar.png" alt="" style=${{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.55 }} />
+            <img src="assets/portada-olivar.webp" alt="" style=${{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.55 }} />
             <div
               style=${{
                 position: 'absolute',

@@ -1,5 +1,4 @@
 import { html } from '../../lib/html.js';
-import { nf } from '../../engine/format.js';
 import { buildPnlHeader, buildPnlLayers } from '../../engine/pnlLayers.js';
 
 const LAB_W = 230;

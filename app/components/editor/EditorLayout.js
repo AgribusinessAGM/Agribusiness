@@ -385,7 +385,7 @@ export function EditorLayout() {
               <${PrecioTab} a=${a} r=${r} title="4. Precio" />
             <//>
           `}
-          ${etab === 'informe' && html`<${Report} title=${isIAG ? '7. Informe' : '7. Informe'} />`}
+          ${etab === 'informe' && html`<${Report} title="7. Informe" />`}
         </div>
       </div>
     </div>

@@ -1,6 +1,5 @@
 <?php
 // Conexión a MySQL/MariaDB, creación de tablas y datos de ejemplo.
-// Equivale a server/db.js de la versión Node.
 
 function config(): array
 {
@@ -53,10 +52,40 @@ function ensure_schema(PDO $pdo): void
         }
         // Los modelos van primero: los permisos de los usuarios de ejemplo apuntan a ellos.
         seed_models($pdo);
-        $adminId = seed_users($pdo);
+        // Los usuarios de ejemplo tienen una contraseña pública: solo en local.
+        $adminId = !empty(config()['demo_users']) ? seed_users($pdo) : null;
         if ($adminId) $pdo->prepare('UPDATE models SET created_by = ?')->execute([$adminId]);
     }
+    ensure_login_attempts($pdo);
+    ensure_first_admin($pdo);
     ensure_iag_model($pdo);
+}
+
+// Tabla de intentos de login fallidos (límite contra la fuerza bruta). Se añadió
+// después del esquema inicial, así que también se crea en bases de datos que ya existían.
+function ensure_login_attempts(PDO $pdo): void
+{
+    $pdo->exec(
+        'CREATE TABLE IF NOT EXISTS login_attempts (
+          id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+          email VARCHAR(190) NOT NULL,
+          ip VARCHAR(45) NOT NULL,
+          attempted_at DATETIME NOT NULL,
+          KEY (email, attempted_at),
+          KEY (ip, attempted_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+    );
+}
+
+// Producción: sin usuarios de ejemplo, el primer administrador es el correo de
+// admin_email. Se crea como invitado y entra con "He olvidado mi contraseña".
+function ensure_first_admin(PDO $pdo): void
+{
+    $email = mb_strtolower(trim((string) (config()['admin_email'] ?? '')));
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) return;
+    if ((int) $pdo->query('SELECT COUNT(*) FROM users')->fetchColumn() > 0) return;
+    $pdo->prepare('INSERT INTO users (name, email, org, status, role, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+        ->execute(['Administrador', $email, 'Agromillora', 'invited', 'admin', now_utc()]);
 }
 
 // Modelo Torrimpietra (motor IAG). Se añadió después de los modelos de ejemplo,
@@ -81,6 +110,7 @@ function ensure_iag_model(PDO $pdo): void
 }
 
 // Usuarios de ejemplo, con una contraseña conocida para poder probar el login.
+// Solo se crean con 'demo_users' => true en config.php (pruebas en local).
 const DEMO_PASSWORD = 'agromillora2026';
 
 function seed_users(PDO $pdo): ?int

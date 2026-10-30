@@ -17,6 +17,15 @@ return [
     // créala desde el panel y pon aquí su nombre, usuario y contraseña.
     'db_autocreate' => true,
 
+    // ---------- Primer administrador ----------
+    // Mientras no haya ninguna cuenta, se crea un administrador con este correo.
+    // Entra pidiendo "He olvidado mi contraseña" en el login (necesita SMTP).
+    'admin_email' => '',
+
+    // Solo en local: crea los usuarios de ejemplo (contraseña "agromillora2026",
+    // ver README) al crear la base de datos. En producción, siempre false.
+    'demo_users' => false,
+
     // ---------- URL pública de la app ----------
     // Se usa para construir el enlace "crea tu contraseña" de las invitaciones.
     // Debe apuntar a la carpeta donde está index.html, sin barra final.
